@@ -4247,3 +4247,19 @@ text-component {
     font-size: max(1rem, 100%);
   }
 }
+
+
+/* Preorder badge styles */
+.preorder-badge {
+  display: inline-block;
+  background: var(--color-primary);
+  color: var(--color-primary-button-text);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-top: 0.5rem;
+}
+
