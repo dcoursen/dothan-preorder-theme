@@ -17,7 +17,7 @@
   endif
 
   # ===========================================
-  # PREORDER LOGIC - CORRECTED
+  # PREORDER LOGIC WITH SMART DATE/TIME FORMATTING
   # ===========================================
   
   # Get preorder metafields
@@ -31,6 +31,7 @@
   assign preorder_formatted_drop_date = ''
   assign preorder_formatted_pickup_start = ''
   assign preorder_formatted_pickup_end = ''
+  assign preorder_smart_drop_text = ''
   
   # Check if this is a preorder product
   if preorder_drop_date != blank
@@ -38,12 +39,45 @@
     assign current_date = 'now' | date: '%s'
     assign drop_date_timestamp = preorder_drop_date | date: '%s'
     
-    # Format the drop date for display
-    assign preorder_formatted_drop_date = preorder_drop_date | date: '%B %-d'
-    
     # Check if we're before the drop date (coming soon)
     if current_date < drop_date_timestamp
       assign preorder_is_coming_soon = true
+      
+      # Create smart date/time formatting for drop date
+      # current_day: 0=Sunday, 1=Monday, etc.
+      assign current_day = 'now' | date: '%w'
+      assign drop_day = preorder_drop_date | date: '%w'
+      assign drop_date_only = preorder_drop_date | date: '%Y-%m-%d'
+      assign current_date_only = 'now' | date: '%Y-%m-%d'
+      
+      # Calculate days difference
+      assign current_date_timestamp = current_date_only | date: '%s'
+      assign drop_date_only_timestamp = drop_date_only | date: '%s'
+      assign days_diff = drop_date_only_timestamp | minus: current_date_timestamp | divided_by: 86400
+      
+      # Format time in EST (assuming drop date is in UTC)
+      assign drop_time_est = preorder_drop_date | date: '%l:%M%p EST'
+      assign drop_day_name = preorder_drop_date | date: '%A'
+      
+      # Create smart relative date text
+      if days_diff == 0
+        assign preorder_smart_drop_text = 'Today @ ' | append: drop_time_est
+      elsif days_diff == 1
+        assign preorder_smart_drop_text = 'Tomorrow @ ' | append: drop_time_est
+      elsif days_diff <= 6
+        # Within a week - use day name
+        if days_diff == 1
+          assign preorder_smart_drop_text = 'This ' | append: drop_day_name | append: ' @ ' | append: drop_time_est
+        elsif days_diff <= 3
+          assign preorder_smart_drop_text = 'This ' | append: drop_day_name | append: ' @ ' | append: drop_time_est
+        else
+          assign preorder_smart_drop_text = drop_day_name | append: ' @ ' | append: drop_time_est
+        endif
+      else
+        # More than a week away - use date
+        assign drop_month_day = preorder_drop_date | date: '%B %-d'
+        assign preorder_smart_drop_text = drop_month_day | append: ' @ ' | append: drop_time_est
+      endif
     endif
     
     # Format pickup dates for informational display (not logic)
@@ -58,6 +92,9 @@
         assign preorder_formatted_pickup_end = pickup_end_timestamp | date: '%B %-d'
       endif
     endif
+    
+    # Fallback formatting
+    assign preorder_formatted_drop_date = preorder_drop_date | date: '%B %-d'
   endif
 
   # ===========================================
@@ -87,26 +124,15 @@
   if preorder_is_preorder and preorder_is_coming_soon
     # Before drop date - always disabled, regardless of inventory
     assign can_add_to_cart = false
-    assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_formatted_drop_date
+    if preorder_smart_drop_text != blank
+      assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_smart_drop_text
+    else
+      assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_formatted_drop_date
+    endif
   endif
   
   # After drop date, preorder products work exactly like normal products (inventory-dependent)
 %}
-
-<!-- DEBUG: Preorder Logic in Buy Buttons -->
-<div style="background: orange; padding: 10px; margin: 10px 0; border: 2px solid #ff6600; border-radius: 5px; font-size: 12px;">
-  <strong>🔧 DEBUG - Buy Buttons Preorder Logic (FIXED):</strong><br>
-  Product: {{ product.title }}<br>
-  Is Preorder: {{ preorder_is_preorder }}<br>
-  Is Coming Soon: {{ preorder_is_coming_soon }}<br>
-  Drop Date: {{ preorder_drop_date }}<br>
-  Pickup Start: {{ preorder_pickup_start }}<br>
-  Formatted Drop: {{ preorder_formatted_drop_date }}<br>
-  Current Inventory: {{ inventory_quantity }}<br>
-  Inventory Managed: {{ inventory_managed }}<br>
-  Can Add to Cart: {{ can_add_to_cart }}<br>
-  Button Text: {{ add_to_cart_text }}<br>
-</div>
 
 <span
   class="buy-buttons-block buy-buttons-block--{{ block.id }}"
