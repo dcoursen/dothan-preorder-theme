@@ -4263,3 +4263,18 @@ text-component {
   margin-top: 0.5rem;
 }
 
+
+
+/* Preorder text styling - plain text at bottom of card */
+.preorder-text {
+  display: block;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+  text-align: center;
+  background: none;
+  border: none;
+  font-weight: normal;
+  text-transform: none;
+}
+
