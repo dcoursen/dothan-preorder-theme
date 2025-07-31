@@ -46,7 +46,7 @@
   "
 >
   <div class="section-resource-list__header">
-    {%- render 'block' with, type: '_product-list-content', id: 'static-header' -%}
+    {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
   </div>
 
   {% capture list_items %}
@@ -60,7 +60,7 @@
       <div
         class="resource-list__item"
       >
-        {% render 'block' with, type: '_product-card', id: 'static-product-card', closest.product: product %}
+        {% content_for 'block', type: '_product-card', id: 'static-product-card', closest.product: product %}
       </div>
 
       {% unless forloop.last %}

@@ -61,7 +61,7 @@
         class="product-information__media"
         data-testid="product-information-media"
       >
-        {%- render 'block' with
+        {%- content_for 'block',
           type: '_product-media-gallery',
           id: 'media-gallery',
           closest.product: closest.product
@@ -70,7 +70,7 @@
     {% endcapture %}
 
     {% capture details %}
-      {% render 'block' with
+      {% content_for 'block',
         type: '_product-details',
         id: 'product-details',
         closest.product: closest.product
