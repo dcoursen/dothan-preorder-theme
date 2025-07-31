@@ -137,3 +137,15 @@
   {% assign preorder_smart_pickup_start = smart_pickup_start %}
   {% assign preorder_smart_pickup_end = smart_pickup_end %}
   {% assign preorder_pickup_end_date = pickup_end_date %}
+  {% comment %} DEBUG - Remove in production {% endcomment %}
+{% if product.handle == 'spider-lily-surprise-resurrection-hurricane-yellow' %}
+    <div style="background: yellow; padding: 10px; margin: 10px; font-size: 12px;">
+      DEBUG: Product Handle: {{ product.handle }}<br>
+      Drop Date: {{ product.metafields.custom.preorder_drop_date.value }}<br>
+      Pickup Start: {{ product.metafields.custom.preorder_pickup_start.value }}<br>
+      Is Preorder: {{ is_preorder }}<br>
+      Is Coming Soon: {{ is_coming_soon }}<br>
+      Now: {{ now }}<br>
+      Drop Timestamp: {{ drop_timestamp }}
+    </div>
+  {% endif %}
