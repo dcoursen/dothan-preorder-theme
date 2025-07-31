@@ -10,14 +10,17 @@
   
   # Check for sold out products with future drop dates
   if product.available == false
-    if product.metafields.custom.drop_date != blank
-      assign drop_date = product.metafields.custom.drop_date | date: '%s'
+    # Try different possible metafield names for drop date
+    assign drop_date_field = product.metafields.custom.preorder_drop_date | default: product.metafields.custom.drop_date
+    
+    if drop_date_field != blank
+      assign drop_date = drop_date_field | date: '%s'
       assign days_until_drop = drop_date | minus: today | divided_by: 86400
       
       # Show if the drop date is in the future
       if days_until_drop > 0
         assign is_preorder = true
-        assign preorder_text = 'Available ' | append: product.metafields.custom.drop_date | date: '%m/%d'
+        assign preorder_text = 'Available ' | append: drop_date_field | date: '%m/%d'
       endif
     endif
     
@@ -31,6 +34,4 @@
 
 {%- if is_preorder -%}
   <span class="preorder-badge">{{ preorder_text }}</span>
-{%- else -%}
-  {%- comment -%}Allow fallback to other badge logic{%- endcomment -%}
 {%- endif -%}
