@@ -1,0 +1,139 @@
+{% comment %}
+  Preorder Logic Snippet
+  
+  Usage: {% render 'preorder-logic', product: product %}
+  
+  This snippet handles:
+  - Drop date availability logic
+  - Pickup date display and calculation
+  - Smart date formatting
+  - Coming soon vs sold out states
+  
+  Required metafields:
+  - custom.preorder_drop_date (datetime)
+  - custom.preorder_pickup_start (datetime)
+  - custom.pickup_duration_days (number, optional, defaults to 14)
+{% endcomment %}
+
+{% liquid
+    # Get current time in store timezone
+    assign now = 'now' | date: '%s'
+    assign store_timezone = shop.timezone | default: 'America/New_York'
+    
+    # Get metafield values
+    assign drop_date = product.metafields.custom.preorder_drop_date.value
+    assign pickup_start = product.metafields.custom.preorder_pickup_start.value
+    assign pickup_duration = product.metafields.custom.pickup_duration_days.value | default: 14
+    
+    # Initialize states
+    assign is_preorder = false
+    assign is_coming_soon = false
+    assign show_pickup_dates = false
+    assign pickup_end_date = null
+    assign smart_drop_date = ''
+    assign smart_pickup_start = ''
+    assign smart_pickup_end = ''
+    
+    # Check if this is a preorder product
+    if drop_date != blank and pickup_start != blank
+      assign is_preorder = true
+      
+      # Convert dates to timestamps for comparison
+      assign drop_timestamp = drop_date | date: '%s'
+      assign pickup_start_timestamp = pickup_start | date: '%s'
+      
+      # Calculate pickup end date
+      assign pickup_end_seconds = pickup_start_timestamp | plus: pickup_duration | times: 86400
+      assign pickup_end_date = pickup_end_seconds | date: '%Y-%m-%d %H:%M:%S %z'
+      
+      # Determine if product is coming soon (before drop date)
+      if now < drop_timestamp
+        assign is_coming_soon = true
+      endif
+      
+      # Show pickup dates if drop date has passed
+      if now >= drop_timestamp
+        assign show_pickup_dates = true
+      endif
+      
+      # Generate smart date formatting
+      assign smart_drop_date = drop_date | date: '%s' | minus: now | divided_by: 86400
+      assign smart_pickup_start = pickup_start | date: '%s' | minus: now | divided_by: 86400
+      assign smart_pickup_end = pickup_end_seconds | minus: now | divided_by: 86400
+    endif
+  %}
+  
+  {% comment %} Smart Date Formatting Logic {% endcomment %}
+  {% if is_preorder %}
+    {% liquid
+      # Format drop date smartly
+      if smart_drop_date == 0
+        # Today - show time remaining
+        assign time_diff = drop_timestamp | minus: now
+        assign hours_remaining = time_diff | divided_by: 3600
+        assign minutes_remaining = time_diff | modulo: 3600 | divided_by: 60
+        
+        if hours_remaining < 1
+          assign smart_drop_date = minutes_remaining | append: ' minutes'
+        elsif hours_remaining < 24
+          assign smart_drop_date = hours_remaining | append: ' hours'
+        else
+          assign smart_drop_date = 'today'
+        endif
+      elsif smart_drop_date > 0 and smart_drop_date <= 6
+        # This week - show day name
+        assign day_name = drop_date | date: '%A'
+        assign current_day = now | date: '%A'
+        
+        if day_name == current_day
+          assign smart_drop_date = 'today'
+        elsif smart_drop_date == 1
+          assign smart_drop_date = 'tomorrow'
+        elsif smart_drop_date <= 6
+          assign smart_drop_date = 'this ' | append: day_name
+        endif
+      else
+        # More than 6 days - show actual date
+        assign smart_drop_date = drop_date | date: '%B %d'
+      endif
+      
+      # Format pickup start date smartly  
+      if smart_pickup_start == 0
+        assign smart_pickup_start = 'today'
+      elsif smart_pickup_start == 1
+        assign smart_pickup_start = 'tomorrow'
+      elsif smart_pickup_start > 0 and smart_pickup_start <= 6
+        assign day_name = pickup_start | date: '%A'
+        assign smart_pickup_start = 'this ' | append: day_name
+      elsif smart_pickup_start > 6 and smart_pickup_start <= 13
+        assign day_name = pickup_start | date: '%A'
+        assign smart_pickup_start = 'next ' | append: day_name
+      else
+        assign smart_pickup_start = pickup_start | date: '%A %m/%d'
+      endif
+      
+      # Format pickup end date smartly
+      if smart_pickup_end == 0
+        assign smart_pickup_end = 'today'
+      elsif smart_pickup_end == 1
+        assign smart_pickup_end = 'tomorrow'
+      elsif smart_pickup_end > 0 and smart_pickup_end <= 6
+        assign day_name = pickup_end_date | date: '%A'
+        assign smart_pickup_end = 'this ' | append: day_name
+      elsif smart_pickup_end > 6 and smart_pickup_end <= 13
+        assign day_name = pickup_end_date | date: '%A'
+        assign smart_pickup_end = 'next ' | append: day_name
+      else
+        assign smart_pickup_end = pickup_end_date | date: '%A %m/%d'
+      endif
+    %}
+  {% endif %}
+  
+  {% comment %} Make variables available to parent template {% endcomment %}
+  {% assign preorder_is_preorder = is_preorder %}
+  {% assign preorder_is_coming_soon = is_coming_soon %}
+  {% assign preorder_show_pickup_dates = show_pickup_dates %}
+  {% assign preorder_smart_drop_date = smart_drop_date %}
+  {% assign preorder_smart_pickup_start = smart_pickup_start %}
+  {% assign preorder_smart_pickup_end = smart_pickup_end %}
+  {% assign preorder_pickup_end_date = pickup_end_date %}
