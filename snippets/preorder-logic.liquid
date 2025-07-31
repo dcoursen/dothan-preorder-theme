@@ -1,0 +1,27 @@
+{%- comment -%}
+  Preorder Logic Snippet
+  Determines if a product/variant is available for preorder
+{%- endcomment -%}
+
+{%- liquid
+  assign is_preorder = false
+  assign preorder_text = 'Coming Soon'
+  
+  if product.available == false
+    assign is_preorder = true
+  elsif product.selected_or_first_available_variant.inventory_quantity <= 0 and product.selected_or_first_available_variant.inventory_policy == 'continue'
+    assign is_preorder = true
+  endif
+  
+  if product.metafields.custom.preorder_enabled == true
+    assign is_preorder = true
+  endif
+  
+  if product.metafields.custom.preorder_text != blank
+    assign preorder_text = product.metafields.custom.preorder_text
+  endif
+-%}
+
+{%- if is_preorder -%}
+  <span class="preorder-badge">{{ preorder_text }}</span>
+{%- endif -%}
