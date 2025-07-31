@@ -1,6 +1,6 @@
 {%- comment -%}
   Preorder Logic Snippet
-  Only shows preorder dates for sold out products with future drop dates
+  Shows preorder dates for sold out products with future drop dates
 {%- endcomment -%}
 
 {%- liquid
@@ -8,24 +8,29 @@
   assign preorder_text = ''
   assign today = 'now' | date: '%s'
   
-  # Only show preorder logic for products that are sold out AND have a future drop date
-  if product.available == false and product.metafields.custom.drop_date != blank
-    assign drop_date = product.metafields.custom.drop_date | date: '%s'
-    assign days_until_drop = drop_date | minus: today | divided_by: 86400
-    
-    # Only show if the drop date is in the future
-    if days_until_drop > 0
-      assign is_preorder = true
-      assign preorder_text = 'Available ' | append: product.metafields.custom.drop_date | date: '%m/%d'
+  # Check for sold out products with future drop dates
+  if product.available == false
+    if product.metafields.custom.drop_date != blank
+      assign drop_date = product.metafields.custom.drop_date | date: '%s'
+      assign days_until_drop = drop_date | minus: today | divided_by: 86400
+      
+      # Show if the drop date is in the future
+      if days_until_drop > 0
+        assign is_preorder = true
+        assign preorder_text = 'Available ' | append: product.metafields.custom.drop_date | date: '%m/%d'
+      endif
     endif
-  endif
-  
-  # Override with custom text if provided
-  if is_preorder and product.metafields.custom.preorder_text != blank
-    assign preorder_text = product.metafields.custom.preorder_text
+    
+    # Override with custom text if provided
+    if product.metafields.custom.preorder_text != blank
+      assign is_preorder = true
+      assign preorder_text = product.metafields.custom.preorder_text
+    endif
   endif
 -%}
 
 {%- if is_preorder -%}
   <span class="preorder-badge">{{ preorder_text }}</span>
+{%- else -%}
+  {%- comment -%}Allow fallback to other badge logic{%- endcomment -%}
 {%- endif -%}
