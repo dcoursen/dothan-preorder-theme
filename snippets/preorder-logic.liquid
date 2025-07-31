@@ -1,61 +1,30 @@
 {%- comment -%}
   Preorder Logic Snippet
-  Determines if a product/variant is available for preorder and shows appropriate date messaging
+  Shows preorder dates only for products with future drop dates
 {%- endcomment -%}
 
 {%- liquid
   assign is_preorder = false
-  assign preorder_text = 'Available'
+  assign preorder_text = ''
   assign today = 'now' | date: '%s'
-  assign today_weekday = 'now' | date: '%w'
   
-  # Check if product should show as preorder
-  if product.available == false
-    assign is_preorder = true
-  elsif product.selected_or_first_available_variant.inventory_quantity <= 0 and product.selected_or_first_available_variant.inventory_policy == 'continue'
-    assign is_preorder = true
-  endif
-  
-  # Check for custom preorder metafields
-  if product.metafields.custom.preorder_enabled == true
-    assign is_preorder = true
-  endif
-  
-  # Determine the preorder text based on date logic
-  if is_preorder
-    if product.metafields.custom.available_date != blank
-      assign available_date = product.metafields.custom.available_date | date: '%s'
-      assign days_until_available = available_date | minus: today | divided_by: 86400
+  # Only show preorder logic if there's a future available_date metafield
+  if product.metafields.custom.available_date != blank
+    assign available_date = product.metafields.custom.available_date | date: '%s'
+    assign days_until_available = available_date | minus: today | divided_by: 86400
+    
+    # Only show if the date is in the future
+    if days_until_available > 0
+      assign is_preorder = true
       
-      if days_until_available <= 7
-        assign available_weekday = product.metafields.custom.available_date | date: '%w'
-        if available_weekday == 1
-          if days_until_available <= 3
-            assign preorder_text = 'Available this Monday'
-          else
-            assign preorder_text = 'Available next Monday'
-          endif
-        else
-          assign preorder_text = 'Available ' | append: product.metafields.custom.available_date | date: '%B %d'
-        endif
-      else
-        assign preorder_text = 'Available ' | append: product.metafields.custom.available_date | date: '%B %d'
-      endif
-    elsif product.metafields.custom.preorder_text != blank
-      assign preorder_text = product.metafields.custom.preorder_text
-    else
-      # Default logic for Monday release
-      assign days_until_monday = 1 | minus: today_weekday
-      if days_until_monday <= 0
-        assign days_until_monday = days_until_monday | plus: 7
-      endif
-      
-      if days_until_monday <= 3
-        assign preorder_text = 'Available this Monday'
-      else
-        assign preorder_text = 'Available next Monday'
-      endif
+      # Show actual date in MM/DD format
+      assign preorder_text = 'Available ' | append: product.metafields.custom.available_date | date: '%m/%d'
     endif
+  endif
+  
+  # Override with custom text if provided (for future dates only)
+  if is_preorder and product.metafields.custom.preorder_text != blank
+    assign preorder_text = product.metafields.custom.preorder_text
   endif
 -%}
 
