@@ -19,7 +19,7 @@
   >
     {% paginate search.results by 24 %}
       {% if search.results_count > 0 %}
-        {% content_for 'block', type: 'filters', id: 'filters', results: search, results_size: search.results_count %}
+        {% render 'block' with, type: 'filters', id: 'filters', results: search, results_size: search.results_count %}
         {% assign products = search.results | where: 'object_type', 'product' %}
       {% else %}
         {% assign collection = settings.empty_state_collection | default: collections.all %}
@@ -37,7 +37,7 @@
             data-product-id="{{ product.id }}"
             ref="cards[]"
           >
-            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+            {% render 'block' with, type: '_product-card', id: 'product-card', closest.product: product %}
           </li>
         {% endfor %}
       {% endcapture %}
