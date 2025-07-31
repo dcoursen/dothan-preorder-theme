@@ -1,0 +1,370 @@
+{% doc %}
+  @prompt
+    create a custom theme section for the footer, that allows for me to hav e three texts nect to each other, it should look like a multicolumn buti need it for the footer to add texts
+
+{% enddoc %}
+{% assign ai_gen_id = section.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-footer-multicolumn-{{ ai_gen_id }} {
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    background-color: {{ section.settings.background_color }};
+    color: {{ section.settings.text_color }};}
+
+  .ai-footer-multicolumn__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-footer-multicolumn__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: {{ section.settings.column_gap }}px;
+    align-items: start;
+  }
+
+  .ai-footer-multicolumn__column-{{ ai_gen_id }} {
+    text-align: {{ section.settings.text_alignment }};
+  }
+
+  .ai-footer-multicolumn__heading-{{ ai_gen_id }} {
+    font-size: {{ section.settings.heading_size }}px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: {{ section.settings.heading_color }};
+  }
+
+  .ai-footer-multicolumn__text-{{ ai_gen_id }} {
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .ai-footer-multicolumn__text-{{ ai_gen_id }} p {
+    margin: 0 0 12px;
+  }
+
+  .ai-footer-multicolumn__text-{{ ai_gen_id }} p:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-footer-multicolumn__text-{{ ai_gen_id }} a {
+    color: {{ section.settings.link_color }};
+    text-decoration: none;
+  }
+
+  .ai-footer-multicolumn__text-{{ ai_gen_id }} a:hover {
+    color: {{ section.settings.link_hover_color }};
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-footer-multicolumn__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+      gap: {{ section.settings.mobile_gap }}px;
+    }
+
+    .ai-footer-multicolumn__column-{{ ai_gen_id }} {
+      text-align: {{ section.settings.mobile_text_alignment }};
+    }
+
+    .ai-footer-multicolumn__heading-{{ ai_gen_id }} {
+      font-size: {{ section.settings.mobile_heading_size }}px;
+    }
+
+    .ai-footer-multicolumn__text-{{ ai_gen_id }} {
+      font-size: {{ section.settings.mobile_text_size }}px;
+    }
+  }
+{% endstyle %}<footer class="ai-footer-multicolumn-{{ ai_gen_id }}">
+  <div class="ai-footer-multicolumn__container-{{ ai_gen_id }}">
+    <div class="ai-footer-multicolumn__grid-{{ ai_gen_id }}">
+      <div class="ai-footer-multicolumn__column-{{ ai_gen_id }}">
+        {% if section.settings.column_1_heading != blank %}
+          <h3 class="ai-footer-multicolumn__heading-{{ ai_gen_id }}">
+            {{ section.settings.column_1_heading }}
+          </h3>
+        {% endif %}
+        {% if section.settings.column_1_text != blank %}
+          <div class="ai-footer-multicolumn__text-{{ ai_gen_id }}">
+            {{ section.settings.column_1_text }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ai-footer-multicolumn__column-{{ ai_gen_id }}">
+        {% if section.settings.column_2_heading != blank %}
+          <h3 class="ai-footer-multicolumn__heading-{{ ai_gen_id }}">
+            {{ section.settings.column_2_heading }}
+          </h3>
+        {% endif %}
+        {% if section.settings.column_2_text != blank %}
+          <div class="ai-footer-multicolumn__text-{{ ai_gen_id }}">
+            {{ section.settings.column_2_text }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ai-footer-multicolumn__column-{{ ai_gen_id }}">
+        {% if section.settings.column_3_heading != blank %}
+          <h3 class="ai-footer-multicolumn__heading-{{ ai_gen_id }}">
+            {{ section.settings.column_3_heading }}
+          </h3>
+        {% endif %}
+        {% if section.settings.column_3_text != blank %}
+          <div class="ai-footer-multicolumn__text-{{ ai_gen_id }}">
+            {{ section.settings.column_3_text }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer Multicolumn Text",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Column 1"
+    },
+    {
+      "type": "text",
+      "id": "column_1_heading",
+      "label": "Heading",
+      "default": "About Us"
+    },
+    {
+      "type": "richtext",
+      "id": "column_1_text",
+      "label": "Text",
+      "default": "<p>Share information about your brand with your customers. Describe a product, make announcements, or welcome customers to your store.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Column 2"
+    },
+    {
+      "type": "text",
+      "id": "column_2_heading",
+      "label": "Heading",
+      "default": "Customer Service"
+    },
+    {
+      "type": "richtext",
+      "id": "column_2_text",
+      "label": "Text",
+      "default": "<p>Contact us for any questions or support. We're here to help you with your shopping experience.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Column 3"
+    },
+    {
+      "type": "text",
+      "id": "column_3_heading",
+      "label": "Heading",
+      "default": "Quick Links"
+    },
+    {
+      "type": "richtext",
+      "id": "column_3_text",
+      "label": "Text",
+      "default": "<p><a href=\"/pages/shipping\">Shipping Info</a><br><a href=\"/pages/returns\">Returns</a><br><a href=\"/pages/faq\">FAQ</a></p>"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Column spacing",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Mobile Layout"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "mobile_text_alignment",
+      "label": "Mobile text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "mobile_gap",
+      "min": 16,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile column spacing",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_size",
+      "min": 14,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "label": "Mobile heading size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile text size",
+      "default": 14
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Multicolumn Text"
+    }
+  ]
+}
+{% endschema %}
