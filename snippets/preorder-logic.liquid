@@ -1,12 +1,13 @@
 {%- comment -%}
   Preorder Logic Snippet
-  Shows preorder dates for sold out products with future drop dates
+  Shows preorder dates with smart day/time formatting
 {%- endcomment -%}
 
 {%- liquid
   assign is_preorder = false
   assign preorder_text = ''
   assign today = 'now' | date: '%s'
+  assign today_weekday = 'now' | date: '%w'
   
   # Check for sold out products with future drop dates
   if product.available == false
@@ -16,11 +17,38 @@
     if drop_date_field != blank
       assign drop_date = drop_date_field | date: '%s'
       assign days_until_drop = drop_date | minus: today | divided_by: 86400
+      assign drop_weekday = drop_date_field | date: '%w'
       
       # Show if the drop date is in the future
       if days_until_drop > 0
         assign is_preorder = true
-        assign preorder_text = 'Available ' | append: drop_date_field | date: '%m/%d'
+        
+        # If within the next 7 days, show day name with time
+        if days_until_drop <= 7
+          assign day_name = ''
+          case drop_weekday
+            when '0'
+              assign day_name = 'Sunday'
+            when '1'
+              assign day_name = 'Monday'
+            when '2'
+              assign day_name = 'Tuesday'
+            when '3'
+              assign day_name = 'Wednesday'
+            when '4'
+              assign day_name = 'Thursday'
+            when '5'
+              assign day_name = 'Friday'
+            when '6'
+              assign day_name = 'Saturday'
+          endcase
+          
+          assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
+          assign preorder_text = 'Available this ' | append: day_name | append: ' @ ' | append: time_with_tz
+        else
+          # Show MM/DD format for dates more than a week away
+          assign preorder_text = 'Available ' | append: drop_date_field | date: '%m/%d'
+        endif
       endif
     endif
     
