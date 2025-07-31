@@ -1,6 +1,6 @@
 {%- comment -%}
   Preorder Logic Snippet
-  Shows preorder dates only for products with future drop dates
+  Only shows preorder dates for sold out products with future drop dates
 {%- endcomment -%}
 
 {%- liquid
@@ -8,21 +8,19 @@
   assign preorder_text = ''
   assign today = 'now' | date: '%s'
   
-  # Only show preorder logic if there's a future drop_date metafield
-  if product.metafields.custom.drop_date != blank
+  # Only show preorder logic for products that are sold out AND have a future drop date
+  if product.available == false and product.metafields.custom.drop_date != blank
     assign drop_date = product.metafields.custom.drop_date | date: '%s'
     assign days_until_drop = drop_date | minus: today | divided_by: 86400
     
-    # Only show if the date is in the future
+    # Only show if the drop date is in the future
     if days_until_drop > 0
       assign is_preorder = true
-      
-      # Show actual date in MM/DD format
       assign preorder_text = 'Available ' | append: product.metafields.custom.drop_date | date: '%m/%d'
     endif
   endif
   
-  # Override with custom text if provided (for future dates only)
+  # Override with custom text if provided
   if is_preorder and product.metafields.custom.preorder_text != blank
     assign preorder_text = product.metafields.custom.preorder_text
   endif
