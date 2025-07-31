@@ -8,17 +8,17 @@
   assign preorder_text = ''
   assign today = 'now' | date: '%s'
   
-  # Only show preorder logic if there's a future available_date metafield
-  if product.metafields.custom.available_date != blank
-    assign available_date = product.metafields.custom.available_date | date: '%s'
-    assign days_until_available = available_date | minus: today | divided_by: 86400
+  # Only show preorder logic if there's a future drop_date metafield
+  if product.metafields.custom.drop_date != blank
+    assign drop_date = product.metafields.custom.drop_date | date: '%s'
+    assign days_until_drop = drop_date | minus: today | divided_by: 86400
     
     # Only show if the date is in the future
-    if days_until_available > 0
+    if days_until_drop > 0
       assign is_preorder = true
       
       # Show actual date in MM/DD format
-      assign preorder_text = 'Available ' | append: product.metafields.custom.available_date | date: '%m/%d'
+      assign preorder_text = 'Available ' | append: product.metafields.custom.drop_date | date: '%m/%d'
     endif
   endif
   
