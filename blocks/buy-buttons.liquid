@@ -3,25 +3,69 @@
   if request.visual_preview_mode and product == blank
     assign product = collections.all.products.first
   endif
-  
-  # Include preorder logic
-  render 'preorder-logic', product: product
-  
+
   assign variant = closest.product.selected_or_first_available_variant
   assign inventory_quantity = variant.inventory_quantity
   assign inventory_policy = variant.inventory_policy
+
   if variant.inventory_management == 'shopify'
     assign inventory_managed = true
   endif
+
   if variant.quantity_rule.min > variant.inventory_quantity and inventory_managed and inventory_policy == 'deny'
     assign quantity_rule_soldout = true
   endif
+
+  # ===========================================
+  # PREORDER LOGIC - CORRECTED
+  # ===========================================
   
-  # Preorder logic overrides standard availability logic
-  if preorder_is_preorder and preorder_is_coming_soon
-    assign can_add_to_cart = false
-    assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_smart_drop_date
-  elsif inventory_managed
+  # Get preorder metafields
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
+  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
+  assign pickup_duration_days = product.metafields.custom.pickup_duration_days.value
+  
+  # Initialize preorder variables
+  assign preorder_is_preorder = false
+  assign preorder_is_coming_soon = false
+  assign preorder_formatted_drop_date = ''
+  assign preorder_formatted_pickup_start = ''
+  assign preorder_formatted_pickup_end = ''
+  
+  # Check if this is a preorder product
+  if preorder_drop_date != blank
+    assign preorder_is_preorder = true
+    assign current_date = 'now' | date: '%s'
+    assign drop_date_timestamp = preorder_drop_date | date: '%s'
+    
+    # Format the drop date for display
+    assign preorder_formatted_drop_date = preorder_drop_date | date: '%B %-d'
+    
+    # Check if we're before the drop date (coming soon)
+    if current_date < drop_date_timestamp
+      assign preorder_is_coming_soon = true
+    endif
+    
+    # Format pickup dates for informational display (not logic)
+    if preorder_pickup_start != blank
+      assign preorder_formatted_pickup_start = preorder_pickup_start | date: '%B %-d'
+      
+      # Calculate pickup end date if duration is specified
+      if pickup_duration_days != blank and pickup_duration_days > 0
+        assign pickup_start_timestamp = preorder_pickup_start | date: '%s'
+        assign duration_seconds = pickup_duration_days | times: 86400
+        assign pickup_end_timestamp = pickup_start_timestamp | plus: duration_seconds
+        assign preorder_formatted_pickup_end = pickup_end_timestamp | date: '%B %-d'
+      endif
+    endif
+  endif
+
+  # ===========================================
+  # BUTTON LOGIC - CORRECTED
+  # ===========================================
+  
+  # Standard inventory logic first
+  if inventory_managed
     if inventory_quantity <= 0 and inventory_policy == 'deny' or quantity_rule_soldout
       assign can_add_to_cart = false
       assign add_to_cart_text = 'products.product.sold_out' | t
@@ -38,7 +82,32 @@
       assign add_to_cart_text = 'products.product.unavailable' | t
     endif
   endif
+  
+  # Override ONLY if preorder and coming soon
+  if preorder_is_preorder and preorder_is_coming_soon
+    # Before drop date - always disabled, regardless of inventory
+    assign can_add_to_cart = false
+    assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_formatted_drop_date
+  endif
+  
+  # After drop date, preorder products work exactly like normal products (inventory-dependent)
 %}
+
+<!-- DEBUG: Preorder Logic in Buy Buttons -->
+<div style="background: orange; padding: 10px; margin: 10px 0; border: 2px solid #ff6600; border-radius: 5px; font-size: 12px;">
+  <strong>🔧 DEBUG - Buy Buttons Preorder Logic (FIXED):</strong><br>
+  Product: {{ product.title }}<br>
+  Is Preorder: {{ preorder_is_preorder }}<br>
+  Is Coming Soon: {{ preorder_is_coming_soon }}<br>
+  Drop Date: {{ preorder_drop_date }}<br>
+  Pickup Start: {{ preorder_pickup_start }}<br>
+  Formatted Drop: {{ preorder_formatted_drop_date }}<br>
+  Current Inventory: {{ inventory_quantity }}<br>
+  Inventory Managed: {{ inventory_managed }}<br>
+  Can Add to Cart: {{ can_add_to_cart }}<br>
+  Button Text: {{ add_to_cart_text }}<br>
+</div>
+
 <span
   class="buy-buttons-block buy-buttons-block--{{ block.id }}"
   {{ block.shopify_attributes }}
@@ -70,7 +139,10 @@
           class="product-form-buttons spacing-style{% if block.settings.stacking %} product-form-buttons--stacked{% endif %}"
           style="{% render 'spacing-style', settings: block.settings %}"
         >
-          {% content_for 'block', type: 'quantity', id: 'quantity' %}
+          {% if can_add_to_cart %}
+            {% content_for 'block', type: 'quantity', id: 'quantity' %}
+          {% endif %}
+
           {% content_for 'block',
             type: 'add-to-cart',
             id: 'add-to-cart',
@@ -106,14 +178,17 @@
     </div>
   {%- endif -%}
 </span>
+
 {% if block.settings.show_pickup_availability %}
   <script
     src="{{ 'local-pickup.js' | asset_url }}"
     type="module"
   ></script>
+
   {%- assign pick_up_availabilities = closest.product.selected_or_first_available_variant.store_availabilities
     | where: 'pick_up_enabled', true
   -%}
+
   <local-pickup
     class="spacing-style product__pickup-availabilities"
     {% if pick_up_availabilities.size == 0 %}
@@ -130,225 +205,16 @@
         <div class="pickup-availability__row">
           <div class="pickup-availability__column">
             <span class="svg-wrapper">
-              {% if pick_up_availabilities.first.available %}
-                {{- 'icon-available.svg' | inline_asset_content -}}
-              {% else %}
-                {{- 'icon-unavailable.svg' | inline_asset_content -}}
-              {% endif %}
+              {{- 'icon-unavailable.svg' | inline_asset_content -}}
             </span>
-          </div>
-          <div class="pickup-availability__column">
-            {% if pick_up_availabilities.first.available %}
-              <p class="pickup-location__text-sm">
-                {{ 'content.pickup_available_at_html' | t: location: pick_up_availabilities.first.location.name }}
-              </p>
-              <p class="pickup-location__text-xs">
-                {{ 'content.pickup_ready_in' | t: pickup_time: pick_up_availabilities.first.pick_up_time }}
-              </p>
-            {% else %}
-              <p class="pickup-location__text-sm">
-                {{ 'content.pickup_not_available' | t }}
-              </p>
-            {% endif %}
-            <button
-              on:click="/showDialog"
-              class="button-unstyled pickup-location__button"
-            >
-              {{ 'actions.view_store_information' | t }}
-            </button>
+            <span class="pickup-availability__text">{{ 'products.product.pickup_availability.unavailable' | t }}</span>
           </div>
         </div>
-        <dialog
-          ref="dialog"
-          class="dialog-modal dialog-drawer pickup-location__dialog color-{{ settings.drawer_color_scheme }}"
-          scroll-lock
-        >
-          <div class="pickup-availability__dialog-row pickup-availability__header-container">
-            <div class="pickup-availability__column">
-              <h4 class="pickup-location__h4">{{ closest.product.title }}</h4>
-              <p class="pickup-location__text-sm">
-                {{ closest.product.selected_or_first_available_variant.title }}
-              </p>
-            </div>
-            <button
-              ref="closeButton"
-              on:click="/closeDialog"
-              class="button button-unstyled pickup-location__close-button"
-              aria-label="{{ 'actions.close_dialog' | t }}"
-            >
-              <span class="svg-wrapper">
-                {{- 'icon-close.svg' | inline_asset_content -}}
-              </span>
-            </button>
-          </div>
-          {% for pick_up_availability in pick_up_availabilities %}
-            <div class="pickup-location__wrapper">
-              <p class="pickup-location__text-bold">{{ pick_up_availability.location.name }}</p>
-              <div class="pickup-location__address-wrapper">
-                <span class="pickup-location__availability-wrapper">
-                  {% if pick_up_availability.available %}
-                    {{- 'icon-available.svg' | inline_asset_content -}}
-                    {% assign pickup_time = pick_up_availability.pick_up_time | downcase %}
-                    {{ 'content.pickup_available_in' | t: pickup_time: pickup_time }}
-                  {% else %}
-                    {{- 'icon-unavailable.svg' | inline_asset_content -}}
-                    {{ 'content.pickup_not_available' | t }}
-                  {% endif %}
-                </span>
-                <address class="pickup-location__address">
-                  {{ pick_up_availability.location.address | format_address }}
-                  {{ pick_up_availability.location.address.phone }}
-                </address>
-              </div>
-            </div>
-          {% endfor %}
-        </dialog>
       </dialog-component>
     {% endif %}
   </local-pickup>
 {% endif %}
-{% stylesheet %}
-  .buy-buttons-block {
-    width: 100%;
-  }
-  .product-form-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: calc(var(--gap-sm) / 2);
-    @media screen and (min-width: 750px) {
-      gap: var(--gap-sm);
-    }
-  }
-  .product-form-buttons > *:not(.quantity-selector) {
-    flex: 1 1 185px;
-    min-width: fit-content;
-  }
-  .product-form-buttons--stacked > *:not(.quantity-selector) {
-    flex-basis: 51%; /* Force the buttons to be on separate rows */
-  }
-  .quantity-selector {
-    flex-grow: 0;
-  }
-  .product-form-buttons button {
-    width: 100%;
-    padding-inline: var(--padding-4xl);
-    padding-block: var(--padding-lg);
-  }
-  .add-to-cart-button {
-    text-transform: var(--button-text-case-primary);
-  }
-  .add-to-cart-button.button-secondary {
-    text-transform: var(--button-text-case-secondary);
-  }
-  .product-form-buttons .shopify-payment-button__button {
-    width: 100%;
-    min-height: var(--minimum-touch-target);
-  }
-  .quantity-selector,
-  .add-to-cart-button {
-    height: var(--height-buy-buttons);
-  }
-  .product__pickup-availabilities {
-    width: 100%;
-  }
-  .pickup-availability__column {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-  .pickup-availability__row {
-    display: flex;
-    gap: var(--padding-xs);
-  }
-  .pickup-availability__dialog-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-  .pickup-availability__header-container {
-    padding-block-end: var(--padding-2xl);
-  }
-  .pickup-location__wrapper {
-    display: flex;
-    flex-direction: column;
-    padding-block: var(--padding-2xl);
-    border-top: 1px solid var(--color-border);
-    gap: var(--padding-xs);
-  }
-  .pickup-location__address-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: var(--padding-md);
-  }
-  .pickup-location__dialog {
-    padding: var(--padding-2xl);
-    position: fixed;
-    border-radius: 0;
-    width: var(--sidebar-width);
-    max-width: 95vw;
-    height: 100%;
-    margin: 0 0 0 auto;
-    border: var(--style-border-drawer);
-    box-shadow: var(--shadow-drawer);
-    background-color: var(--color-background);
-  }
-  .pickup-location__dialog:modal {
-    max-height: 100dvh;
-  }
-  .pickup-location__text-sm {
-    font-size: var(--font-size--sm);
-    margin: 0;
-  }
-  .pickup-location__text-xs {
-    font-size: var(--font-size--xs);
-    margin: 0;
-  }
-  .product-form-text__error {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--gap-xs);
-  }
-  .pickup-location__button {
-    width: fit-content;
-    color: var(--color-primary);
-    font-size: var(--font-size--xs);
-    font-family: var(--font-body--family);
-    padding: 0;
-    cursor: pointer;
-    margin-block: var(--margin-xs);
-  }
-  .pickup-location__button:hover {
-    color: var(--color-primary-hover);
-  }
-  .pickup-location__h4 {
-    margin: 0;
-  }
-  .pickup-location__text-bold {
-    font-size: var(--font-size--md);
-    font-weight: 600;
-    margin: 0;
-  }
-  .pickup-location__availability-wrapper {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-xs);
-    font-family: var(--font-paragraph--family);
-  }
-  .pickup-location__address {
-    font-style: normal;
-  }
-  .pickup-location__close-button {
-    position: absolute;
-    top: calc(var(--padding-2xl) - (var(--icon-size-xs) / 2));
-    right: calc(var(--padding-2xl) - var(--icon-size-xs));
-    height: var(--minimum-touch-target);
-    width: var(--minimum-touch-target);
-  }
-  .pickup-location__close-button svg {
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
-  }
-{% endstylesheet %}
+
 {% schema %}
 {
   "name": "t:names.product_buy_buttons",
@@ -440,12 +306,3 @@
   ]
 }
 {% endschema %}
-{% comment %} DEBUG - Remove in production {% endcomment %}
-{% if product.handle == 'spider-lily-surprise-resurrection-hurricane-yellow' %}
-  <div style="background: orange; padding: 10px; margin: 10px; font-size: 12px;">
-    BUY BUTTONS DEBUG:<br>
-    preorder_is_coming_soon: {{ preorder_is_coming_soon }}<br>
-    can_add_to_cart: {{ can_add_to_cart }}<br>
-    add_to_cart_text: {{ add_to_cart_text }}
-  </div>
-{% endif %}
