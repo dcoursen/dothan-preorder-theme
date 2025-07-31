@@ -440,3 +440,12 @@
   ]
 }
 {% endschema %}
+{% comment %} DEBUG - Remove in production {% endcomment %}
+{% if product.handle == 'spider-lily-surprise-resurrection-hurricane-yellow' %}
+  <div style="background: orange; padding: 10px; margin: 10px; font-size: 12px;">
+    BUY BUTTONS DEBUG:<br>
+    preorder_is_coming_soon: {{ preorder_is_coming_soon }}<br>
+    can_add_to_cart: {{ can_add_to_cart }}<br>
+    add_to_cart_text: {{ add_to_cart_text }}
+  </div>
+{% endif %}
