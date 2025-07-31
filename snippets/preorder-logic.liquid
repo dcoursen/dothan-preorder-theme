@@ -1,6 +1,6 @@
 {%- comment -%}
   Preorder Logic Snippet
-  Shows preorder dates with smart day/time formatting as plain text
+  Shows preorder dates with smart day/time formatting
 {%- endcomment -%}
 
 {%- liquid
@@ -61,5 +61,5 @@
 -%}
 
 {%- if is_preorder -%}
-  {{ preorder_text }}
+  <span class="preorder-badge">{{ preorder_text }}</span>
 {%- endif -%}
