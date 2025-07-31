@@ -1,6 +1,6 @@
 {%- comment -%}
   Preorder Logic Snippet
-  Shows preorder dates as plain text only
+  Shows preorder dates as completely plain text
 {%- endcomment -%}
 
 {%- liquid
@@ -61,5 +61,5 @@
 -%}
 
 {%- if is_preorder -%}
-<div class="preorder-text">{{ preorder_text }}</div>
+{{ preorder_text }}
 {%- endif -%}
