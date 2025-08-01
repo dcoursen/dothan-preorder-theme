@@ -19,45 +19,16 @@
   # Initialize preorder variables
   assign preorder_is_preorder = false
   assign preorder_is_coming_soon = false
-  assign preorder_smart_drop_date = ''
   
   # Check if this is a preorder product
   if preorder_drop_date != blank
     assign preorder_is_preorder = true
     assign current_date = 'now' | date: '%s'
     assign drop_date_timestamp = preorder_drop_date | date: '%s'
-    assign days_until_drop = drop_date_timestamp | minus: current_date | divided_by: 86400
-    assign drop_weekday = preorder_drop_date | date: '%w'
     
     # Check if we're before the drop date (coming soon)
     if current_date < drop_date_timestamp
       assign preorder_is_coming_soon = true
-      
-      # Get day name for drops overlay
-      case drop_weekday
-        when '0'
-          assign day_name = 'Sunday'
-        when '1'
-          assign day_name = 'Monday'
-        when '2'
-          assign day_name = 'Tuesday'
-        when '3'
-          assign day_name = 'Wednesday'
-        when '4'
-          assign day_name = 'Thursday'
-        when '5'
-          assign day_name = 'Friday'
-        when '6'
-          assign day_name = 'Saturday'
-      endcase
-      
-      if days_until_drop <= 7
-        assign time_with_tz = preorder_drop_date | date: '%l:%M%p EST'
-        assign preorder_smart_drop_date = 'This ' | append: day_name | append: ' @ ' | append: time_with_tz
-      else
-        assign formatted_date = preorder_drop_date | date: '%-m/%-d'
-        assign preorder_smart_drop_date = day_name | append: ' ' | append: formatted_date
-      endif
     endif
   endif
   
@@ -85,22 +56,18 @@
     --badge-font-family: var(--font-{{ settings.badge_font_family }}--family); --badge-font-weight: var(--font-{{ settings.badge_font_family }}--weight); --badge-text-transform: {{ settings.badge_text_transform }};
   "
 >
-  {%- comment -%} Preorder Drops Overlay {%- endcomment -%}
-  {%- if preorder_is_coming_soon -%}
-    <div class="product-badges__badge product-badges__badge--drops">
-      Drops: {{ preorder_smart_drop_date }}
-    </div>
-  {%- endif -%}
-
   {%- if show_coming_soon or show_sold_out or show_sale -%}
     <div
       class="
         product-badges__badge product-badges__badge--rectangle
-        {% if show_coming_soon %} color-{{ settings.badge_sale_color_scheme }}{% elsif show_sold_out %} color-{{ settings.badge_sold_out_color_scheme }}{% elsif show_sale %} color-{{ settings.badge_sale_color_scheme }}{% endif %}
+        {% if show_coming_soon %} color-{{ settings.badge_sold_out_color_scheme }}
+        {% elsif show_sold_out %} color-{{ settings.badge_sold_out_color_scheme }}
+        {% elsif show_sale %} color-{{ settings.badge_sale_color_scheme }}
+        {% endif %}
       "
     >
       {%- if show_coming_soon -%}
-        Coming Soon
+        {{ 'products.product.coming_soon' | t }}
       {%- elsif show_sold_out -%}
         {{ 'content.product_badge_sold_out' | t }}
       {%- elsif show_sale -%}
@@ -147,29 +114,10 @@
     font-weight: var(--badge-font-weight);
     text-transform: var(--badge-text-transform);
     border-radius: var(--badge-border-radius);
-    margin-bottom: var(--padding-2xs);
   }
 
   .product-badges__badge--rectangle {
     padding-block: var(--badge-rectangle-padding-block);
     padding-inline: var(--badge-rectangle-padding-inline);
-  }
-
-  /* Custom styling for Drops badge */
-  .product-badges__badge--drops {
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: var(--padding-xs) var(--padding-sm);
-    font-size: var(--font-size--xs);
-    font-weight: 500;
-    border-radius: 4px;
-    text-transform: none;
-  }
-
-  @media screen and (max-width: 749px) {
-    .product-badges__badge--drops {
-      font-size: var(--font-size--2xs);
-      padding: var(--padding-2xs) var(--padding-xs);
-    }
   }
 {% endstylesheet %}

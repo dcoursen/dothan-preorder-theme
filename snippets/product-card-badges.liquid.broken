@@ -8,75 +8,8 @@
   {% render 'product-card-badges', product: product, settings: settings %}
 {%- enddoc -%}
 
-{% liquid
-  # ===========================================
-  # PREORDER LOGIC FOR BADGES
-  # ===========================================
-  
-  # Get preorder metafields
-  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
-  
-  # Initialize preorder variables
-  assign preorder_is_preorder = false
-  assign preorder_is_coming_soon = false
-  assign preorder_smart_drop_date = ''
-  
-  # Check if this is a preorder product
-  if preorder_drop_date != blank
-    assign preorder_is_preorder = true
-    assign current_date = 'now' | date: '%s'
-    assign drop_date_timestamp = preorder_drop_date | date: '%s'
-    assign days_until_drop = drop_date_timestamp | minus: current_date | divided_by: 86400
-    assign drop_weekday = preorder_drop_date | date: '%w'
-    
-    # Check if we're before the drop date (coming soon)
-    if current_date < drop_date_timestamp
-      assign preorder_is_coming_soon = true
-      
-      # Get day name for drops overlay
-      case drop_weekday
-        when '0'
-          assign day_name = 'Sunday'
-        when '1'
-          assign day_name = 'Monday'
-        when '2'
-          assign day_name = 'Tuesday'
-        when '3'
-          assign day_name = 'Wednesday'
-        when '4'
-          assign day_name = 'Thursday'
-        when '5'
-          assign day_name = 'Friday'
-        when '6'
-          assign day_name = 'Saturday'
-      endcase
-      
-      if days_until_drop <= 7
-        assign time_with_tz = preorder_drop_date | date: '%l:%M%p EST'
-        assign preorder_smart_drop_date = 'This ' | append: day_name | append: ' @ ' | append: time_with_tz
-      else
-        assign formatted_date = preorder_drop_date | date: '%-m/%-d'
-        assign preorder_smart_drop_date = day_name | append: ' ' | append: formatted_date
-      endif
-    endif
-  endif
-  
-  # Determine badge logic
-  assign show_coming_soon = false
-  assign show_sold_out = false
-  assign show_sale = false
-  
-  if preorder_is_preorder and preorder_is_coming_soon
-    # Preorder product that's coming soon - show "Coming Soon" even if marked unavailable
-    assign show_coming_soon = true
-  elsif product.available == false
-    # Regular sold out product (not preorder or past drop date)
-    assign show_sold_out = true
-  elsif product.compare_at_price > product.price and product.available
-    # Sale product
-    assign show_sale = true
-  endif
-%}
+{% comment %} Include preorder logic for drops badge {% endcomment %}
+{% render 'preorder-overlay-logic', product: product %}
 
 <div
   class="product-badges product-badges--{{ settings.badge_position }}"
@@ -85,25 +18,23 @@
     --badge-font-family: var(--font-{{ settings.badge_font_family }}--family); --badge-font-weight: var(--font-{{ settings.badge_font_family }}--weight); --badge-text-transform: {{ settings.badge_text_transform }};
   "
 >
-  {%- comment -%} Preorder Drops Overlay {%- endcomment -%}
-  {%- if preorder_is_coming_soon -%}
+  {%- comment -%} Preorder Drops Badge {%- endcomment -%}
+  {%- if preorder_is_preorder -%}
     <div class="product-badges__badge product-badges__badge--drops">
       Drops: {{ preorder_smart_drop_date }}
     </div>
   {%- endif -%}
 
-  {%- if show_coming_soon or show_sold_out or show_sale -%}
+  {%- if product.available == false or product.compare_at_price > product.price and product.available -%}
     <div
       class="
         product-badges__badge product-badges__badge--rectangle
-        {% if show_coming_soon %} color-{{ settings.badge_sale_color_scheme }}{% elsif show_sold_out %} color-{{ settings.badge_sold_out_color_scheme }}{% elsif show_sale %} color-{{ settings.badge_sale_color_scheme }}{% endif %}
+        {% if product.available == false %} color-{{ settings.badge_sold_out_color_scheme }}{% elsif product.compare_at_price > product.price %} color-{{ settings.badge_sale_color_scheme }}{% endif %}
       "
     >
-      {%- if show_coming_soon -%}
-        Coming Soon
-      {%- elsif show_sold_out -%}
+      {%- if product.available == false -%}
         {{ 'content.product_badge_sold_out' | t }}
-      {%- elsif show_sale -%}
+      {%- elsif product.compare_at_price > product.price -%}
         {{ 'content.product_badge_sale' | t }}
       {%- endif -%}
     </div>
