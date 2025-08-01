@@ -1,49 +1,96 @@
-{%- liquid
-  assign today = 'now' | date: '%s'
-  assign drop_date_field = closest.product.metafields.custom.preorder_drop_date
+{% comment %}
+  Enhanced Preorder Logic with Klaviyo Back in Stock Integration
   
-  # Initialize preorder variables globally
-  assign preorder_is_preorder = false
-  assign preorder_text = ''
-  assign preorder_is_coming_soon = false
-  assign preorder_smart_drop_date = ''
+  Handles:
+  - Available products (normal add to cart)
+  - Preorder products with future drop dates
+  - Preorder products with past drop dates (back in stock)
+  - Regular sold-out products (back in stock)
+  - Fallback sold-out state
+{% endcomment %}
+
+{% assign current_variant = variant | default: product.selected_or_first_available_variant %}
+
+{% if product.available %}
+  {% comment %} Product is available - show normal add to cart {% endcomment %}
+  <div class="product-form__buttons">
+    <button
+      type="submit"
+      name="add"
+      class="btn product-form__cart-submit{% if block.settings.show_dynamic_checkout and product.selling_plan_groups == empty %} btn--secondary-accent{% endif %}"
+      {% if product.selected_or_first_available_variant.available == false %}disabled{% endif %}
+    >
+      <span>
+        {%- if product.selected_or_first_available_variant.available -%}
+          {{ 'products.product.add_to_cart' | t }}
+        {%- else -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- endif -%}
+      </span>
+      <div class="loading-overlay__spinner hidden">
+        <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+          <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+        </svg>
+      </div>
+    </button>
+  </div>
+
+{% elsif product.metafields.custom.preorder_enabled %}
+  {% comment %} Preorder product - check drop date {% endcomment %}
+  {% assign drop_date = product.metafields.custom.preorder_drop_date | date: '%s' | plus: 0 %}
+  {% assign current_date = 'now' | date: '%s' | plus: 0 %}
   
-  if drop_date_field != blank
-    assign drop_date = drop_date_field | date: '%s'
-    assign days_until_drop = drop_date | minus: today | divided_by: 86400
-    assign drop_weekday = drop_date_field | date: '%w'
+  {% if drop_date > current_date %}
+    {% comment %} Future drop date - check for Klaviyo override {% endcomment %}
+    {% if settings.klaviyo_back_in_stock_enabled and settings.klaviyo_preorder_back_in_stock_override != blank %}
+      {% render 'klaviyo-back-in-stock', 
+         product: product, 
+         variant: current_variant,
+         button_text: settings.klaviyo_preorder_back_in_stock_override,
+         context: 'preorder-override' %}
+    {% else %}
+      {% comment %} Show preorder button {% endcomment %}
+      <div class="product-form__buttons">
+        <button
+          type="submit"
+          name="add"
+          class="btn product-form__cart-submit btn--preorder"
+          data-preorder="true"
+        >
+          <span>{{ 'products.product.preorder' | t | default: 'Pre-order' }}</span>
+        </button>
+      </div>
+    {% endif %}
     
-    if days_until_drop > 0
-      assign preorder_is_preorder = true
-      assign preorder_is_coming_soon = true
-      
-      # Get day name
-      case drop_weekday
-        when '0'
-          assign day_name = 'Sunday'
-        when '1'
-          assign day_name = 'Monday'
-        when '2'
-          assign day_name = 'Tuesday'
-        when '3'
-          assign day_name = 'Wednesday'
-        when '4'
-          assign day_name = 'Thursday'
-        when '5'
-          assign day_name = 'Friday'
-        when '6'
-          assign day_name = 'Saturday'
-      endcase
-      
-      if days_until_drop <= 7
-        assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
-        assign preorder_text = 'This ' | append: day_name | append: ' @ ' | append: time_with_tz
-        assign preorder_smart_drop_date = preorder_text
-      else
-        assign formatted_date = drop_date_field | date: '%-m/%-d'
-        assign preorder_text = day_name | append: ' ' | append: formatted_date
-        assign preorder_smart_drop_date = preorder_text
-      endif
-    endif
-  endif
--%}
+  {% else %}
+    {% comment %} Drop date passed, inventory 0 - use back in stock {% endcomment %}
+    {% if settings.klaviyo_back_in_stock_enabled %}
+      {% render 'klaviyo-back-in-stock', 
+         product: product, 
+         variant: current_variant,
+         button_text: settings.klaviyo_back_in_stock_button_text,
+         context: 'post-preorder' %}
+    {% else %}
+      <div class="product-form__buttons">
+        <button type="button" class="btn product-form__cart-submit" disabled>
+          <span>{{ 'products.product.sold_out' | t | default: 'Sold out' }}</span>
+        </button>
+      </div>
+    {% endif %}
+  {% endif %}
+
+{% elsif settings.klaviyo_back_in_stock_enabled %}
+  {% comment %} Regular sold-out product with Klaviyo enabled {% endcomment %}
+  {% render 'klaviyo-back-in-stock', 
+     product: product, 
+     variant: current_variant,
+     context: 'sold-out' %}
+
+{% else %}
+  {% comment %} Default sold-out state {% endcomment %}
+  <div class="product-form__buttons">
+    <button type="button" class="btn product-form__cart-submit" disabled>
+      <span>{{ 'products.product.sold_out' | t | default: 'Sold out' }}</span>
+    </button>
+  </div>
+{% endif %}

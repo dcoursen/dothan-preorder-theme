@@ -3,10 +3,6 @@
   class="no-js{% if request.design_mode %} shopify-design-mode{% endif %}"
   lang="{{ request.locale.iso_code }}"
 >
-  <script>
-    window.klaviyoPublicApiKey = {{ settings.klaviyo_public_api_key | json }};
-    window.klaviyoSmsMarketingListId = {{ settings.klaviyo_sms_marketing_list_id | json }};
-  </script>
   <head>
     {%- render 'stylesheets' -%}
 
