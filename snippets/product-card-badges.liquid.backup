@@ -8,6 +8,47 @@
   {% render 'product-card-badges', product: product, settings: settings %}
 {%- enddoc -%}
 
+{% liquid
+  # ===========================================
+  # PREORDER LOGIC FOR BADGES
+  # ===========================================
+  
+  # Get preorder metafields
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
+  
+  # Initialize preorder variables
+  assign preorder_is_preorder = false
+  assign preorder_is_coming_soon = false
+  
+  # Check if this is a preorder product
+  if preorder_drop_date != blank
+    assign preorder_is_preorder = true
+    assign current_date = 'now' | date: '%s'
+    assign drop_date_timestamp = preorder_drop_date | date: '%s'
+    
+    # Check if we're before the drop date (coming soon)
+    if current_date < drop_date_timestamp
+      assign preorder_is_coming_soon = true
+    endif
+  endif
+  
+  # Determine badge logic
+  assign show_coming_soon = false
+  assign show_sold_out = false
+  assign show_sale = false
+  
+  if preorder_is_preorder and preorder_is_coming_soon
+    # Preorder product that's coming soon - show "Coming Soon" even if marked unavailable
+    assign show_coming_soon = true
+  elsif product.available == false
+    # Regular sold out product (not preorder or past drop date)
+    assign show_sold_out = true
+  elsif product.compare_at_price > product.price and product.available
+    # Sale product
+    assign show_sale = true
+  endif
+%}
+
 <div
   class="product-badges product-badges--{{ settings.badge_position }}"
   style="
@@ -15,16 +56,21 @@
     --badge-font-family: var(--font-{{ settings.badge_font_family }}--family); --badge-font-weight: var(--font-{{ settings.badge_font_family }}--weight); --badge-text-transform: {{ settings.badge_text_transform }};
   "
 >
-  {%- if product.available == false or product.compare_at_price > product.price and product.available -%}
+  {%- if show_coming_soon or show_sold_out or show_sale -%}
     <div
       class="
         product-badges__badge product-badges__badge--rectangle
-        {% if product.available == false %} color-{{ settings.badge_sold_out_color_scheme }}{% elsif product.compare_at_price > product.price %} color-{{ settings.badge_sale_color_scheme }}{% endif %}
+        {% if show_coming_soon %} color-{{ settings.badge_sold_out_color_scheme }}
+        {% elsif show_sold_out %} color-{{ settings.badge_sold_out_color_scheme }}
+        {% elsif show_sale %} color-{{ settings.badge_sale_color_scheme }}
+        {% endif %}
       "
     >
-      {%- if product.available == false -%}
+      {%- if show_coming_soon -%}
+        {{ 'products.product.coming_soon' | t }}
+      {%- elsif show_sold_out -%}
         {{ 'content.product_badge_sold_out' | t }}
-      {%- elsif product.compare_at_price > product.price -%}
+      {%- elsif show_sale -%}
         {{ 'content.product_badge_sale' | t }}
       {%- endif -%}
     </div>

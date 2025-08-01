@@ -8,46 +8,8 @@
   {% render 'product-card-badges', product: product, settings: settings %}
 {%- enddoc -%}
 
-{% liquid
-  # ===========================================
-  # PREORDER LOGIC FOR BADGES
-  # ===========================================
-  
-  # Get preorder metafields
-  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
-  
-  # Initialize preorder variables
-  assign preorder_is_preorder = false
-  assign preorder_is_coming_soon = false
-  
-  # Check if this is a preorder product
-  if preorder_drop_date != blank
-    assign preorder_is_preorder = true
-    assign current_date = 'now' | date: '%s'
-    assign drop_date_timestamp = preorder_drop_date | date: '%s'
-    
-    # Check if we're before the drop date (coming soon)
-    if current_date < drop_date_timestamp
-      assign preorder_is_coming_soon = true
-    endif
-  endif
-  
-  # Determine badge logic
-  assign show_coming_soon = false
-  assign show_sold_out = false
-  assign show_sale = false
-  
-  if preorder_is_preorder and preorder_is_coming_soon
-    # Preorder product that's coming soon - show "Coming Soon" even if marked unavailable
-    assign show_coming_soon = true
-  elsif product.available == false
-    # Regular sold out product (not preorder or past drop date)
-    assign show_sold_out = true
-  elsif product.compare_at_price > product.price and product.available
-    # Sale product
-    assign show_sale = true
-  endif
-%}
+{% comment %} Include preorder logic for drops badge {% endcomment %}
+{% render 'preorder-overlay-logic', product: product %}
 
 <div
   class="product-badges product-badges--{{ settings.badge_position }}"
@@ -56,21 +18,23 @@
     --badge-font-family: var(--font-{{ settings.badge_font_family }}--family); --badge-font-weight: var(--font-{{ settings.badge_font_family }}--weight); --badge-text-transform: {{ settings.badge_text_transform }};
   "
 >
-  {%- if show_coming_soon or show_sold_out or show_sale -%}
+  {%- comment -%} Preorder Drops Badge {%- endcomment -%}
+  {%- if preorder_is_preorder -%}
+    <div class="product-badges__badge product-badges__badge--drops">
+      Drops: {{ preorder_smart_drop_date }}
+    </div>
+  {%- endif -%}
+
+  {%- if product.available == false or product.compare_at_price > product.price and product.available -%}
     <div
       class="
         product-badges__badge product-badges__badge--rectangle
-        {% if show_coming_soon %} color-{{ settings.badge_sold_out_color_scheme }}
-        {% elsif show_sold_out %} color-{{ settings.badge_sold_out_color_scheme }}
-        {% elsif show_sale %} color-{{ settings.badge_sale_color_scheme }}
-        {% endif %}
+        {% if product.available == false %} color-{{ settings.badge_sold_out_color_scheme }}{% elsif product.compare_at_price > product.price %} color-{{ settings.badge_sale_color_scheme }}{% endif %}
       "
     >
-      {%- if show_coming_soon -%}
-        {{ 'products.product.coming_soon' | t }}
-      {%- elsif show_sold_out -%}
+      {%- if product.available == false -%}
         {{ 'content.product_badge_sold_out' | t }}
-      {%- elsif show_sale -%}
+      {%- elsif product.compare_at_price > product.price -%}
         {{ 'content.product_badge_sale' | t }}
       {%- endif -%}
     </div>
@@ -114,10 +78,29 @@
     font-weight: var(--badge-font-weight);
     text-transform: var(--badge-text-transform);
     border-radius: var(--badge-border-radius);
+    margin-bottom: var(--padding-2xs);
   }
 
   .product-badges__badge--rectangle {
     padding-block: var(--badge-rectangle-padding-block);
     padding-inline: var(--badge-rectangle-padding-inline);
+  }
+
+  /* Custom styling for Drops badge */
+  .product-badges__badge--drops {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size--xs);
+    font-weight: 500;
+    border-radius: 4px;
+    text-transform: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-badges__badge--drops {
+      font-size: var(--font-size--2xs);
+      padding: var(--padding-2xs) var(--padding-xs);
+    }
   }
 {% endstylesheet %}
