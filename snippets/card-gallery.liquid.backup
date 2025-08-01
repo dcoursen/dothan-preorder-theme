@@ -81,10 +81,6 @@
   endif
 %}
 
-{% comment %} Include preorder logic for image overlay {% endcomment %}
-{% include 'preorder-logic' %}
-
-
 <div
   ref="cardGallery"
   class="card-gallery card-gallery-{{ block.id }} spacing-style border-style"
@@ -213,13 +209,6 @@
         attributes: slideshow_attributes
       %}
     </a>
-
-    {% comment %} Preorder Drops Overlay {% endcomment %}
-    {% if preorder_is_preorder %}
-      <div class="card-gallery__preorder-overlay">
-        <span class="preorder-overlay__text">Drops: {{ preorder_smart_drop_date }}</span>
-      </div>
-    {% endif %}
   {% elsif product != blank and product.media.size == 0 %}
     <product-title class="product-card-gallery__title-placeholder">
       <a
@@ -230,13 +219,6 @@
       >
         <span class="title-text">{{- product.title -}}</span>
       </a>
-
-    {% comment %} Preorder Drops Overlay {% endcomment %}
-    {% if preorder_is_preorder %}
-      <div class="card-gallery__preorder-overlay">
-        <span class="preorder-overlay__text">Drops: {{ preorder_smart_drop_date }}</span>
-      </div>
-    {% endif %}
     </product-title>
   {% elsif product == blank %}
     {% capture placeholder_image %}
@@ -262,7 +244,6 @@
 
 {% stylesheet %}
   .card-gallery {
-    position: relative;
     overflow: hidden;
     container-type: inline-size; /* Make card-gallery a container */
     container-name: card-gallery-container; /* Optional: name the container */
@@ -419,31 +400,4 @@
     padding: var(--padding-xs) !important;
     font-size: var(--font-size--xs);
   }
-
-  /* Preorder Drops Overlay */
-  .card-gallery__preorder-overlay {
-    position: absolute;
-    top: var(--padding-sm);
-    left: var(--padding-sm);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: var(--padding-xs) var(--padding-sm);
-    border-radius: var(--style-border-radius-sm);
-    font-size: var(--font-size--sm);
-    font-weight: 500;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .preorder-overlay__text {
-    white-space: nowrap;
-  }
-
-  @media screen and (max-width: 749px) {
-    .card-gallery__preorder-overlay {
-      font-size: var(--font-size--xs);
-      padding: var(--padding-2xs) var(--padding-xs);
-    }
-  }
-
 {% endstylesheet %}
