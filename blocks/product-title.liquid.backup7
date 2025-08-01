@@ -16,6 +16,15 @@
     {% render 'text', fallback_text: product_title, block: block %}
   </a>
   
+  {% comment %} Add pickup dates below title for preorder products {% endcomment %}
+  {% if preorder_is_preorder %}
+    <div class="product-card__pickup-info" style="margin-top: 0.5rem; font-size: 0.875rem; color: rgb(var(--color-foreground)); opacity: 0.8;">
+      {% if preorder_is_coming_soon %}
+        <div class="pickup-coming-soon">
+          <span style="font-weight: 500;">Available:</span>
+          <span style="color: rgb(var(--color-primary));">{{ preorder_smart_drop_date }}</span>
+        </div>
+      {% endif %}
       
       {% if preorder_show_pickup_dates %}
         <div class="pickup-dates-display">
