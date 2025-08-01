@@ -83,15 +83,15 @@
   <div 
     class="product-drops-overlay"
     style="
-      --drops-opacity: {{ settings.drops_overlay_opacity }};
       --drops-font-family: var(--font-{{ settings.drops_overlay_font_family }}--family);
       --drops-font-weight: {{ settings.drops_overlay_font_weight }};
       --drops-font-size: {{ settings.drops_overlay_font_size }}px;
       --drops-text-transform: {{ settings.drops_overlay_text_transform }};
       --drops-padding-vertical: {{ settings.drops_overlay_padding_vertical }}px;
       --drops-padding-horizontal: {{ settings.drops_overlay_padding_horizontal }}px;
-      background: rgba(0, 0, 0, calc(var(--drops-opacity) / 100));
-      color: white;
+      background: {{ settings.drops_overlay_background_color }};
+      color: {{ settings.drops_overlay_text_color }};
+      opacity: {{ settings.drops_overlay_opacity | divided_by: 100.0 }};
     "
   >
     Drops: {{ preorder_smart_drop_date }}

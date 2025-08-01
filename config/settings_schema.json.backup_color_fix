@@ -1510,16 +1510,10 @@
         "content": "Styling"
       },
       {
-        "type": "color",
-        "id": "drops_overlay_background_color",
-        "label": "Background color",
-        "default": "#000000"
-      },
-      {
-        "type": "color",
-        "id": "drops_overlay_text_color",
-        "label": "Text color",
-        "default": "#ffffff"
+        "type": "color_scheme",
+        "id": "drops_overlay_color_scheme",
+        "label": "Color scheme",
+        "default": "scheme-1"
       },
       {
         "type": "range",
