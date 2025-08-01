@@ -1,5 +1,6 @@
 {% comment %} Include preorder logic {% endcomment %}
 {% include 'preorder-logic' %}
+DEBUG: preorder_is_preorder={{ preorder_is_preorder }}, preorder_smart_drop_date={{ preorder_smart_drop_date }}
 
 {% if closest.product == blank %}
   {% assign text = 'placeholders.product_title' | t %}
