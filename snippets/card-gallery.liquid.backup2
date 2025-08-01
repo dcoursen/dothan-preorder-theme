@@ -82,7 +82,7 @@
 %}
 
 {% comment %} Include preorder logic for image overlay {% endcomment %}
-{% render 'preorder-overlay-logic', product: product %}
+{% include 'preorder-logic' %}
 
 
 <div
