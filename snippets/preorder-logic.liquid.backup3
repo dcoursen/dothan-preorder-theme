@@ -37,11 +37,11 @@
       
       if days_until_drop <= 7
         assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
-        assign preorder_text = 'This ' | append: day_name | append: ' @ ' | append: time_with_tz
+        assign preorder_text = 'this ' | append: day_name | append: ' @ ' | append: time_with_tz
         assign preorder_smart_drop_date = preorder_text
       else
-        assign formatted_date = drop_date_field | date: '%-m/%-d'
-        assign preorder_text = day_name | append: ' ' | append: formatted_date
+        assign formatted_date = drop_date_field | date: '%m/%d'
+        assign preorder_text = formatted_date
         assign preorder_smart_drop_date = preorder_text
       endif
     endif
