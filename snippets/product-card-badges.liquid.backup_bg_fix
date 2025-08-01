@@ -173,9 +173,8 @@
     left: 0;
     right: 0;
     width: 100%;
-    background: var(--color-background);
+    background: rgba(var(--color-background), calc(var(--drops-opacity) / 100));
     color: var(--color-foreground);
-    opacity: calc(var(--drops-opacity) / 100);
     padding: var(--drops-padding-vertical) var(--drops-padding-horizontal);
     font-family: var(--drops-font-family);
     font-size: var(--drops-font-size);
