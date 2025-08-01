@@ -78,13 +78,6 @@
   endif
 %}
 
-{%- comment -%} Preorder Drops Overlay - positioned separately from badges {%- endcomment -%}
-{%- if preorder_is_coming_soon -%}
-  <div class="product-drops-overlay">
-    Drops: {{ preorder_smart_drop_date }}
-  </div>
-{%- endif -%}
-
 <div
   class="product-badges product-badges--{{ settings.badge_position }}"
   style="
@@ -92,6 +85,13 @@
     --badge-font-family: var(--font-{{ settings.badge_font_family }}--family); --badge-font-weight: var(--font-{{ settings.badge_font_family }}--weight); --badge-text-transform: {{ settings.badge_text_transform }};
   "
 >
+  {%- comment -%} Preorder Drops Overlay {%- endcomment -%}
+  {%- if preorder_is_coming_soon -%}
+    <div class="product-badges__badge product-badges__badge--drops">
+      Drops: {{ preorder_smart_drop_date }}
+    </div>
+  {%- endif -%}
+
   {%- if show_coming_soon or show_sold_out or show_sale -%}
     <div
       class="
@@ -155,8 +155,8 @@
     padding-inline: var(--badge-rectangle-padding-inline);
   }
 
-  /* Custom styling for Drops overlay - spans bottom of image */
-  .product-drops-overlay {
+  /* Custom styling for Drops badge - spans bottom of image */
+  .product-badges__badge--drops {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -167,13 +167,14 @@
     padding: var(--padding-xs) var(--padding-sm);
     font-size: var(--font-size--xs);
     font-weight: 500;
-    text-align: center;
-    z-index: 10;
+    border-radius: 0;
     text-transform: none;
+    margin-bottom: 0;
+    z-index: 3;
   }
 
   @media screen and (max-width: 749px) {
-    .product-drops-overlay {
+    .product-badges__badge--drops {
       font-size: var(--font-size--2xs);
       padding: var(--padding-2xs) var(--padding-xs);
     }
