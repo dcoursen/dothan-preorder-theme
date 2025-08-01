@@ -81,15 +81,17 @@
 {%- comment -%} Preorder Drops Overlay - positioned separately from badges {%- endcomment -%}
 {%- if settings.drops_overlay_enabled and preorder_is_coming_soon -%}
   <div 
-    class="product-drops-overlay color-{{ settings.drops_overlay_color_scheme }}"
+    class="product-drops-overlay"
     style="
-      --drops-opacity: {{ settings.drops_overlay_opacity }}%;
+      --drops-opacity: {{ settings.drops_overlay_opacity }};
       --drops-font-family: var(--font-{{ settings.drops_overlay_font_family }}--family);
       --drops-font-weight: {{ settings.drops_overlay_font_weight }};
       --drops-font-size: {{ settings.drops_overlay_font_size }}px;
       --drops-text-transform: {{ settings.drops_overlay_text_transform }};
       --drops-padding-vertical: {{ settings.drops_overlay_padding_vertical }}px;
       --drops-padding-horizontal: {{ settings.drops_overlay_padding_horizontal }}px;
+      background: rgba(0, 0, 0, calc(var(--drops-opacity) / 100));
+      color: white;
     "
   >
     Drops: {{ preorder_smart_drop_date }}
@@ -173,8 +175,6 @@
     left: 0;
     right: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.8); /* Fallback */
-    color: rgb(var(--color-foreground));
     padding: var(--drops-padding-vertical) var(--drops-padding-horizontal);
     font-family: var(--drops-font-family);
     font-size: var(--drops-font-size);
@@ -182,32 +182,6 @@
     text-transform: var(--drops-text-transform);
     text-align: center;
     z-index: 10;
-  }
-  
-  /* Apply color scheme styling */
-  .product-drops-overlay.color-scheme-1 {
-    background: rgba(var(--color-scheme-1-background), calc(var(--drops-opacity) / 100));
-    color: rgb(var(--color-scheme-1-foreground));
-  }
-  
-  .product-drops-overlay.color-scheme-2 {
-    background: rgba(var(--color-scheme-2-background), calc(var(--drops-opacity) / 100));
-    color: rgb(var(--color-scheme-2-foreground));
-  }
-  
-  .product-drops-overlay.color-scheme-3 {
-    background: rgba(var(--color-scheme-3-background), calc(var(--drops-opacity) / 100));
-    color: rgb(var(--color-scheme-3-foreground));
-  }
-  
-  .product-drops-overlay.color-scheme-4 {
-    background: rgba(var(--color-scheme-4-background), calc(var(--drops-opacity) / 100));
-    color: rgb(var(--color-scheme-4-foreground));
-  }
-  
-  .product-drops-overlay.color-scheme-5 {
-    background: rgba(var(--color-scheme-5-background), calc(var(--drops-opacity) / 100));
-    color: rgb(var(--color-scheme-5-foreground));
   }
 
   @media screen and (max-width: 749px) {
