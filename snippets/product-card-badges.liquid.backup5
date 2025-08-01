@@ -155,22 +155,15 @@
     padding-inline: var(--badge-rectangle-padding-inline);
   }
 
-  /* Custom styling for Drops badge - spans bottom of image */
+  /* Custom styling for Drops badge */
   .product-badges__badge--drops {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
     background: rgba(0, 0, 0, 0.8);
     color: white;
     padding: var(--padding-xs) var(--padding-sm);
     font-size: var(--font-size--xs);
     font-weight: 500;
-    border-radius: 0;
+    border-radius: 4px;
     text-transform: none;
-    margin-bottom: 0;
-    z-index: 3;
   }
 
   @media screen and (max-width: 749px) {
