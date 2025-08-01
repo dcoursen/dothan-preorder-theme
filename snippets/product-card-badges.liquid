@@ -173,9 +173,8 @@
     left: 0;
     right: 0;
     width: 100%;
-    background: var(--color-background);
-    color: var(--color-foreground);
-    opacity: calc(var(--drops-opacity) / 100);
+    background: rgba(0, 0, 0, 0.8); /* Fallback */
+    color: rgb(var(--color-foreground));
     padding: var(--drops-padding-vertical) var(--drops-padding-horizontal);
     font-family: var(--drops-font-family);
     font-size: var(--drops-font-size);
@@ -183,6 +182,32 @@
     text-transform: var(--drops-text-transform);
     text-align: center;
     z-index: 10;
+  }
+  
+  /* Apply color scheme styling */
+  .product-drops-overlay.color-scheme-1 {
+    background: rgba(var(--color-scheme-1-background), calc(var(--drops-opacity) / 100));
+    color: rgb(var(--color-scheme-1-foreground));
+  }
+  
+  .product-drops-overlay.color-scheme-2 {
+    background: rgba(var(--color-scheme-2-background), calc(var(--drops-opacity) / 100));
+    color: rgb(var(--color-scheme-2-foreground));
+  }
+  
+  .product-drops-overlay.color-scheme-3 {
+    background: rgba(var(--color-scheme-3-background), calc(var(--drops-opacity) / 100));
+    color: rgb(var(--color-scheme-3-foreground));
+  }
+  
+  .product-drops-overlay.color-scheme-4 {
+    background: rgba(var(--color-scheme-4-background), calc(var(--drops-opacity) / 100));
+    color: rgb(var(--color-scheme-4-foreground));
+  }
+  
+  .product-drops-overlay.color-scheme-5 {
+    background: rgba(var(--color-scheme-5-background), calc(var(--drops-opacity) / 100));
+    color: rgb(var(--color-scheme-5-foreground));
   }
 
   @media screen and (max-width: 749px) {
