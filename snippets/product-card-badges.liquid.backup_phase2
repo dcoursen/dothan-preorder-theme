@@ -79,19 +79,8 @@
 %}
 
 {%- comment -%} Preorder Drops Overlay - positioned separately from badges {%- endcomment -%}
-{%- if settings.drops_overlay_enabled and preorder_is_coming_soon -%}
-  <div 
-    class="product-drops-overlay color-{{ settings.drops_overlay_color_scheme }}"
-    style="
-      --drops-opacity: {{ settings.drops_overlay_opacity }}%;
-      --drops-font-family: var(--font-{{ settings.drops_overlay_font_family }}--family);
-      --drops-font-weight: {{ settings.drops_overlay_font_weight }};
-      --drops-font-size: {{ settings.drops_overlay_font_size }}px;
-      --drops-text-transform: {{ settings.drops_overlay_text_transform }};
-      --drops-padding-vertical: {{ settings.drops_overlay_padding_vertical }}px;
-      --drops-padding-horizontal: {{ settings.drops_overlay_padding_horizontal }}px;
-    "
-  >
+{%- if preorder_is_coming_soon -%}
+  <div class="product-drops-overlay">
     Drops: {{ preorder_smart_drop_date }}
   </div>
 {%- endif -%}
@@ -173,21 +162,20 @@
     left: 0;
     right: 0;
     width: 100%;
-    background: rgba(var(--color-background), calc(var(--drops-opacity) / 100));
-    color: var(--color-foreground);
-    padding: var(--drops-padding-vertical) var(--drops-padding-horizontal);
-    font-family: var(--drops-font-family);
-    font-size: var(--drops-font-size);
-    font-weight: var(--drops-font-weight);
-    text-transform: var(--drops-text-transform);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size--xs);
+    font-weight: 500;
     text-align: center;
     z-index: 10;
+    text-transform: none;
   }
 
   @media screen and (max-width: 749px) {
     .product-drops-overlay {
-      font-size: calc(var(--drops-font-size) - 2px);
-      padding: calc(var(--drops-padding-vertical) - 2px) calc(var(--drops-padding-horizontal) - 4px);
+      font-size: var(--font-size--2xs);
+      padding: var(--padding-2xs) var(--padding-xs);
     }
   }
 {% endstylesheet %}
