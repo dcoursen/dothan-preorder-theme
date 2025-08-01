@@ -1,0 +1,143 @@
+{% comment %}
+  Klaviyo Back in Stock Notification Component
+  
+  Usage:
+  {% render 'klaviyo-back-in-stock', 
+     product: product, 
+     variant: variant,
+     button_text: 'Custom button text',
+     context: 'sold-out' %}
+{% endcomment %}
+
+{% comment %} Only render if Klaviyo is enabled and configured {% endcomment %}
+{% unless settings.klaviyo_back_in_stock_enabled and settings.klaviyo_public_api_key != blank %}
+  {% comment %} Fallback: show sold out message {% endcomment %}
+  <button type="button" class="btn product-form__cart-submit" disabled>
+    <span>Sold out</span>
+  </button>
+{% else %}
+
+{% comment %} Set up variables {% endcomment %}
+{% assign current_variant = variant | default: product.selected_or_first_available_variant %}
+{% assign product_id = product.id %}
+{% assign variant_id = current_variant.id %}
+{% assign button_text = button_text | default: settings.klaviyo_back_in_stock_button_text %}
+{% assign context = context | default: 'sold-out' %}
+{% assign color_scheme = settings.klaviyo_back_in_stock_color_scheme | default: 'accent-1' %}
+
+{% comment %} Generate unique IDs for this instance {% endcomment %}
+{% assign component_id = 'klaviyo-bis-' | append: product_id | append: '-' | append: variant_id %}
+{% assign form_id = component_id | append: '-form' %}
+{% assign phone_id = component_id | append: '-phone' %}
+{% assign consent_id = component_id | append: '-consent' %}
+
+<div class="klaviyo-back-in-stock color-{{ color_scheme }}" 
+     data-klaviyo-component="{{ component_id }}"
+     data-product-id="{{ product_id }}"
+     data-variant-id="{{ variant_id }}"
+     data-product-title="{{ product.title | escape }}"
+     data-variant-title="{{ current_variant.title | escape }}"
+     data-context="{{ context }}">
+
+  {% comment %} Initial State: Button {% endcomment %}
+  <div class="klaviyo-bis-initial-state">
+    <button type="button" 
+            class="btn product-form__cart-submit klaviyo-bis-trigger"
+            data-component-id="{{ component_id }}">
+      <span>{{ button_text }}</span>
+    </button>
+  </div>
+
+  {% comment %} Form State: Inline form {% endcomment %}
+  <div class="klaviyo-bis-form-state" hidden>
+    <div class="klaviyo-bis-form-content">
+      
+      {% comment %} Form heading and description {% endcomment %}
+      <div class="klaviyo-bis-form-header">
+        {% if settings.klaviyo_back_in_stock_form_heading != blank %}
+          <h3 class="klaviyo-bis-form-heading">{{ settings.klaviyo_back_in_stock_form_heading }}</h3>
+        {% endif %}
+        {% if settings.klaviyo_back_in_stock_form_description != blank %}
+          <p class="klaviyo-bis-form-description">{{ settings.klaviyo_back_in_stock_form_description }}</p>
+        {% endif %}
+      </div>
+
+      {% comment %} Subscription form {% endcomment %}
+      <form class="klaviyo-bis-subscription-form" id="{{ form_id }}">
+        
+        {% comment %} Mobile number field {% endcomment %}
+        <div class="field">
+          <label for="{{ phone_id }}" class="field__label">Mobile Number</label>
+          <input type="tel" 
+                 id="{{ phone_id }}"
+                 name="phone"
+                 class="field__input"
+                 placeholder="(555) 123-4567"
+                 autocomplete="tel"
+                 pattern="^\(\d{3}\) \d{3}-\d{4}$"
+                 required>
+          <div class="field__error" hidden></div>
+        </div>
+
+        {% comment %} SMS marketing consent checkbox {% endcomment %}
+        {% if settings.klaviyo_sms_marketing_list_id != blank and settings.klaviyo_sms_consent_text != blank %}
+        <div class="field field--checkbox">
+          <div class="field__checkbox">
+            <input type="checkbox" 
+                   id="{{ consent_id }}"
+                   name="marketing_consent"
+                   class="field__checkbox-input"
+                   checked>
+            <label for="{{ consent_id }}" class="field__checkbox-label">
+              <span class="field__checkbox-indicator"></span>
+              <span class="field__checkbox-text">{{ settings.klaviyo_sms_consent_text }}</span>
+            </label>
+          </div>
+        </div>
+        {% endif %}
+
+        {% comment %} Form actions {% endcomment %}
+        <div class="klaviyo-bis-form-actions">
+          <button type="submit" class="btn btn--primary klaviyo-bis-submit">
+            <span class="btn__text">Notify Me</span>
+            <div class="loading-overlay__spinner hidden">
+              <svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+              </svg>
+            </div>
+          </button>
+          
+          <button type="button" class="btn btn--secondary klaviyo-bis-cancel">
+            Cancel
+          </button>
+        </div>
+
+      </form>
+      
+      {% comment %} Error state {% endcomment %}
+      <div class="klaviyo-bis-error-state" hidden>
+        <div class="klaviyo-bis-error-content">
+          <p class="klaviyo-bis-error-message"></p>
+          <button type="button" class="btn btn--secondary klaviyo-bis-retry">
+            Try Again
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% comment %} Success State: Collapsed message {% endcomment %}
+  <div class="klaviyo-bis-success-state" hidden>
+    <div class="klaviyo-bis-success-content">
+      <span class="klaviyo-bis-success-message">{{ settings.klaviyo_back_in_stock_success_message }}</span>
+    </div>
+  </div>
+
+</div>
+
+{% comment %} Load JavaScript and CSS {% endcomment %}
+{{ 'klaviyo-back-in-stock.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'klaviyo-back-in-stock.js' | asset_url }}" defer></script>
+
+{% endunless %}

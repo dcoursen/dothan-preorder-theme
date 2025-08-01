@@ -1,0 +1,62 @@
+/**
+ * Klaviyo Back in Stock Component
+ * Handles form interactions and API communication for back in stock notifications
+ */
+
+class KlaviyoBackInStock {
+  constructor() {
+    this.publicApiKey = window.klaviyoPublicApiKey || this.getPublicApiKey();
+    this.smsMarketingListId = window.klaviyoSmsMarketingListId || this.getSmsMarketingListId();
+    this.errorMessages = this.getErrorMessages();
+    this.submissionCache = this.getSubmissionCache();
+    
+    this.init();
+  }
+
+  init() {
+    // Initialize all back in stock components on the page
+    document.querySelectorAll('.klaviyo-back-in-stock').forEach(component => {
+      this.initializeComponent(component);
+    });
+  }
+
+  initializeComponent(component) {
+    const componentId = component.dataset.klaviyoComponent;
+    
+    // Get elements
+    const trigger = component.querySelector('.klaviyo-bis-trigger');
+    const cancelBtn = component.querySelector('.klaviyo-bis-cancel');
+    const retryBtn = component.querySelector('.klaviyo-bis-retry');
+    const form = component.querySelector('.klaviyo-bis-subscription-form');
+    const phoneInput = component.querySelector('input[name="phone"]');
+    
+    // Set up event listeners
+    if (trigger) {
+      trigger.addEventListener('click', () => this.showForm(component));
+    }
+    
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => this.hideForm(component));
+    }
+    
+    if (retryBtn) {
+      retryBtn.addEventListener('click', () => this.hideError(component));
+    }
+    
+    if (form) {
+      form.addEventListener('submit', (e) => this.handleFormSubmit(e, component));
+    }
+    
+    if (phoneInput) {
+      phoneInput.addEventListener('input', (e) => this.formatPhoneNumber(e));
+      phoneInput.addEventListener('blur', (e) => this.validatePhoneNumber(e));
+    }
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => new KlaviyoBackInStock());
+} else {
+  new KlaviyoBackInStock();
+}
