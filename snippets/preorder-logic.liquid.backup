@@ -1,6 +1,6 @@
 {%- liquid
     assign today = 'now' | date: '%s'
-    assign drop_date_field = closest.product.metafields.custom.preorder_drop_date
+    assign drop_date_field = product.metafields.custom.preorder_drop_date
     
     # Initialize preorder variables globally
     assign preorder_is_preorder = false

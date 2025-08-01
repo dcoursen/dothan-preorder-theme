@@ -1,5 +1,6 @@
 {% comment %} Include preorder logic {% endcomment %}
-{% render 'preorder-logic', product: closest.product %}
+{% include 'preorder-logic' %}
+DEBUG: preorder_is_preorder={{ preorder_is_preorder }}, preorder_smart_drop_date={{ preorder_smart_drop_date }}
 
 {% if closest.product == blank %}
   {% assign text = 'placeholders.product_title' | t %}
@@ -35,6 +36,7 @@
     </div>
   {% endif %}
 {% endif %}
+
 {% schema %}
 {
   "name": "t:names.product_title",
