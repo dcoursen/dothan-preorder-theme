@@ -1,5 +1,6 @@
 {%- comment -%}
-  Simple and Reliable Preorder + BIS Integration
+  JavaScript-based Preorder + BIS Integration
+  This works WITH your theme's existing logic instead of fighting it
 {%- endcomment -%}
 
 {%- liquid
@@ -10,16 +11,9 @@
   assign today = 'now' | date: '%s'
   assign drop_date_field = target_product.metafields.custom.preorder_drop_date
   
-  # Force enable for testing (remove these when theme settings work)
-  assign bis_enabled = true
-  assign preorder_enabled = true
-  assign klaviyo_form_id = 'TEST123'
-  
-  assign show_preorder_date = false
-  assign show_klaviyo_button = false
+  assign has_future_preorder = false
   assign preorder_text = ''
   assign klaviyo_button_text = ''
-  assign has_future_preorder = false
   
   # Check for future preorder date
   if drop_date_field != blank
@@ -28,16 +22,13 @@
     
     if days_until_drop > 0
       assign has_future_preorder = true
-      assign show_preorder_date = true
       assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p EST'
       assign preorder_text = 'Available ' | append: formatted_date
     endif
   endif
   
-  # Determine Klaviyo button logic
+  # Determine button text for sold-out products
   if inventory_quantity < 1 and product_available == false
-    assign show_klaviyo_button = true
-    
     if has_future_preorder
       assign klaviyo_button_text = 'Get Early Access'
     else
@@ -46,30 +37,97 @@
   endif
 -%}
 
-{%- comment -%}Always show preorder date if it exists{%- endcomment -%}
-{%- if show_preorder_date -%}
-  <div style="background: #e8f5e8; border: 2px solid #4a7c4a; padding: 12px; margin: 0 0 15px 0; text-align: center; border-radius: 8px; font-weight: 600;">
-    {{ preorder_text }}
-  </div>
-{%- endif -%}
+{%- comment -%}
+  This div will be populated by JavaScript after your theme loads
+{%- endcomment -%}
+<div id="preorder-bis-container" 
+     data-product-id="{{ target_product.id }}"
+     data-has-preorder="{{ has_future_preorder }}"
+     data-preorder-text="{{ preorder_text | escape }}"
+     data-inventory="{{ inventory_quantity }}"
+     data-available="{{ product_available }}"
+     data-klaviyo-text="{{ klaviyo_button_text | escape }}">
+</div>
 
-{%- comment -%}Only show Klaviyo button for sold-out products{%- endcomment -%}
-{%- if show_klaviyo_button -%}
-  <div style="margin: 15px 0;">
-    <button type="button" 
-            onclick="alert('Klaviyo form would open here with: {{ klaviyo_button_text }}')"
-            style="width: 100%; padding: 15px; background: #dc6565; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
-      {{ klaviyo_button_text }}
-    </button>
-  </div>
-{%- endif -%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait a bit for your theme's logic to finish
+  setTimeout(function() {
+    initializePreorderBIS();
+  }, 500);
+  
+  function initializePreorderBIS() {
+    const container = document.getElementById('preorder-bis-container');
+    if (!container) return;
+    
+    const hasPreorder = container.dataset.hasPreorder === 'true';
+    const preorderText = container.dataset.preorderText;
+    const inventory = parseInt(container.dataset.inventory);
+    const available = container.dataset.available === 'true';
+    const klaviyoText = container.dataset.klaviyoText;
+    
+    console.log('Preorder BIS Debug:', {
+      hasPreorder,
+      preorderText,
+      inventory,
+      available,
+      klaviyoText
+    });
+    
+    // Always show preorder date if it exists
+    if (hasPreorder && preorderText) {
+      showPreorderDate(container, preorderText);
+    }
+    
+    // Handle sold-out products
+    if (inventory < 1 && !available) {
+      // Wait a bit more for add-to-cart component to settle
+      setTimeout(function() {
+        replaceSoldOutButton(container, klaviyoText);
+      }, 200);
+    }
+  }
+  
+  function showPreorderDate(container, text) {
+    const dateDiv = document.createElement('div');
+    dateDiv.innerHTML = `
+      <div style="background: #e8f5e8; border: 2px solid #4a7c4a; padding: 12px; margin: 0 0 15px 0; text-align: center; border-radius: 8px; font-weight: 600;">
+        ${text}
+      </div>
+    `;
+    container.appendChild(dateDiv);
+  }
+  
+  function replaceSoldOutButton(container, buttonText) {
+    // Find the add-to-cart component
+    const addToCartComponent = document.querySelector('add-to-cart-component');
+    const addToCartButton = document.querySelector('[name="add"]');
+    
+    if (addToCartComponent && buttonText) {
+      // Hide the original add to cart
+      addToCartComponent.style.display = 'none';
+      
+      // Create and show our BIS button
+      const bisDiv = document.createElement('div');
+      bisDiv.innerHTML = `
+        <button type="button" 
+                onclick="alert('Klaviyo form: ${buttonText}')"
+                style="width: 100%; padding: 15px; background: #dc6565; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
+          ${buttonText}
+        </button>
+      `;
+      container.appendChild(bisDiv);
+    }
+  }
+});
+</script>
 
 {%- comment -%}DEBUG INFO{%- endcomment -%}
 <div style="font-size: 11px; color: #666; margin: 10px 0; padding: 8px; background: #f9f9f9; border-radius: 4px;">
-  <strong>DEBUG:</strong> Product={{ target_product.title | truncate: 20 }}, 
+  <strong>DEBUG:</strong> 
+  Product={{ target_product.title | truncate: 15 }}, 
+  Future Preorder={{ has_future_preorder }}, 
   Inventory={{ inventory_quantity }}, 
-  Available={{ product_available }}, 
-  Drop Date={{ drop_date_field | date: '%m/%d' | default: 'none' }}, 
-  Show Date={{ show_preorder_date }}, 
-  Show Button={{ show_klaviyo_button }}
+  Available={{ product_available }}
+  {%- if drop_date_field -%}, Drop Date={{ drop_date_field | date: '%m/%d %H:%M' }}{%- endif -%}
 </div>
