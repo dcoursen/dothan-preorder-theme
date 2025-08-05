@@ -2461,5 +2461,51 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Back in Stock",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Back in Stock Configuration"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_back_in_stock",
+        "label": "Enable Back in Stock",
+        "default": false,
+        "info": "Show Back in Stock signup for sold-out products without preorder dates"
+      },
+      {
+        "type": "text",
+        "id": "klaviyo_bis_form_id",
+        "label": "Klaviyo Form ID",
+        "info": "Enter your Klaviyo Back in Stock form ID from Forms & Pop-ups",
+        "placeholder": "e.g., ABC123"
+      },
+      {
+        "type": "header",
+        "content": "Button Settings"
+      },
+      {
+        "type": "text",
+        "id": "bis_button_text",
+        "label": "Button Text",
+        "default": "Notify When Back in Stock",
+        "info": "Text displayed on the back in stock button"
+      },
+      {
+        "type": "color",
+        "id": "bis_button_background",
+        "label": "Button Background Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "bis_button_text_color",
+        "label": "Button Text Color",
+        "default": "#000000"
+      }
+    ]
   }
 ]
