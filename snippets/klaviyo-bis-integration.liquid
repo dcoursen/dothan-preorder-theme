@@ -1,0 +1,245 @@
+{%- comment -%}
+  Enhanced Preorder + Klaviyo Back in Stock Integration
+  
+  CORRECTED LOGIC:
+  1. Has future preorder drop date → Show preorder text (regardless of inventory)
+  2. No preorder date + sold out → Show Klaviyo BIS button (if enabled)
+  3. No preorder date + has inventory → Show nothing (normal add to cart)
+  
+  Usage: {% render 'klaviyo-bis-integration', product: product, location: 'product-page' %}
+{%- endcomment -%}
+
+{%- liquid
+  # Use closest context if available (for sections), otherwise use passed product
+  if closest.product
+    assign target_product = closest.product
+    assign target_variant = closest.product.selected_or_first_available_variant
+  else
+    assign target_product = product
+    assign target_variant = product.selected_or_first_available_variant
+  endif
+  
+  # Get location context (product-page vs product-card)
+  assign display_location = location | default: 'product-page'
+  
+  # Check if features are enabled and should display in this location
+  assign bis_enabled = settings.enable_back_in_stock
+  assign preorder_enabled = settings.enable_preorder_display
+  assign show_on_cards = settings.show_on_product_cards
+  assign show_on_pages = settings.show_on_product_pages
+  
+  assign should_display = false
+  if display_location == 'product-card' and show_on_cards
+    assign should_display = true
+  elsif display_location == 'product-page' and show_on_pages
+    assign should_display = true
+  endif
+  
+  # Exit early if not enabled for this location
+  unless should_display
+    break
+  endunless
+  
+  # Get inventory and date info
+  assign inventory_quantity = target_variant.inventory_quantity
+  assign product_available = target_product.available
+  assign today = 'now' | date: '%s'
+  
+  # Get metafields
+  assign drop_date_field = target_product.metafields.custom.preorder_drop_date
+  assign pickup_start_field = target_product.metafields.custom.preorder_pickup_start
+  assign pickup_duration = target_product.metafields.custom.preorder_pickup_duration_days
+  
+  # Get theme settings
+  assign klaviyo_form_id = settings.klaviyo_bis_form_id
+  assign button_text = settings.bis_button_text | default: 'Notify When Back in Stock'
+  assign button_style = settings.bis_button_style | default: 'secondary'
+  assign preorder_prefix = settings.preorder_text_prefix | default: 'Available'
+  
+  # Initialize state variables
+  assign show_preorder = false
+  assign show_klaviyo_bis = false
+  assign preorder_text = ''
+  assign is_future_preorder = false
+  
+  # Case 1: Check if there's a future preorder drop date (REGARDLESS OF INVENTORY)
+  if preorder_enabled and drop_date_field != blank
+    assign drop_date = drop_date_field | date: '%s'
+    assign days_until_drop = drop_date | minus: today | divided_by: 86400
+    
+    if days_until_drop > 0
+      assign is_future_preorder = true
+      assign show_preorder = true
+      
+      # Generate preorder text based on timeframe
+      if days_until_drop <= 7
+        # Show "Available this Monday @ 10:00AM EST" format
+        assign drop_weekday = drop_date_field | date: '%w'
+        case drop_weekday
+          when '0'
+            assign day_name = 'Sunday'
+          when '1'
+            assign day_name = 'Monday'
+          when '2'
+            assign day_name = 'Tuesday'
+          when '3'
+            assign day_name = 'Wednesday'
+          when '4'
+            assign day_name = 'Thursday'
+          when '5'
+            assign day_name = 'Friday'
+          when '6'
+            assign day_name = 'Saturday'
+        endcase
+        assign time_with_tz = drop_date_field | date: '%B %d @ %l:%M%p EST'
+        assign preorder_text = preorder_prefix | append: ' ' | append: time_with_tz
+      else
+        # Show "Available MM/DD" format
+        assign formatted_date = drop_date_field | date: '%B %d'
+        assign preorder_text = preorder_prefix | append: ' ' | append: formatted_date
+      endif
+    endif
+  endif
+  
+  # Case 2: Regular sold out product (no preorder date, sold out)
+  # Show Klaviyo BIS only if enabled, form ID configured, product is sold out, AND no future preorder
+  if bis_enabled and is_future_preorder == false and inventory_quantity < 1 and product_available == false and klaviyo_form_id != blank
+    assign show_klaviyo_bis = true
+  endif
+  
+  # Case 3: Product has inventory and no preorder date - shows nothing (normal add to cart)
+-%}
+
+{%- if show_preorder -%}
+  <div class="preorder-notification" data-location="{{ display_location }}">
+    <span class="preorder-text">{{ preorder_text }}</span>
+  </div>
+{%- elsif show_klaviyo_bis -%}
+  <div class="klaviyo-bis-wrapper" data-location="{{ display_location }}">
+    <div class="klaviyo-bis-trigger"
+         data-product-id="{{ target_product.id }}"
+         data-variant-id="{{ target_variant.id }}"
+         data-product-handle="{{ target_product.handle }}"
+         data-form-id="{{ klaviyo_form_id }}">
+      <button type="button" 
+              class="klaviyo-bis-button klaviyo-bis-button--{{ button_style }}"
+              data-bis-variant-id="{{ target_variant.id }}"
+              data-bis-product-id="{{ target_product.id }}"
+              data-bis-form-id="{{ klaviyo_form_id }}">
+        {{ button_text }}
+      </button>
+    </div>
+  </div>
+{%- endif -%}
+
+{%- if show_klaviyo_bis -%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Klaviyo BIS triggers for this product
+  const productTriggers = document.querySelectorAll('[data-product-id="{{ target_product.id }}"] .klaviyo-bis-button');
+  
+  productTriggers.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const variantId = this.dataset.bisVariantId;
+      const productId = this.dataset.bisProductId;
+      const formId = this.dataset.bisFormId;
+      
+      // Ensure Klaviyo is loaded
+      if (typeof klaviyo !== 'undefined' && formId) {
+        // Track the back in stock interest event
+        klaviyo.push(['track', 'Viewed Product', {
+          'ProductID': productId,
+          'ProductVariantID': variantId,
+          'ProductName': '{{ target_product.title | escape }}',
+          'ProductHandle': '{{ target_product.handle }}',
+          'ProductImageURL': '{{ target_product.featured_image | image_url: width: 600 }}',
+          'ProductURL': '{{ shop.secure_url }}{{ target_product.url }}',
+          'value': {{ target_variant.price | money_without_currency }}
+        }]);
+        
+        # Show the BIS form
+        klaviyo.push(['showForm', formId]);
+      } else {
+        console.warn('Klaviyo not loaded or form ID not configured');
+      }
+    });
+  });
+});
+</script>
+{%- endif -%}
+
+{% stylesheet %}
+.preorder-notification {
+  padding: var(--padding-sm, 8px) 0;
+  font-size: var(--font-size--sm, 14px);
+  font-weight: 500;
+  text-align: center;
+}
+
+.preorder-text {
+  display: inline-block;
+  background-color: {{ settings.preorder_background_color | default: '#f5f5f5' }};
+  color: {{ settings.preorder_text_color | default: '#000000' }};
+  padding: var(--padding-xs, 6px) var(--padding-sm, 12px);
+  border: 1px solid {{ settings.preorder_border_color | default: '#666666' }};
+  border-radius: var(--style-border-radius, 6px);
+  font-weight: 500;
+}
+
+.klaviyo-bis-wrapper {
+  padding: var(--padding-sm, 8px) 0;
+  width: 100%;
+}
+
+.klaviyo-bis-button {
+  width: 100%;
+  min-height: 44px;
+  font-size: var(--font-size--sm, 14px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: var(--style-border-radius, 4px);
+  padding: var(--padding-md, 12px);
+  font-family: var(--font-body--family, inherit);
+  text-align: center;
+  border: 1px solid;
+}
+
+/* Secondary Button Style (default) */
+.klaviyo-bis-button,
+.klaviyo-bis-button--secondary {
+  background-color: {{ settings.bis_button_background | default: '#ffffff' }};
+  color: {{ settings.bis_button_text_color | default: '#000000' }};
+  border-color: {{ settings.bis_button_border_color | default: '#e6e6e6' }};
+}
+
+.klaviyo-bis-button:hover,
+.klaviyo-bis-button--secondary:hover {
+  background-color: {{ settings.bis_button_text_color | default: '#000000' }};
+  color: {{ settings.bis_button_background | default: '#ffffff' }};
+}
+
+/* Product card specific styles */
+[data-location="product-card"] .preorder-notification,
+[data-location="product-card"] .klaviyo-bis-wrapper {
+  padding: var(--padding-xs, 4px) 0;
+}
+
+[data-location="product-card"] .klaviyo-bis-button {
+  min-height: 36px;
+  font-size: var(--font-size--xs, 12px);
+}
+
+@media screen and (max-width: 749px) {
+  .preorder-notification,
+  .klaviyo-bis-wrapper {
+    padding: var(--padding-xs, 4px) 0;
+  }
+  
+  .klaviyo-bis-button {
+    min-height: 40px;
+    font-size: var(--font-size--xs, 12px);
+  }
+}
+{% endstylesheet %}
