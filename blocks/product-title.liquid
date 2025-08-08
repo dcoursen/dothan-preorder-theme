@@ -1,5 +1,3 @@
-{% comment %} Include preorder logic {% endcomment %}
-{% include 'preorder-logic' %}
 
 {% if closest.product == blank %}
   {% assign text = 'placeholders.product_title' | t %}
@@ -15,6 +13,7 @@
   >
     {% render 'text', fallback_text: product_title, block: block %}
   </a>
+  
   
   {% comment %} Add pickup dates below title for preorder products {% endcomment %}
   {% if preorder_is_preorder %}

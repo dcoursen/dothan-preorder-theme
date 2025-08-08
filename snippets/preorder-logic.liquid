@@ -1,49 +1,87 @@
 {%- liquid
-  assign today = 'now' | date: '%s'
-  assign drop_date_field = closest.product.metafields.custom.preorder_drop_date
-  
-  # Initialize preorder variables globally
-  assign preorder_is_preorder = false
+  assign is_preorder = false
   assign preorder_text = ''
-  assign preorder_is_coming_soon = false
-  assign preorder_smart_drop_date = ''
+  assign pickup_text = ''
+  assign today = 'now' | date: '%s'
   
-  if drop_date_field != blank
-    assign drop_date = drop_date_field | date: '%s'
-    assign days_until_drop = drop_date | minus: today | divided_by: 86400
-    assign drop_weekday = drop_date_field | date: '%w'
+  if product.available == false
+    assign drop_date_field = product.metafields.custom.preorder_drop_date
     
-    if days_until_drop > 0
-      assign preorder_is_preorder = true
-      assign preorder_is_coming_soon = true
+    if drop_date_field != blank
+      assign drop_date = drop_date_field | date: '%s'
+      assign days_until_drop = drop_date | minus: today | divided_by: 86400
+      assign drop_weekday = drop_date_field | date: '%w'
       
-      # Get day name
-      case drop_weekday
-        when '0'
-          assign day_name = 'Sunday'
-        when '1'
-          assign day_name = 'Monday'
-        when '2'
-          assign day_name = 'Tuesday'
-        when '3'
-          assign day_name = 'Wednesday'
-        when '4'
-          assign day_name = 'Thursday'
-        when '5'
-          assign day_name = 'Friday'
-        when '6'
-          assign day_name = 'Saturday'
-      endcase
-      
-      if days_until_drop <= 7
-        assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
-        assign preorder_text = 'This ' | append: day_name | append: ' @ ' | append: time_with_tz
-        assign preorder_smart_drop_date = preorder_text
-      else
-        assign formatted_date = drop_date_field | date: '%-m/%-d'
-        assign preorder_text = day_name | append: ' ' | append: formatted_date
-        assign preorder_smart_drop_date = preorder_text
+      if days_until_drop > 0
+        assign is_preorder = true
+        
+        if days_until_drop <= 7
+          case drop_weekday
+            when '0'
+              assign day_name = 'Sunday'
+            when '1'
+              assign day_name = 'Monday'  
+            when '2'
+              assign day_name = 'Tuesday'
+            when '3'
+              assign day_name = 'Wednesday'
+            when '4'
+              assign day_name = 'Thursday'
+            when '5'
+              assign day_name = 'Friday'
+            when '6'
+              assign day_name = 'Saturday'
+          endcase
+          assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
+          assign preorder_text = 'Available this ' | append: day_name | append: ' @ ' | append: time_with_tz
+        else
+          assign preorder_text = 'Available ' | append: drop_date_field | date: '%m/%d'
+        endif
       endif
     endif
   endif
+
+  assign pickup_start_field = product.metafields.custom.preorder_pickup_start
+  if pickup_start_field != blank
+    assign pickup_start_date = pickup_start_field | date: '%s'
+    assign days_until_pickup = pickup_start_date | minus: today | divided_by: 86400
+    assign pickup_weekday = pickup_start_field | date: '%w'
+    
+    if days_until_pickup < 7
+      case pickup_weekday
+        when '0'
+          assign pickup_day_name = 'Sunday'
+        when '1'
+          assign pickup_day_name = 'Monday'  
+        when '2'
+          assign pickup_day_name = 'Tuesday'
+        when '3'
+          assign pickup_day_name = 'Wednesday'
+        when '4'
+          assign pickup_day_name = 'Thursday'
+        when '5'
+          assign pickup_day_name = 'Friday'
+        when '6'
+          assign pickup_day_name = 'Saturday'
+      endcase
+      assign pickup_text = 'this ' | append: pickup_day_name
+    else
+      assign pickup_text = pickup_start_field | date: '%m/%d/%Y'
+    endif
+  endif
 -%}
+
+{%- comment -%}
+  Availability date display removed - only showing pickup date
+  {%- if is_preorder -%}
+    <div class="preorder-wrapper" data-preorder="true">{{ preorder_text }}</div>
+  {%- endif -%}
+{%- endcomment -%}
+
+{%- if pickup_text != blank -%}
+  <div class="pickup-start-display" style="margin-top: 0.25rem; margin-bottom: 1rem; font-size: 0.9rem; color: rgb(var(--color-foreground-heading)); line-height: 1.4;">
+    <strong>Pickup Begins In-Store:</strong> {{ pickup_text }}
+  </div>
+{%- endif -%}
+
+
