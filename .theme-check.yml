@@ -1,0 +1,49 @@
+# Shopify Theme Check Configuration
+extends: :recommended
+
+# Disable checks that don't apply to our use case
+DisabledChecks:
+  - MissingEnableComment  # We manage our snippets differently
+
+# Custom check configurations
+LiquidTag:
+  enabled: true
+  severity: error
+
+DeprecatedTags:
+  enabled: true
+  severity: warning
+
+RequiredLayoutThemeObject:
+  enabled: true
+
+# Ignore files
+ignore:
+  - node_modules/**/*
+  - .git/**/*
+  - tests/**/*
+  - docs/**/*
+
+# Custom patterns to check
+include_patterns:
+  - "*.liquid"
+  - "assets/*.js"
+  - "assets/*.css"
+
+# Performance settings
+AssetSizeCSS:
+  enabled: true
+  threshold_in_bytes: 100000
+
+AssetSizeJavaScript:
+  enabled: true  
+  threshold_in_bytes: 100000
+
+# Liquid specific
+UnknownFilter:
+  enabled: true
+  severity: error
+
+UndefinedObject:
+  enabled: true
+  severity: error

@@ -1,0 +1,64 @@
+name: Deploy to Shopify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm run test:ci
+        env:
+          SHOPIFY_STORE_URL: ${{ secrets.SHOPIFY_STORE_URL }}
+          PREORDER_PRODUCT: ${{ secrets.PREORDER_PRODUCT }}
+          REGULAR_PRODUCT: ${{ secrets.REGULAR_PRODUCT }}
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Shopify CLI
+        run: npm install -g @shopify/cli @shopify/theme
+      
+      - name: Deploy to Shopify
+        env:
+          SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+          SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE_URL }}
+        run: |
+          # Deploy to the appropriate theme based on branch/environment
+          if [ "${{ github.event.inputs.environment || 'production' }}" = "production" ]; then
+            shopify theme push --theme=${{ secrets.PRODUCTION_THEME_ID }} --only="snippets/preorder-*.liquid" --only="snippets/klaviyo-*.liquid" --only="assets/*.js" --only="assets/*.css"
+          else
+            shopify theme push --theme=${{ secrets.STAGING_THEME_ID }} --only="snippets/preorder-*.liquid" --only="snippets/klaviyo-*.liquid" --only="assets/*.js" --only="assets/*.css"
+          fi
+      
+      - name: Notify deployment
+        if: success()
+        run: |
+          echo "✅ Deployment successful to ${{ github.event.inputs.environment || 'production' }}"
+          # Add Slack/Discord notification here if needed

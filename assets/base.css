@@ -4278,3 +4278,28 @@ text-component {
   text-transform: none;
 }
 
+
+
+
+
+
+/* Hide buy button when preorder text is shown */
+.preorder-wrapper[data-preorder="true"] + * .add-to-cart-component {
+  display: none !important;
+}
+
+.preorder-wrapper[data-preorder="true"] + * .shopify-payment-button {
+  display: none !important;
+}
+
+/* Style preorder text */
+.preorder-wrapper {
+  text-align: center;
+  padding: 12px;
+  color: #666;
+  font-size: 16px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

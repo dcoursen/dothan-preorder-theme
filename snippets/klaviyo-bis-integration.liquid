@@ -1,6 +1,5 @@
 {%- comment -%}
-  JavaScript-based Preorder + BIS Integration
-  This works WITH your theme's existing logic instead of fighting it
+  Production Preorder + BIS Integration
 {%- endcomment -%}
 
 {%- liquid
@@ -11,6 +10,11 @@
   assign today = 'now' | date: '%s'
   assign drop_date_field = target_product.metafields.custom.preorder_drop_date
   
+  # Get theme settings (with fallbacks)
+  assign bis_enabled = settings.enable_back_in_stock | default: true
+  assign preorder_enabled = settings.enable_preorder_display | default: true
+  assign klaviyo_form_id = settings.klaviyo_bis_form_id | default: 'WQZSWn'
+  
   assign has_future_preorder = false
   assign preorder_text = ''
   assign klaviyo_button_text = ''
@@ -19,42 +23,98 @@
   if drop_date_field != blank
     assign drop_date = drop_date_field | date: '%s'
     assign days_until_drop = drop_date | minus: today | divided_by: 86400
+    assign drop_weekday = drop_date_field | date: '%w'
     
     if days_until_drop > 0
       assign has_future_preorder = true
-      assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p EST'
-      assign preorder_text = 'Available ' | append: formatted_date
+      
+      # Smart date formatting - show "This Friday @ 2:00PM EST" for dates within a week
+      if days_until_drop <= 7
+        case drop_weekday
+          when '0'
+            assign day_name = 'Sunday'
+          when '1'
+            assign day_name = 'Monday'  
+          when '2'
+            assign day_name = 'Tuesday'
+          when '3'
+            assign day_name = 'Wednesday'
+          when '4'
+            assign day_name = 'Thursday'
+          when '5'
+            assign day_name = 'Friday'
+          when '6'
+            assign day_name = 'Saturday'
+        endcase
+        assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
+        assign preorder_text = 'Available this ' | append: day_name | append: ' @ ' | append: time_with_tz
+      else
+        assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p EST'
+        assign preorder_text = 'Available ' | append: formatted_date
+      endif
     endif
   endif
   
   # Determine button text for sold-out products
   if inventory_quantity < 1 and product_available == false
     if has_future_preorder
-      assign klaviyo_button_text = 'Get Early Access'
+      assign klaviyo_button_text = settings.preorder_button_text | default: 'Get Early Access'
     else
-      assign klaviyo_button_text = 'Notify When Back in Stock'
+      assign klaviyo_button_text = settings.bis_button_text | default: 'Notify When Back in Stock'
     endif
   endif
 -%}
 
-{%- comment -%}
-  This div will be populated by JavaScript after your theme loads
-{%- endcomment -%}
+<!-- Debug: Product ID = {{ target_product.id }}, Inventory = {{ inventory_quantity }}, Available = {{ product_available }} -->
 <div id="preorder-bis-container" 
      data-product-id="{{ target_product.id }}"
      data-has-preorder="{{ has_future_preorder }}"
      data-preorder-text="{{ preorder_text | escape }}"
      data-inventory="{{ inventory_quantity }}"
      data-available="{{ product_available }}"
-     data-klaviyo-text="{{ klaviyo_button_text | escape }}">
+     data-klaviyo-text="{{ klaviyo_button_text | escape }}"
+     data-klaviyo-form-id="{{ klaviyo_form_id }}"
+     data-bis-enabled="{{ bis_enabled }}"
+     data-preorder-enabled="{{ preorder_enabled }}">
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Wait a bit for your theme's logic to finish
+  // Hide sold-out button immediately to prevent flicker
+  if (shouldHideSoldOutButton()) {
+    hideSoldOutButton();
+  }
+  
+  // Initialize with minimal delay
   setTimeout(function() {
     initializePreorderBIS();
-  }, 500);
+  }, 100);
+  
+  function shouldHideSoldOutButton() {
+    const container = document.getElementById('preorder-bis-container');
+    if (!container) return false;
+    
+    const inventory = parseInt(container.dataset.inventory);
+    const available = container.dataset.available === 'true';
+    const klaviyoText = container.dataset.klaviyoText;
+    const bisEnabled = container.dataset.bisEnabled === 'true';
+    
+    return bisEnabled && inventory < 1 && !available && klaviyoText;
+  }
+  
+  function hideSoldOutButton() {
+    // Hide the add-to-cart component if it exists
+    const addToCartComponent = document.querySelector('add-to-cart-component');
+    if (addToCartComponent) {
+      addToCartComponent.style.display = 'none';
+    }
+    
+    // Hide the fallback BIS button container
+    const fallbackBISContainer = document.getElementById('klaviyo-bis-button-container');
+    if (fallbackBISContainer) {
+      fallbackBISContainer.style.display = 'none';
+    }
+  }
   
   function initializePreorderBIS() {
     const container = document.getElementById('preorder-bis-container');
@@ -65,69 +125,250 @@ document.addEventListener('DOMContentLoaded', function() {
     const inventory = parseInt(container.dataset.inventory);
     const available = container.dataset.available === 'true';
     const klaviyoText = container.dataset.klaviyoText;
+    const formId = container.dataset.klaviyoFormId;
+    const bisEnabled = container.dataset.bisEnabled === 'true';
+    const preorderEnabled = container.dataset.preorderEnabled === 'true';
     
-    console.log('Preorder BIS Debug:', {
-      hasPreorder,
-      preorderText,
-      inventory,
-      available,
-      klaviyoText
-    });
-    
-    // Always show preorder date if it exists
-    if (hasPreorder && preorderText) {
+    // Handle sold-out products with preorder date above BIS button
+    if (bisEnabled && inventory < 1 && !available && klaviyoText) {
+      // Show preorder date first if enabled and exists
+      if (preorderEnabled && hasPreorder && preorderText) {
+        showPreorderDate(container, preorderText);
+      }
+      
+      // Always show the BIS button - don't wait for add-to-cart replacement
+      showBISButton(container, klaviyoText, formId);
+      
+      // Try to hide the original add-to-cart component if it exists
+      hideSoldOutButton();
+    } else if (preorderEnabled && hasPreorder && preorderText) {
+      // Show preorder date for products that are available but have preorder info
       showPreorderDate(container, preorderText);
-    }
-    
-    // Handle sold-out products
-    if (inventory < 1 && !available) {
-      // Wait a bit more for add-to-cart component to settle
-      setTimeout(function() {
-        replaceSoldOutButton(container, klaviyoText);
-      }, 200);
     }
   }
   
   function showPreorderDate(container, text) {
+    // Remove any existing preorder date display
+    const existingDate = container.querySelector('.preorder-date-display');
+    if (existingDate) {
+      existingDate.remove();
+    }
+    
     const dateDiv = document.createElement('div');
-    dateDiv.innerHTML = `
-      <div style="background: #e8f5e8; border: 2px solid #4a7c4a; padding: 12px; margin: 0 0 15px 0; text-align: center; border-radius: 8px; font-weight: 600;">
-        ${text}
-      </div>
-    `;
-    container.appendChild(dateDiv);
+    dateDiv.className = 'preorder-date-display';
+    dateDiv.innerHTML = text;
+    
+    // Insert at the beginning of container to appear above BIS button
+    container.insertBefore(dateDiv, container.firstChild);
   }
   
-  function replaceSoldOutButton(container, buttonText) {
-    // Find the add-to-cart component
-    const addToCartComponent = document.querySelector('add-to-cart-component');
-    const addToCartButton = document.querySelector('[name="add"]');
-    
-    if (addToCartComponent && buttonText) {
-      // Hide the original add to cart
-      addToCartComponent.style.display = 'none';
-      
-      // Create and show our BIS button
-      const bisDiv = document.createElement('div');
-      bisDiv.innerHTML = `
-        <button type="button" 
-                onclick="alert('Klaviyo form: ${buttonText}')"
-                style="width: 100%; padding: 15px; background: #dc6565; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
-          ${buttonText}
-        </button>
-      `;
-      container.appendChild(bisDiv);
+  function showBISButton(container, buttonText, formId) {
+    // Remove any existing BIS button first
+    const existingBIS = container.querySelector('.klaviyo-bis-button-container');
+    if (existingBIS) {
+      existingBIS.remove();
     }
+    
+    // Create BIS button
+    const bisDiv = document.createElement('div');
+    bisDiv.className = 'klaviyo-bis-button-container';
+    
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'klaviyo-bis-button';
+    button.textContent = buttonText;
+    
+    button.addEventListener('click', function() {
+      console.log('BIS button clicked, trying to open Klaviyo form:', formId);
+      
+      // Method 1: Try _learnq with multiple commands
+      if (typeof window._learnq !== 'undefined' && window._learnq.push && formId) {
+        try {
+          // Track the event first
+          window._learnq.push(['track', 'Requested Back in Stock', {
+            'item': '{{ target_product.title | escape }}',
+            'variant': '{{ target_variant.title | escape }}',
+            'product_id': '{{ target_product.id }}',
+            'variant_id': '{{ target_variant.id }}'
+          }]);
+          
+          // Then show the form - try multiple methods
+          window._learnq.push(['showForm', formId]);
+          console.log('Called _learnq.showForm with ID:', formId);
+          
+          // Alternative method for showing forms
+          window._learnq.push(['identify', {}]);
+          window._learnq.push(['showForm', formId]);
+          
+        } catch (e) {
+          console.log('_learnq methods failed:', e);
+        }
+      }
+      
+      // Method 2: Try klaviyo global object with different commands
+      if (typeof window.klaviyo !== 'undefined' && window.klaviyo.push && formId) {
+        try {
+          window.klaviyo.push(['openForm', formId]);
+          window.klaviyo.push(['showForm', formId]); 
+          console.log('Called klaviyo showForm/openForm with ID:', formId);
+        } catch (e) {
+          console.log('klaviyo methods failed:', e);
+        }
+      }
+      
+      // Method 3: Wait and try to find the form in DOM
+      setTimeout(function() {
+        // Look for Klaviyo forms with various selectors
+        var selectors = [
+          '[data-testid="klaviyo-form-' + formId + '"]',
+          '.klaviyo-form-' + formId,
+          '#klaviyo_' + formId,
+          '[class*="' + formId + '"]',
+          '.klaviyo-form',
+          '[data-form-id="' + formId + '"]',
+          '.kl-private-reset-css-Xuajs1'
+        ];
+        
+        var klaviyoForm = null;
+        for (var i = 0; i < selectors.length; i++) {
+          klaviyoForm = document.querySelector(selectors[i]);
+          if (klaviyoForm) {
+            console.log('Found Klaviyo form with selector:', selectors[i], klaviyoForm);
+            break;
+          }
+        }
+        
+        if (klaviyoForm) {
+          // Force show the form
+          klaviyoForm.style.display = 'block !important';
+          klaviyoForm.style.visibility = 'visible !important';
+          klaviyoForm.style.opacity = '1 !important';
+          klaviyoForm.style.zIndex = '999999 !important';
+          klaviyoForm.style.position = 'fixed !important';
+          
+          // Remove any hidden attributes
+          klaviyoForm.removeAttribute('hidden');
+          klaviyoForm.classList.remove('hidden');
+          
+          console.log('Force displayed Klaviyo form');
+        } else {
+          console.log('No Klaviyo form found in DOM');
+          
+          // Debug: log all elements that might be Klaviyo-related
+          var allKlaviyoElements = document.querySelectorAll('[class*="klaviyo"], [id*="klaviyo"], [data-testid*="klaviyo"]');
+          console.log('All Klaviyo-related elements found:', allKlaviyoElements);
+        }
+      }, 500);
+      
+      // Debug info
+      console.log('Klaviyo debug info:', {
+        _learnq: typeof window._learnq,
+        klaviyo: typeof window.klaviyo,
+        formId: formId,
+        allKlaviyoGlobals: Object.keys(window).filter(key => key.toLowerCase().includes('klaviyo'))
+      });
+    });
+    
+    bisDiv.appendChild(button);
+    container.appendChild(bisDiv);
   }
 });
 </script>
 
-{%- comment -%}DEBUG INFO{%- endcomment -%}
-<div style="font-size: 11px; color: #666; margin: 10px 0; padding: 8px; background: #f9f9f9; border-radius: 4px;">
-  <strong>DEBUG:</strong> 
-  Product={{ target_product.title | truncate: 15 }}, 
-  Future Preorder={{ has_future_preorder }}, 
-  Inventory={{ inventory_quantity }}, 
-  Available={{ product_available }}
-  {%- if drop_date_field -%}, Drop Date={{ drop_date_field | date: '%m/%d %H:%M' }}{%- endif -%}
-</div>
+<style>
+.preorder-date-display {
+  background: {{ settings.preorder_date_background | default: '#e8f5e8' }};
+  border: 2px solid {{ settings.preorder_date_border | default: '#4a7c4a' }};
+  color: {{ settings.preorder_date_text | default: '#2d5a2d' }};
+  border-radius: {{ settings.preorder_date_border_radius | default: 8 }}px;
+  {% if settings.preorder_date_font_size == 'inherit' or settings.preorder_date_font_size == blank %}
+    font-size: inherit;
+  {% else %}
+    font-size: {{ settings.preorder_date_font_size }}px;
+  {% endif %}
+  {% if settings.preorder_date_font_weight == 'inherit' or settings.preorder_date_font_weight == blank %}
+    font-weight: inherit;
+  {% else %}
+    font-weight: {{ settings.preorder_date_font_weight }};
+  {% endif %}
+  padding: 12px 16px;
+  margin: 0 0 16px 0;
+  text-align: center;
+  box-shadow: 0 2px 4px {{ settings.preorder_date_border | default: '#4a7c4a' | color_modify: 'alpha', 0.1 }};
+  animation: slideInDown 0.4s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.klaviyo-bis-button-container {
+  margin: 16px 0;
+}
+
+.klaviyo-bis-button {
+  width: 100%;
+  padding: 16px 24px;
+  background: {{ settings.preorder_button_background | default: '#dc6565' }};
+  color: {{ settings.preorder_button_text_color | default: '#ffffff' }};
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  {% case settings.preorder_button_text_case %}
+    {% when 'uppercase' %}
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    {% when 'capitalize' %}
+      text-transform: capitalize;
+      letter-spacing: 0.2px;
+    {% when 'lowercase' %}
+      text-transform: lowercase;
+      letter-spacing: 0.2px;
+    {% when 'as-typed' %}
+      text-transform: none;
+      letter-spacing: normal;
+    {% else %}
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+  {% endcase %}
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px {{ settings.preorder_button_background | default: '#dc6565' | color_modify: 'alpha', 0.2 }};
+}
+
+.klaviyo-bis-button:hover {
+  background: {{ settings.preorder_button_background_hover | default: '#c85454' }};
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px {{ settings.preorder_button_background | default: '#dc6565' | color_modify: 'alpha', 0.3 }};
+}
+
+.klaviyo-bis-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px {{ settings.preorder_button_background | default: '#dc6565' | color_modify: 'alpha', 0.2 }};
+}
+
+@media screen and (max-width: 749px) {
+  .preorder-date-display {
+    {% if settings.preorder_date_font_size == 'inherit' or settings.preorder_date_font_size == blank %}
+      font-size: 0.92em; /* Slightly smaller on mobile */
+    {% else %}
+      font-size: {{ settings.preorder_date_font_size | minus: 1 }}px; /* 1px smaller on mobile */
+    {% endif %}
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  
+  .klaviyo-bis-button {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+}
+</style>

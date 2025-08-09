@@ -101,11 +101,21 @@
   # BUTTON LOGIC - CORRECTED
   # ===========================================
   
+  # Check if BIS should be shown (sold out + BIS enabled)
+  assign show_bis_button = false
+  assign bis_enabled = settings.enable_back_in_stock | default: true
+  
   # Standard inventory logic first
   if inventory_managed
     if inventory_quantity <= 0 and inventory_policy == 'deny' or quantity_rule_soldout
-      assign can_add_to_cart = false
-      assign add_to_cart_text = 'products.product.sold_out' | t
+      # Product is sold out - check if BIS should be shown instead
+      if bis_enabled
+        assign show_bis_button = true
+        assign can_add_to_cart = false
+      else
+        assign can_add_to_cart = false
+        assign add_to_cart_text = 'products.product.sold_out' | t
+      endif
     else
       assign can_add_to_cart = true
       assign add_to_cart_text = 'products.product.add_to_cart' | t
@@ -115,8 +125,14 @@
       assign can_add_to_cart = true
       assign add_to_cart_text = 'products.product.add_to_cart' | t
     else
-      assign can_add_to_cart = false
-      assign add_to_cart_text = 'products.product.unavailable' | t
+      # No variant available - check if BIS should be shown
+      if bis_enabled
+        assign show_bis_button = true
+        assign can_add_to_cart = false
+      else
+        assign can_add_to_cart = false
+        assign add_to_cart_text = 'products.product.unavailable' | t
+      endif
     endif
   endif
   
@@ -139,8 +155,122 @@
   {{ block.shopify_attributes }}
 >
   {%- if product != blank -%}
-    {%- assign product_form_id = 'BuyButtons-ProductForm-' | append: block.id -%}
-    <product-form-component
+    {%- if show_bis_button -%}
+      {% comment %} Include enhanced preorder + BIS integration {% endcomment %}
+      {% render 'klaviyo-bis-integration' %}
+      
+      {% comment %} Original BIS button as fallback {% endcomment %}
+      <div id="klaviyo-bis-button-container" style="display: none;">
+        <!-- Use Klaviyo's expected data attributes for Back in Stock -->
+        <button type="button" 
+                class="bis-button button klaviyo-bis-trigger"
+                data-product-id="{{ product.id }}"
+                data-variant-id="{{ variant.id }}"
+                data-product-title="{{ product.title | escape }}"
+                data-product-url="{{ request.origin }}{{ product.url }}"
+                data-product-image="{{ variant.featured_image | default: product.featured_image | image_url: width: 200 }}"
+                data-variant-price="{{ variant.price | money_without_currency }}"
+                data-klaviyo-form-id="{{ settings.klaviyo_bis_form_id | default: 'WQZSWn' }}"
+onclick="
+                event.preventDefault();
+                
+                var formId = '{{ settings.klaviyo_bis_form_id | default: 'WQZSWn' }}';
+                
+                // Method 1: Try _learnq form display
+                if (typeof window._learnq !== 'undefined' && window._learnq.push) {
+                  try {
+                    window._learnq.push(['showForm', formId]);
+                    console.log('Tried _learnq showForm with ID:', formId);
+                  } catch (e) {
+                    console.log('_learnq showForm failed:', e);
+                  }
+                }
+                
+                // Method 2: Try klaviyo global object
+                if (typeof window.klaviyo !== 'undefined' && window.klaviyo.push) {
+                  try {
+                    window.klaviyo.push(['openForm', formId]);
+                    console.log('Tried klaviyo openForm with ID:', formId);
+                  } catch (e) {
+                    console.log('klaviyo openForm failed:', e);
+                  }
+                }
+                
+                // Method 3: Try KlaviyoSubscribe global function
+                if (typeof window.KlaviyoSubscribe !== 'undefined') {
+                  try {
+                    window.KlaviyoSubscribe.attachToForms();
+                    window.KlaviyoSubscribe.show(formId);
+                    console.log('Tried KlaviyoSubscribe.show with ID:', formId);
+                  } catch (e) {
+                    console.log('KlaviyoSubscribe failed:', e);
+                  }
+                }
+                
+                // Method 4: Direct DOM manipulation to find and trigger form
+                setTimeout(function() {
+                  var klaviyoForm = document.querySelector('[data-testid=klaviyo-form-' + formId + ']') ||
+                                    document.querySelector('.klaviyo-form-' + formId) ||
+                                    document.querySelector('#klaviyo_' + formId) ||
+                                    document.querySelector('[class*=' + formId + ']');
+                  
+                  if (klaviyoForm) {
+                    if (klaviyoForm.style) {
+                      klaviyoForm.style.display = 'block';
+                      klaviyoForm.style.visibility = 'visible';
+                      klaviyoForm.style.opacity = '1';
+                    }
+                    console.log('Found and displayed Klaviyo form:', klaviyoForm);
+                  } else {
+                    console.log('No Klaviyo form found with ID:', formId);
+                  }
+                }, 100);
+                
+                // Log debug information
+                console.log('Available Klaviyo objects:', {
+                  _learnq: typeof window._learnq,
+                  klaviyo: typeof window.klaviyo,
+                  KlaviyoSubscribe: typeof window.KlaviyoSubscribe,
+                  formId: formId
+                });
+                ">
+          {% if preorder_is_preorder %}{{ settings.preorder_button_text | default: 'Get Early Access' }}{% else %}{{ settings.bis_button_text | default: 'Notify me when back in stock' }}{% endif %}
+        </button>
+      </div>
+      
+      <style>
+        #klaviyo-bis-button-container {
+          display: block;
+          margin: 0;
+        }
+        .bis-button {
+          width: 100%;
+          min-height: var(--height-buy-buttons, 48px);
+          padding-inline: var(--padding-4xl);
+          padding-block: var(--padding-lg);
+          background: {{ settings.bis_button_background | default: '#ffffff' }};
+          color: {{ settings.bis_button_text_color | default: '#000000' }};
+          {% case settings.bis_button_text_case %}
+            {% when 'uppercase' %}
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            {% when 'capitalize' %}
+              text-transform: capitalize;
+              letter-spacing: 0.2px;
+            {% when 'lowercase' %}
+              text-transform: lowercase;
+              letter-spacing: 0.2px;
+            {% when 'as-typed' %}
+              text-transform: none;
+              letter-spacing: normal;
+            {% else %}
+              text-transform: var(--button-text-case-primary);
+          {% endcase %}
+        }
+      </style>
+    {%- else -%}
+      {%- assign product_form_id = 'BuyButtons-ProductForm-' | append: block.id -%}
+      <product-form-component
       data-section-id="{{ section.id }}"
       data-product-id="{{ product.id }}"
       data-product-url="{{ product.url }}"
@@ -191,6 +321,7 @@
         </div>
       {%- endform -%}
     </product-form-component>
+    {%- endif -%}
   {%- else -%}
     <div class="product-form-buttons">
       <button

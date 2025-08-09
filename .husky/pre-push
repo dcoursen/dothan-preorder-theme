@@ -1,0 +1,27 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "📦 Updating theme configuration backups..."
+
+# Update theme backups before push
+node scripts/backup-theme-config.js --pre-push
+
+# If backup fails, prevent the push
+if [ $? -ne 0 ]; then
+  echo "❌ Backup failed! Push aborted."
+  exit 1
+fi
+
+echo "Running tests before push..."
+
+# Run tests in CI mode (headless)
+npm run test:ci
+
+# If tests fail, prevent the push
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed! Push aborted."
+  echo "Run 'npm test' to see the failures."
+  exit 1
+fi
+
+echo "✅ All tests passed!"
