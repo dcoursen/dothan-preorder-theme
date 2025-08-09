@@ -1,0 +1,71 @@
+{%- comment -%}
+  Anti-flicker fix for existing BIS functionality
+  Prevents sold-out button flash before BIS button appears
+{%- endcomment -%}
+
+<script>
+(function() {
+  'use strict';
+  
+  // Run as early as possible to prevent flicker
+  function preventBISFlicker() {
+    // Check if product is sold out and should show BIS
+    const addToCartButton = document.querySelector('add-to-cart-component button[name="add"]');
+    const isSoldOut = addToCartButton && (
+      addToCartButton.textContent.toLowerCase().includes('sold out') ||
+      addToCartButton.textContent.toLowerCase().includes('unavailable') ||
+      addToCartButton.disabled
+    );
+    
+    if (isSoldOut) {
+      // Hide the sold-out button immediately
+      const addToCartComponent = document.querySelector('add-to-cart-component');
+      if (addToCartComponent) {
+        addToCartComponent.style.visibility = 'hidden';
+        addToCartComponent.style.opacity = '0';
+        addToCartComponent.style.transition = 'opacity 0.2s ease';
+        
+        // Wait for BIS to load, then hide sold-out permanently
+        const checkForBIS = setInterval(function() {
+          const bisButton = document.querySelector('#klaviyo-bis-button-container, .klaviyo-bis-button, [data-testid*="bis"], [class*="notify"]');
+          
+          if (bisButton && bisButton.offsetHeight > 0) {
+            // BIS button found and visible - hide sold-out permanently
+            addToCartComponent.style.display = 'none';
+            clearInterval(checkForBIS);
+          }
+        }, 100);
+        
+        // Fallback: show sold-out if BIS doesn't appear within 3 seconds
+        setTimeout(function() {
+          if (addToCartComponent.style.display !== 'none') {
+            addToCartComponent.style.visibility = 'visible';
+            addToCartComponent.style.opacity = '1';
+          }
+          clearInterval(checkForBIS);
+        }, 3000);
+      }
+    }
+  }
+  
+  // Run immediately if DOM is ready, otherwise wait for it
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', preventBISFlicker);
+  } else {
+    preventBISFlicker();
+  }
+})();
+</script>
+
+<style>
+/* Ensure smooth transitions for BIS elements */
+#klaviyo-bis-button-container,
+.klaviyo-bis-button {
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+/* Prevent layout shift during BIS loading */
+add-to-cart-component {
+  min-height: 48px; /* Maintain space during transition */
+}
+</style>

@@ -1,0 +1,32 @@
+/**
+ * BIS Anti-Flicker Styles
+ * Supporting styles for the anti-flicker functionality
+ */
+
+/* Ensure smooth transitions for BIS elements */
+#klaviyo-bis-button-container,
+.klaviyo-bis-button,
+.bis-button,
+[class*="back-in-stock"] {
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+/* Prevent layout shift during BIS loading */
+add-to-cart-component,
+.product-form__cart {
+  min-height: 48px; /* Maintain space during transition */
+}
+
+/* Smooth transitions for add-to-cart components when hidden by BIS script */
+add-to-cart-component[data-bis-hidden],
+.product-form__cart[data-bis-hidden] {
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+/* Ensure BIS buttons are visible when they appear */
+#klaviyo-bis-button-container:not(:empty),
+.klaviyo-bis-button,
+.bis-button {
+  opacity: 1;
+  visibility: visible;
+}

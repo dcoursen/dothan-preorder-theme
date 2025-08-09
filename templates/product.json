@@ -16,15 +16,15 @@
           "type": "_product-media-gallery",
           "static": true,
           "settings": {
-            "media_presentation": "grid",
+            "media_presentation": "carousel",
             "media_columns": "one",
             "image_gap": 4,
             "large_first_image": false,
-            "icons_style": "none",
-            "slideshow_controls_style": "counter",
+            "icons_style": "chevron_large",
+            "slideshow_controls_style": "thumbnails",
             "slideshow_mobile_controls_style": "dots",
             "thumbnail_position": "right",
-            "thumbnail_width": 44,
+            "thumbnail_width": 72,
             "aspect_ratio": "adapt",
             "constrain_to_viewport": false,
             "media_fit": "contain",
@@ -96,6 +96,7 @@
                 "border_width": 1,
                 "border_opacity": 100,
                 "border_radius": 0,
+                "placeholder": "",
                 "toggle_overlay": false,
                 "overlay_color": "#00000026",
                 "overlay_style": "solid",
@@ -159,6 +160,12 @@
                 "price_tVjtKg"
               ]
             },
+            "pickup_date_tpzpyp": {
+              "type": "pickup-date",
+              "name": "Pickup Date",
+              "settings": {},
+              "blocks": {}
+            },
             "divider_VJhene": {
               "type": "_divider",
               "name": "t:names.divider",
@@ -221,6 +228,7 @@
             "group_JbmQwr": {
               "type": "group",
               "name": "Policies",
+              "disabled": true,
               "settings": {
                 "link": "",
                 "open_in_new_tab": false,
@@ -247,6 +255,7 @@
                 "border_width": 1,
                 "border_opacity": 100,
                 "border_radius": 0,
+                "placeholder": "",
                 "toggle_overlay": false,
                 "overlay_color": "#00000026",
                 "overlay_style": "solid",
@@ -286,6 +295,7 @@
                     "border_width": 1,
                     "border_opacity": 100,
                     "border_radius": 0,
+                    "placeholder": "",
                     "toggle_overlay": false,
                     "overlay_color": "#00000026",
                     "overlay_style": "solid",
@@ -368,6 +378,7 @@
                     "border_width": 1,
                     "border_opacity": 100,
                     "border_radius": 0,
+                    "placeholder": "",
                     "toggle_overlay": false,
                     "overlay_color": "#00000026",
                     "overlay_style": "solid",
@@ -456,6 +467,7 @@
           },
           "block_order": [
             "group_icgrde",
+            "pickup_date_tpzpyp",
             "divider_VJhene",
             "variant_picker_R3rGDr",
             "buy_buttons_eYQEYi",

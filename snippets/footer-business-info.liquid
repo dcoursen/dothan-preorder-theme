@@ -1,0 +1,113 @@
+{% comment %}
+  Business Info Footer Block
+  Replicates Dothan footer styling with flexible settings
+{% endcomment %}
+
+<div class="footer-business-info">
+  {% if block.settings.heading != blank %}
+    <h3>{{ block.settings.heading }}</h3>
+  {% endif %}
+
+  {% if block.settings.show_logo %}
+    <div class="business-logo">
+      <div class="logo-box">
+        <span class="logo-text-main">{{ block.settings.logo_text | default: 'DN' }}</span>
+      </div>
+      {% if block.settings.business_name != blank %}
+        <div class="logo-text-sub">
+          {{ block.settings.business_name | upcase | replace: ' ', '<br>' }}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="business-details">
+    {% if block.settings.address != blank %}
+      <div class="detail-item">
+        <a href="https://maps.google.com/?q={{ block.settings.address | url_encode }}" 
+           target="_blank" 
+           class="address-link">
+          {{ block.settings.address | newline_to_br }}
+        </a>
+      </div>
+    {% endif %}
+
+    {% if block.settings.phone != blank %}
+      <div class="detail-item">
+        <a href="tel:{{ block.settings.phone | replace: ' ', '' | replace: '(', '' | replace: ')', '' | replace: '-', '' }}" 
+           class="phone-link">{{ block.settings.phone }}</a>
+        {% if block.settings.phone_2 != blank %}
+          <br>
+          <a href="tel:{{ block.settings.phone_2 | replace: ' ', '' | replace: '(', '' | replace: ')', '' | replace: '-', '' }}" 
+             class="phone-link">{{ block.settings.phone_2 }}</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if block.settings.email != blank %}
+      <div class="detail-item">
+        <a href="mailto:{{ block.settings.email }}" class="email-link">
+          {{ block.settings.email }}
+        </a>
+      </div>
+    {% endif %}
+
+    {% if block.settings.website != blank %}
+      <div class="detail-item">
+        <a href="{{ block.settings.website }}" target="_blank" class="website-link">
+          {{ block.settings.website_text | default: 'Visit our website' }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .footer-business-info .business-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .footer-business-info .logo-box {
+    width: 60px;
+    height: 60px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 24px;
+    border-radius: 4px;
+  }
+
+  .footer-business-info .logo-text-sub {
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1.2;
+    color: #333;
+    letter-spacing: 1px;
+  }
+
+  .footer-business-info .business-details .detail-item {
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+
+  .footer-business-info .business-details a {
+    color: #495057;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer-business-info .business-details a:hover {
+    color: #28a745;
+    text-decoration: underline;
+  }
+
+  .footer-business-info .address-link {
+    display: block;
+  }
+</style>

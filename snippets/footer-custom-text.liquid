@@ -1,0 +1,42 @@
+{% comment %}
+  Custom Text Footer Block
+  Flexible text content with alignment options
+{% endcomment %}
+
+<div class="footer-custom-text" style="text-align: {{ block.settings.text_alignment | default: 'left' }};">
+  {% if block.settings.heading != blank %}
+    <h3>{{ block.settings.heading }}</h3>
+  {% endif %}
+
+  {% if block.settings.content != blank %}
+    <div class="custom-text-content">
+      {{ block.settings.content }}
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .footer-custom-text .custom-text-content {
+    line-height: 1.6;
+    color: #495057;
+  }
+
+  .footer-custom-text .custom-text-content p {
+    margin-bottom: 15px;
+  }
+
+  .footer-custom-text .custom-text-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .footer-custom-text .custom-text-content a {
+    color: #495057;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .footer-custom-text .custom-text-content a:hover {
+    color: #28a745;
+    text-decoration: underline;
+  }
+</style>

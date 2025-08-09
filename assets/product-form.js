@@ -291,14 +291,24 @@ class ProductFormComponent extends Component {
     } else if (event.detail.data.productId !== this.dataset.productId) {
       return;
     }
-
+  
     const { variantId, addToCartButtonContainer } = this.refs;
-
+  
     const currentAddToCartButton = addToCartButtonContainer?.refs.addToCartButton;
     const newAddToCartButton = event.detail.data.html.querySelector('[ref="addToCartButton"]');
-
+  
     if (!currentAddToCartButton) return;
-
+  
+    // Check if this is a notify-me/preorder product - skip morphing if so
+    const currentContainer = currentAddToCartButton.closest('.product-form-buttons');
+    const hasNotifyText = currentContainer?.querySelector('.notify-me-text');
+    
+    if (hasNotifyText) {
+      // Skip button morphing for notify-me products
+      variantId.value = event.detail.resource?.id ?? '';
+      return;
+    }
+  
     // Update the button state
     if (event.detail.resource == null || event.detail.resource.available == false) {
       addToCartButtonContainer.disable();
@@ -307,15 +317,15 @@ class ProductFormComponent extends Component {
       addToCartButtonContainer.enable();
       this.refs.acceleratedCheckoutButtonContainer?.removeAttribute('hidden');
     }
-
+  
     // Update the add to cart button text and icon
     if (newAddToCartButton) {
       morph(currentAddToCartButton, newAddToCartButton);
     }
-
+  
     // Update the variant ID
-    variantId.value = event.detail.resource.id ?? '';
-
+    variantId.value = event.detail.resource?.id ?? '';
+  
     // Set the data attribute for the add to cart button to the product variant media if it exists
     if (event.detail.resource) {
       const productVariantMedia = event.detail.resource.featured_media?.preview_image?.src;

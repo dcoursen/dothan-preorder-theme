@@ -1,0 +1,9 @@
+{
+  "timestamp": "2025-08-09T17:22:58.407Z",
+  "schedule": "manual",
+  "clients_backed_up": 1,
+  "backup_location": "/Users/davecoursen/Documents/RS Horizons/horizon-preorder-feature/backups/2025-08-09",
+  "clients": [
+    "dothan"
+  ]
+}

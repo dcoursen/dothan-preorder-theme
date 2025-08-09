@@ -1,8 +1,8 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Retail Savage Preorder Template",
-    "theme_version": "1.0.0",
+    "theme_name": "Horizon",
+    "theme_version": "2.0.3",
     "theme_author": "Shopify",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1496,6 +1496,165 @@
     ]
   },
   {
+    "name": "Preorder Drops Overlay",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "drops_overlay_enabled",
+        "label": "Enable drops overlay",
+        "default": true,
+        "info": "Show drop date overlay on preorder product images"
+      },
+      {
+        "type": "header",
+        "content": "Styling"
+      },
+      {
+        "type": "color",
+        "id": "drops_overlay_background_color",
+        "label": "Background color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "drops_overlay_text_color",
+        "label": "Text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "range",
+        "id": "drops_overlay_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Background opacity",
+        "default": 80
+      },
+      {
+        "type": "header",
+        "content": "Typography"
+      },
+      {
+        "type": "select",
+        "id": "drops_overlay_font_family",
+        "label": "Font",
+        "options": [
+          {
+            "value": "body",
+            "label": "Body"
+          },
+          {
+            "value": "subheading",
+            "label": "Subheading"
+          },
+          {
+            "value": "heading",
+            "label": "Heading"
+          },
+          {
+            "value": "accent",
+            "label": "Accent"
+          }
+        ],
+        "default": "body"
+      },
+      {
+        "type": "range",
+        "id": "drops_overlay_font_size",
+        "min": 10,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "Font size",
+        "default": 14
+      },
+      {
+        "type": "select",
+        "id": "drops_overlay_font_weight",
+        "label": "Font weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Normal"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semi Bold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
+        ],
+        "default": "500"
+      },
+      {
+        "type": "select",
+        "id": "drops_overlay_text_transform",
+        "label": "Text case",
+        "options": [
+          {
+            "value": "none",
+            "label": "Default"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          },
+          {
+            "value": "lowercase",
+            "label": "Lowercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "Capitalize"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "range",
+        "id": "drops_overlay_padding_vertical",
+        "min": 4,
+        "max": 20,
+        "step": 2,
+        "unit": "px",
+        "label": "Vertical padding",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "drops_overlay_padding_horizontal",
+        "min": 8,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Horizontal padding",
+        "default": 16
+      },
+      {
+        "type": "header",
+        "content": "Preorder Text"
+      },
+      {
+        "type": "text",
+        "id": "preorder_availability_text",
+        "label": "Availability text",
+        "default": "Available",
+        "info": "Text shown before the availability date (e.g., 'Available this Monday')"
+      }
+    ]
+  },
+  {
     "name": "t:names.buttons",
     "settings": [
       {
@@ -2311,6 +2470,259 @@
           }
         ],
         "default": "equal-width-buttons"
+      }
+    ]
+  },
+  {
+    "name": "Back in Stock",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Back in Stock Configuration"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_back_in_stock",
+        "label": "Enable Back in Stock",
+        "default": true,
+        "info": "Show Back in Stock signup for sold-out products without preorder dates"
+      },
+      {
+        "type": "text",
+        "id": "klaviyo_bis_form_id",
+        "label": "Klaviyo Form ID",
+        "info": "Enter your Klaviyo Back in Stock form ID from Forms & Pop-ups",
+        "placeholder": "e.g., ABC123"
+      },
+      {
+        "type": "header",
+        "content": "Back in Stock Button (Regular Products)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for the button shown on regular sold-out products without preorder dates"
+      },
+      {
+        "type": "text",
+        "id": "bis_button_text",
+        "label": "Button Text",
+        "default": "Notify When Back in Stock",
+        "info": "Text displayed on the back in stock button"
+      },
+      {
+        "type": "select",
+        "id": "bis_button_text_case",
+        "label": "Text Capitalization",
+        "options": [
+          {
+            "value": "as-typed",
+            "label": "As Typed"
+          },
+          {
+            "value": "uppercase",
+            "label": "ALL CAPS"
+          },
+          {
+            "value": "capitalize",
+            "label": "Title Case"
+          },
+          {
+            "value": "lowercase",
+            "label": "lowercase"
+          }
+        ],
+        "default": "uppercase",
+        "info": "How to display the back in stock button text"
+      },
+      {
+        "type": "color",
+        "id": "bis_button_background",
+        "label": "Background Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "bis_button_text_color",
+        "label": "Text Color",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "Preorder Button (Get Early Access)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for the button shown on preorder products with future availability dates"
+      },
+      {
+        "type": "text",
+        "id": "preorder_button_text",
+        "label": "Button Text",
+        "default": "Get Early Access",
+        "info": "Text displayed on the preorder button"
+      },
+      {
+        "type": "select",
+        "id": "preorder_button_text_case",
+        "label": "Text Capitalization",
+        "options": [
+          {
+            "value": "as-typed",
+            "label": "As Typed"
+          },
+          {
+            "value": "uppercase",
+            "label": "ALL CAPS"
+          },
+          {
+            "value": "capitalize",
+            "label": "Title Case"
+          },
+          {
+            "value": "lowercase",
+            "label": "lowercase"
+          }
+        ],
+        "default": "uppercase",
+        "info": "How to display the preorder button text"
+      },
+      {
+        "type": "color",
+        "id": "preorder_button_background",
+        "label": "Background Color",
+        "default": "#dc6565",
+        "info": "Background color for the preorder button"
+      },
+      {
+        "type": "color",
+        "id": "preorder_button_background_hover",
+        "label": "Background Hover Color",
+        "default": "#c85454",
+        "info": "Background color when hovering over the preorder button"
+      },
+      {
+        "type": "color",
+        "id": "preorder_button_text_color",
+        "label": "Text Color",
+        "default": "#ffffff",
+        "info": "Text color for the preorder button"
+      },
+      {
+        "type": "header",
+        "content": "Preorder Date Display"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_preorder_display",
+        "label": "Show Preorder Date",
+        "default": true,
+        "info": "Display availability dates for preorder products"
+      },
+      {
+        "type": "color",
+        "id": "preorder_date_background",
+        "label": "Background Color",
+        "default": "#e8f5e8",
+        "info": "Background color for the preorder date display"
+      },
+      {
+        "type": "color",
+        "id": "preorder_date_border",
+        "label": "Border Color",
+        "default": "#4a7c4a",
+        "info": "Border color for the preorder date display"
+      },
+      {
+        "type": "color",
+        "id": "preorder_date_text",
+        "label": "Text Color",
+        "default": "#2d5a2d",
+        "info": "Text color for the preorder date"
+      },
+      {
+        "type": "range",
+        "id": "preorder_date_border_radius",
+        "label": "Corner Radius",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "px",
+        "default": 8,
+        "info": "Corner radius for the preorder date display"
+      },
+      {
+        "type": "select",
+        "id": "preorder_date_font_size",
+        "label": "Font Size",
+        "options": [
+          {
+            "value": "inherit",
+            "label": "Inherit from theme"
+          },
+          {
+            "value": "12",
+            "label": "12px"
+          },
+          {
+            "value": "13",
+            "label": "13px"
+          },
+          {
+            "value": "14",
+            "label": "14px"
+          },
+          {
+            "value": "15",
+            "label": "15px"
+          },
+          {
+            "value": "16",
+            "label": "16px"
+          },
+          {
+            "value": "18",
+            "label": "18px"
+          },
+          {
+            "value": "20",
+            "label": "20px"
+          }
+        ],
+        "default": "inherit",
+        "info": "Font size for the preorder date text"
+      },
+      {
+        "type": "select",
+        "id": "preorder_date_font_weight",
+        "label": "Font Weight",
+        "options": [
+          {
+            "value": "inherit",
+            "label": "Inherit from theme"
+          },
+          {
+            "value": "300",
+            "label": "Light"
+          },
+          {
+            "value": "400",
+            "label": "Normal"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semi-Bold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
+        ],
+        "default": "inherit",
+        "info": "Font weight for the preorder date text"
       }
     ]
   }

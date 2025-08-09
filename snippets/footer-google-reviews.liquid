@@ -1,0 +1,188 @@
+{% comment %}
+  Google Reviews Footer Block
+  Easy client setup for review platform links
+{% endcomment %}
+
+<div class="footer-google-reviews">
+  {% if block.settings.heading != blank %}
+    <h3>{{ block.settings.heading }}</h3>
+  {% endif %}
+
+  {% if block.settings.show_review_icons %}
+    <div class="review-icons" data-style="{{ block.settings.icon_style | default: 'color' }}">
+      
+      {% comment %} Google Reviews {% endcomment %}
+      {% if block.settings.google_reviews_url != blank %}
+        <a href="{{ block.settings.google_reviews_url }}" target="_blank" aria-label="Google Reviews" class="review-link google-reviews">
+          {% render 'icon-google-reviews' %}
+        </a>
+      {% elsif block.settings.business_name != blank and block.settings.city_state != blank %}
+        <a href="https://www.google.com/maps/search/{{ block.settings.business_name | append: ' ' | append: block.settings.city_state | url_encode }}" target="_blank" aria-label="Google Reviews" class="review-link google-reviews">
+          {% render 'icon-google-reviews' %}
+        </a>
+      {% endif %}
+
+      {% comment %} Yelp Reviews {% endcomment %}
+      {% if block.settings.yelp_url != blank %}
+        <a href="{{ block.settings.yelp_url }}" target="_blank" aria-label="Yelp Reviews" class="review-link yelp-reviews">
+          {% render 'icon-yelp-reviews' %}
+        </a>
+      {% endif %}
+
+      {% comment %} Facebook Reviews {% endcomment %}
+      {% if block.settings.facebook_url != blank %}
+        <a href="{{ block.settings.facebook_url }}" target="_blank" aria-label="Facebook Reviews" class="review-link facebook-reviews">
+          {% render 'icon-facebook-reviews' %}
+        </a>
+      {% endif %}
+
+    </div>
+  {% else %}
+    {% comment %} Text-based review links {% endcomment %}
+    <div class="review-links">
+      {% if block.settings.google_reviews_url != blank %}
+        <a href="{{ block.settings.google_reviews_url }}" target="_blank" class="review-text-link">
+          Leave a Google Review
+        </a>
+      {% endif %}
+
+      {% if block.settings.yelp_url != blank %}
+        <a href="{{ block.settings.yelp_url }}" target="_blank" class="review-text-link">
+          Review on Yelp
+        </a>
+      {% endif %}
+
+      {% if block.settings.facebook_url != blank %}
+        <a href="{{ block.settings.facebook_url }}" target="_blank" class="review-text-link">
+          Review on Facebook
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% comment %} Inline SVG icons for review platforms {% endcomment %}
+{% capture google_icon %}
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+</svg>
+{% endcapture %}
+
+{% capture yelp_icon %}
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12.017 0C6.396 0 1.807 4.589 1.807 10.21 1.807 15.831 6.396 20.42 12.017 20.42c5.621 0 10.21-4.589 10.21-10.21C22.227 4.589 17.638.001 12.017.001zm0 18.655c-4.666 0-8.445-3.779-8.445-8.445s3.779-8.444 8.445-8.444 8.445 3.778 8.445 8.444-3.779 8.445-8.445 8.445z" fill="#D32323"/>
+  <path d="M15.108 8.717l-2.29.924-1.516-1.516.924-2.29c.152-.376.076-.808-.19-1.074l-.951-.951c-.342-.342-.895-.342-1.237 0l-.951.951c-.266.266-.342.698-.19 1.074l.924 2.29-1.516 1.516-2.29-.924c-.376-.152-.808-.076-1.074.19l-.951.951c-.342.342-.342.895 0 1.237l.951.951c.266.266.698.342 1.074.19l2.29-.924 1.516 1.516-.924 2.29c-.152.376-.076.808.19 1.074l.951.951c.342.342.895.342 1.237 0l.951-.951c.266-.266.342-.698.19-1.074l-.924-2.29 1.516-1.516 2.29.924c.376.152.808.076 1.074-.19l.951-.951c.342-.342.342-.895 0-1.237l-.951-.951c-.266-.266-.698-.342-1.074-.19z" fill="#D32323"/>
+</svg>
+{% endcapture %}
+
+{% capture facebook_icon %}
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
+</svg>
+{% endcapture %}
+
+<style>
+  .footer-google-reviews .review-icons {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .footer-google-reviews .review-link {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    display: inline-block;
+  }
+
+  .footer-google-reviews .review-link:hover {
+    transform: translateY(-2px);
+    opacity: 0.8;
+  }
+
+  /* Monochrome style */
+  .footer-google-reviews .review-icons[data-style="monochrome"] .review-link svg path {
+    fill: #6c757d !important;
+  }
+
+  .footer-google-reviews .review-icons[data-style="monochrome"] .review-link:hover svg path {
+    fill: #28a745 !important;
+  }
+
+  /* Outline style */
+  .footer-google-reviews .review-icons[data-style="outline"] .review-link svg {
+    border: 2px solid #6c757d;
+    border-radius: 6px;
+    padding: 4px;
+  }
+
+  .footer-google-reviews .review-icons[data-style="outline"] .review-link svg path {
+    fill: #6c757d !important;
+  }
+
+  .footer-google-reviews .review-icons[data-style="outline"] .review-link:hover svg {
+    border-color: #28a745;
+  }
+
+  .footer-google-reviews .review-icons[data-style="outline"] .review-link:hover svg path {
+    fill: #28a745 !important;
+  }
+
+  /* Text-based review links */
+  .footer-google-reviews .review-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-google-reviews .review-text-link {
+    color: #495057;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+  }
+
+  .footer-google-reviews .review-text-link:hover {
+    color: #28a745;
+    text-decoration: underline;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    .footer-google-reviews .review-icons {
+      justify-content: center;
+    }
+  }
+</style>
+
+{% comment %} Create icon snippets if they don't exist {% endcomment %}
+<script>
+  // Inject SVG icons directly since we can't guarantee snippet files exist
+  document.addEventListener('DOMContentLoaded', function() {
+    // Google Reviews icons
+    const googleLinks = document.querySelectorAll('.footer-google-reviews .google-reviews');
+    googleLinks.forEach(function(link) {
+      if (!link.innerHTML.trim()) {
+        link.innerHTML = `{{ google_icon }}`;
+      }
+    });
+
+    // Yelp icons  
+    const yelpLinks = document.querySelectorAll('.footer-google-reviews .yelp-reviews');
+    yelpLinks.forEach(function(link) {
+      if (!link.innerHTML.trim()) {
+        link.innerHTML = `{{ yelp_icon }}`;
+      }
+    });
+
+    // Facebook icons
+    const facebookLinks = document.querySelectorAll('.footer-google-reviews .facebook-reviews');
+    facebookLinks.forEach(function(link) {
+      if (!link.innerHTML.trim()) {
+        link.innerHTML = `{{ facebook_icon }}`;
+      }
+    });
+  });
+</script>
