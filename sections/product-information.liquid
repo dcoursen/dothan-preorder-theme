@@ -87,6 +87,9 @@
   </div>
 
   {% content_for 'blocks' %}
+  
+  {% comment %} Include preorder announcement if enabled {% endcomment %}
+  {% render 'preorder-announcement', product: product %}
 </div>
 
 {% stylesheet %}

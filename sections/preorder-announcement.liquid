@@ -1,0 +1,568 @@
+{% comment %}
+  Preorder Announcement Section
+  A configurable banner for preorder items with plant-themed icons
+{% endcomment %}
+
+{% if section.settings.enable_section %}
+<section class="preorder-announcement color-{{ section.settings.color_scheme }}" 
+         style="{% render 'spacing-style', settings: section.settings %}">
+  <div class="preorder-announcement__container">
+    
+    {% comment %} Icon Row {% endcomment %}
+    <div class="preorder-announcement__icons">
+      
+      {% comment %} Plant/Shopping Icon {% endcomment %}
+      <div class="preorder-announcement__icon-wrapper">
+        <div class="preorder-announcement__icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Plant pot base -->
+            <path d="M25 45h30l-3 20H28l-3-20z" fill="currentColor" opacity="0.9"/>
+            <!-- Plant pot rim -->
+            <rect x="22" y="42" width="36" height="6" rx="3" fill="currentColor"/>
+            <!-- Shopping bag handle -->
+            <path d="M35 42c0-5 0-10 5-10s5 5 5 10" stroke="currentColor" stroke-width="2" fill="none"/>
+            <!-- Plant leaves -->
+            <path d="M40 42c0-8-3-12-3-12s-3 4-3 12M40 42c0-8 3-12 3-12s3 4 3 12" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+            <path d="M37 38c-2-4-5-6-5-6s-1 4 1 8M43 38c2-4 5-6 5-6s1 4-1 8" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+          </svg>
+        </div>
+      </div>
+
+      {% comment %} Devices with Plants Icon {% endcomment %}
+      <div class="preorder-announcement__icon-wrapper">
+        <div class="preorder-announcement__icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Laptop -->
+            <rect x="20" y="35" width="40" height="25" rx="2" fill="currentColor" opacity="0.9"/>
+            <rect x="23" y="38" width="34" height="19" rx="1" fill="{{ section.settings.background_color }}" opacity="0.8"/>
+            <!-- Laptop keyboard -->
+            <rect x="15" y="60" width="50" height="3" rx="1" fill="currentColor"/>
+            
+            <!-- Phone -->
+            <rect x="50" y="28" width="20" height="30" rx="3" fill="currentColor" opacity="0.8"/>
+            <rect x="52" y="31" width="16" height="22" rx="1" fill="{{ section.settings.background_color }}" opacity="0.8"/>
+            
+            <!-- Plant on screen -->
+            <circle cx="40" cy="47" r="3" fill="currentColor" opacity="0.6"/>
+            <path d="M40 47c0-4-2-6-2-6s-2 2-2 6M40 47c0-4 2-6 2-6s2 2 2 6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            
+            <!-- Small plant on phone -->
+            <circle cx="60" cy="42" r="2" fill="currentColor" opacity="0.6"/>
+            <path d="M60 42c0-2-1-3-1-3s-1 1-1 3" stroke="currentColor" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      {% comment %} Location/Pickup Icon {% endcomment %}
+      <div class="preorder-announcement__icon-wrapper">
+        <div class="preorder-announcement__icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Location pin -->
+            <path d="M40 20c-8 0-15 7-15 15 0 10 15 25 15 25s15-15 15-25c0-8-7-15-15-15z" fill="currentColor" opacity="0.9"/>
+            <!-- Inner circle -->
+            <circle cx="40" cy="35" r="6" fill="{{ section.settings.background_color }}" opacity="0.8"/>
+            <!-- Plant inside pin -->
+            <circle cx="40" cy="35" r="2" fill="currentColor"/>
+            <path d="M40 35c0-3-1.5-4.5-1.5-4.5s-1.5 1.5-1.5 4.5M40 35c0-3 1.5-4.5 1.5-4.5s1.5 1.5 1.5 4.5" stroke="currentColor" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Main Heading {% endcomment %}
+    {% if section.settings.main_heading != blank %}
+      <h2 class="preorder-announcement__heading">{{ section.settings.main_heading }}</h2>
+    {% endif %}
+
+    {% comment %} Action Text {% endcomment %}
+    <div class="preorder-announcement__actions">
+      {% if section.settings.show_action_1 and section.settings.action_text_1 != blank %}
+        <span class="preorder-announcement__action">{{ section.settings.action_text_1 }}</span>
+      {% endif %}
+      
+      {% if section.settings.show_action_2 and section.settings.action_text_2 != blank %}
+        {% if section.settings.show_action_1 %}<span class="preorder-announcement__separator">{{ section.settings.separator }}</span>{% endif %}
+        <span class="preorder-announcement__action">{{ section.settings.action_text_2 }}</span>
+      {% endif %}
+      
+      {% if section.settings.show_action_3 and section.settings.action_text_3 != blank %}
+        {% if section.settings.show_action_1 or section.settings.show_action_2 %}<span class="preorder-announcement__separator">{{ section.settings.separator }}</span>{% endif %}
+        <span class="preorder-announcement__action">{{ section.settings.action_text_3 }}</span>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .preorder-announcement {
+    background-color: {{ section.settings.background_color }};
+    color: {{ section.settings.text_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preorder-announcement::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: {{ section.settings.accent_color }};
+    opacity: 0.3;
+    z-index: 1;
+  }
+
+  .preorder-announcement__container {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .preorder-announcement__icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: {{ section.settings.icon_spacing }}px;
+    margin-bottom: {{ section.settings.icon_margin_bottom }}px;
+  }
+
+  .preorder-announcement__icon-wrapper {
+    background-color: {{ section.settings.icon_background }};
+    border-radius: 50%;
+    width: {{ section.settings.icon_size }}px;
+    height: {{ section.settings.icon_size }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .preorder-announcement__icon-wrapper:hover {
+    transform: translateY(-2px);
+  }
+
+  .preorder-announcement__icon {
+    color: {{ section.settings.icon_color }};
+  }
+
+  .preorder-announcement__icon svg {
+    width: {{ section.settings.icon_inner_size }}%;
+    height: {{ section.settings.icon_inner_size }}%;
+  }
+
+  .preorder-announcement__heading {
+    font-size: {{ section.settings.heading_size }}px;
+    font-weight: {{ section.settings.heading_weight }};
+    letter-spacing: {{ section.settings.heading_letter_spacing }}px;
+    margin: 0 0 {{ section.settings.heading_margin_bottom }}px;
+    color: {{ section.settings.heading_color }};
+    {% if section.settings.heading_uppercase %}
+      text-transform: uppercase;
+    {% endif %}
+  }
+
+  .preorder-announcement__actions {
+    font-size: {{ section.settings.action_text_size }}px;
+    font-weight: {{ section.settings.action_text_weight }};
+    letter-spacing: {{ section.settings.action_letter_spacing }}px;
+    {% if section.settings.action_uppercase %}
+      text-transform: uppercase;
+    {% endif %}
+  }
+
+  .preorder-announcement__action {
+    color: {{ section.settings.action_text_color }};
+  }
+
+  .preorder-announcement__separator {
+    margin: 0 {{ section.settings.separator_spacing }}px;
+    color: {{ section.settings.separator_color }};
+  }
+
+  @media (max-width: 768px) {
+    .preorder-announcement__icons {
+      gap: {{ section.settings.icon_spacing_mobile }}px;
+    }
+
+    .preorder-announcement__icon-wrapper {
+      width: {{ section.settings.icon_size_mobile }}px;
+      height: {{ section.settings.icon_size_mobile }}px;
+    }
+
+    .preorder-announcement__heading {
+      font-size: {{ section.settings.heading_size_mobile }}px;
+    }
+
+    .preorder-announcement__actions {
+      font-size: {{ section.settings.action_text_size_mobile }}px;
+    }
+  }
+</style>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Preorder Announcement",
+  "tag": "section",
+  "class": "section-preorder-announcement",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_section",
+      "label": "Enable Section",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum Width",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ED1C24"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Line Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "color",
+      "id": "icon_background",
+      "label": "Icon Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#ED1C24"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 80,
+      "max": 140,
+      "step": 5,
+      "unit": "px",
+      "label": "Icon Size (Desktop)",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "icon_size_mobile",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Icon Size (Mobile)",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "icon_inner_size",
+      "min": 50,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Icon Inner Size",
+      "default": 65
+    },
+    {
+      "type": "range",
+      "id": "icon_spacing",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Icon Spacing (Desktop)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "icon_spacing_mobile",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Icon Spacing (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "icon_margin_bottom",
+      "min": 20,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Icon Bottom Margin",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Main Heading"
+    },
+    {
+      "type": "text",
+      "id": "main_heading",
+      "label": "Main Heading",
+      "default": "BUY ONLINE PICKUP FREE"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size (Desktop)",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size (Mobile)",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading Weight",
+      "options": [
+        {"value": "300", "label": "Light"},
+        {"value": "400", "label": "Regular"},
+        {"value": "500", "label": "Medium"},
+        {"value": "600", "label": "Semi-Bold"},
+        {"value": "700", "label": "Bold"},
+        {"value": "800", "label": "Extra Bold"}
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "min": -2,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Heading Letter Spacing",
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_uppercase",
+      "label": "Uppercase Heading",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Bottom Margin",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Action Text"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_action_1",
+      "label": "Show Action 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "action_text_1",
+      "label": "Action Text 1",
+      "default": "SHOP"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_action_2",
+      "label": "Show Action 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "action_text_2",
+      "label": "Action Text 2",
+      "default": "ORDER"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_action_3",
+      "label": "Show Action 3",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "action_text_3",
+      "label": "Action Text 3",
+      "default": "PICKUP"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator",
+      "default": "★"
+    },
+    {
+      "type": "color",
+      "id": "action_text_color",
+      "label": "Action Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Separator Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "action_text_size",
+      "min": 16,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Action Text Size (Desktop)",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "action_text_size_mobile",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Action Text Size (Mobile)",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "action_text_weight",
+      "label": "Action Text Weight",
+      "options": [
+        {"value": "300", "label": "Light"},
+        {"value": "400", "label": "Regular"},
+        {"value": "500", "label": "Medium"},
+        {"value": "600", "label": "Semi-Bold"},
+        {"value": "700", "label": "Bold"}
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "action_letter_spacing",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Action Letter Spacing",
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "action_uppercase",
+      "label": "Uppercase Action Text",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "separator_spacing",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separator Spacing",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Preorder Announcement",
+      "settings": {
+        "main_heading": "PREORDER NOW FOR SPRING",
+        "action_text_1": "PREORDER",
+        "action_text_2": "GET NOTIFIED",
+        "action_text_3": "PICKUP",
+        "background_color": "#2D5016",
+        "icon_background": "#FFFFFF",
+        "icon_color": "#2D5016"
+      }
+    }
+  ]
+}
+{% endschema %}

@@ -2725,5 +2725,105 @@
         "info": "Font weight for the preorder date text"
       }
     ]
+  },
+  {
+    "name": "Preorder Announcement",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_preorder_announcement",
+        "label": "Show Preorder Announcement",
+        "default": false,
+        "info": "Display announcement banner on product pages with preorder items"
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color",
+        "id": "preorder_announce_bg",
+        "label": "Background Color",
+        "default": "#2D5016"
+      },
+      {
+        "type": "color",
+        "id": "preorder_announce_text",
+        "label": "Text Color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "preorder_announce_icon_bg",
+        "label": "Icon Background",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "preorder_announce_icon_color",
+        "label": "Icon Color",
+        "default": "#2D5016"
+      },
+      {
+        "type": "header",
+        "content": "Main Heading"
+      },
+      {
+        "type": "text",
+        "id": "preorder_announce_heading",
+        "label": "Main Heading",
+        "default": "PREORDER NOW FOR SPRING"
+      },
+      {
+        "type": "header",
+        "content": "Action Text"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_announce_show_action_1",
+        "label": "Show Action 1",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "preorder_announce_action_1",
+        "label": "Action Text 1",
+        "default": "SHOP"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_announce_show_action_2",
+        "label": "Show Action 2",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "preorder_announce_action_2",
+        "label": "Action Text 2",
+        "default": "PREORDER"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_announce_show_action_3",
+        "label": "Show Action 3",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "preorder_announce_action_3",
+        "label": "Action Text 3",
+        "default": "PICKUP"
+      },
+      {
+        "type": "text",
+        "id": "preorder_announce_separator",
+        "label": "Separator",
+        "default": "★"
+      }
+    ]
   }
 ]
