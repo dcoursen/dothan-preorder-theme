@@ -10,36 +10,44 @@
          data-columns="{{ section.settings.columns }}"
          style="grid-template-columns: repeat({{ section.settings.columns }}, 1fr);">
       
-      {% for block in section.blocks %}
-        <div class="footer-block footer-block--{{ block.type }}" 
-             id="footer-block-{{ block.id }}"
-             {{ block.shopify_attributes }}
-             style="{% render 'spacing-style', settings: block.settings %}">
-          
-          {% case block.type %}
-            
-            {% when 'business_info' %}
-              {% render 'footer-business-info', block: block %}
-            
-            {% when 'store_hours' %}
-              {% render 'footer-store-hours', block: block %}
-            
-            {% when 'social_media' %}
-              {% render 'footer-social-media', block: block %}
-            
-            {% when 'google_map' %}
-              {% render 'footer-google-map', block: block %}
-            
-            {% when 'google_reviews' %}
-              {% render 'footer-google-reviews', block: block %}
-            
-            {% when 'custom_text' %}
-              {% render 'footer-custom-text', block: block %}
-            
-            {% when 'newsletter' %}
-              {% render 'footer-newsletter', block: block %}
-              
-          {% endcase %}
+      {% comment %} Create columns first, then populate with blocks {% endcomment %}
+      {% for i in (1..section.settings.columns) %}
+        <div class="custom-footer-column" data-column="{{ i }}">
+          {% for block in section.blocks %}
+            {% assign target_column = block.settings.column_assignment | default: 1 %}
+            {% if target_column == i %}
+              <div class="footer-block footer-block--{{ block.type }}" 
+                   id="footer-block-{{ block.id }}"
+                   {{ block.shopify_attributes }}
+                   style="{% render 'spacing-style', settings: block.settings %}">
+                
+                {% case block.type %}
+                  
+                  {% when 'business_info' %}
+                    {% render 'footer-business-info', block: block %}
+                  
+                  {% when 'store_hours' %}
+                    {% render 'footer-store-hours', block: block %}
+                  
+                  {% when 'social_media' %}
+                    {% render 'footer-social-media', block: block %}
+                  
+                  {% when 'google_map' %}
+                    {% render 'footer-google-map', block: block %}
+                  
+                  {% when 'google_reviews' %}
+                    {% render 'footer-google-reviews', block: block %}
+                  
+                  {% when 'custom_text' %}
+                    {% render 'footer-custom-text', block: block %}
+                  
+                  {% when 'newsletter' %}
+                    {% render 'footer-newsletter', block: block %}
+                    
+                {% endcase %}
+              </div>
+            {% endif %}
+          {% endfor %}
         </div>
       {% endfor %}
     </div>
@@ -66,7 +74,7 @@
   .custom-footer-container {
     max-width: {{ section.settings.container_width | default: 1200 }}px;
     margin: 0 auto;
-    padding: 0 var(--spacing-md, 20px);
+    padding: {{ section.settings.padding_block_start | default: 60 }}px var(--spacing-md, 20px) {{ section.settings.padding_block_end | default: 32 }}px;
   }
 
   .custom-footer-content {
@@ -74,6 +82,13 @@
     gap: {{ section.settings.column_gap | default: 60 }}px;
     margin-bottom: 40px;
   }
+
+  .custom-footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
 
   .footer-block h3,
   .footer-block h4 {
@@ -318,6 +333,20 @@
       "name": "Business Info",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 1,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -333,36 +362,37 @@
           "type": "text",
           "id": "logo_text",
           "label": "Logo Text",
-          "placeholder": "DN"
+          "default": "DN"
         },
         {
           "type": "text",
           "id": "business_name",
           "label": "Business Name",
-          "placeholder": "Your Business Name"
+          "default": "DOTHAN NURSERIES"
         },
         {
           "type": "textarea",
           "id": "address",
           "label": "Address",
-          "placeholder": "123 Main St\nCity, State 12345"
+          "default": "1300 Montgomery Hwy\nDothan, AL 36303"
         },
         {
           "type": "text",
           "id": "phone",
           "label": "Phone Number",
-          "placeholder": "(555) 123-4567"
+          "default": "334.793.6244"
         },
         {
           "type": "text",
           "id": "phone_2",
-          "label": "Second Phone Number"
+          "label": "Second Phone Number",
+          "default": "334.794.3480"
         },
         {
           "type": "text",
           "id": "email",
           "label": "Email Address",
-          "placeholder": "info@yourbusiness.com"
+          "default": "orders@dothannursery.com"
         },
         {
           "type": "url",
@@ -382,6 +412,20 @@
       "name": "Store Hours",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 2,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -391,55 +435,55 @@
           "type": "text",
           "id": "monday",
           "label": "Monday",
-          "placeholder": "9AM - 5PM or Closed"
+          "default": "Closed"
         },
         {
           "type": "text",
           "id": "tuesday",
           "label": "Tuesday",
-          "placeholder": "9AM - 5PM"
+          "default": "9AM - 5PM"
         },
         {
           "type": "text",
           "id": "wednesday",
           "label": "Wednesday",
-          "placeholder": "9AM - 5PM"
+          "default": "9AM - 5PM"
         },
         {
           "type": "text",
           "id": "thursday",
           "label": "Thursday",
-          "placeholder": "9AM - 5PM"
+          "default": "9AM - 5PM"
         },
         {
           "type": "text",
           "id": "friday",
           "label": "Friday",
-          "placeholder": "9AM - 5PM"
+          "default": "9AM - 5PM"
         },
         {
           "type": "text",
           "id": "saturday",
           "label": "Saturday",
-          "placeholder": "9AM - 4PM"
+          "default": "9AM - 4PM"
         },
         {
           "type": "text",
           "id": "sunday",
           "label": "Sunday",
-          "placeholder": "Closed"
+          "default": "Closed"
         },
         {
           "type": "checkbox",
           "id": "combine_weekdays",
-          "label": "Combine Weekdays (Mon-Fri)",
+          "label": "Combine Weekdays (Tues-Fri)",
           "default": true
         },
         {
           "type": "text",
           "id": "weekdays_label",
           "label": "Weekdays Label",
-          "default": "Monday - Friday"
+          "default": "Tuesday - Friday"
         }
       ]
     },
@@ -447,6 +491,20 @@
       "type": "google_map",
       "name": "Google Map",
       "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 3,
+          "info": "Which column should this block appear in?"
+        },
         {
           "type": "text",
           "id": "heading",
@@ -507,33 +565,74 @@
     },
     {
       "type": "google_reviews",
-      "name": "Google Reviews",
+      "name": "Reviews",
       "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 3,
+          "info": "Which column should this block appear in?"
+        },
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Leave us a Review"
+          "default": "Reviews"
         },
         {
-          "type": "text",
-          "id": "business_name",
-          "label": "Business Name",
-          "info": "For Google Reviews search",
-          "placeholder": "Dothan Nurseries"
+          "type": "range",
+          "id": "icon_size",
+          "min": 16,
+          "max": 32,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon Size",
+          "default": 20
         },
         {
-          "type": "text",
-          "id": "city_state",
-          "label": "City, State",
-          "info": "For Google Reviews search",
-          "placeholder": "Dothan, AL"
+          "type": "select",
+          "id": "layout_style",
+          "label": "Layout Style",
+          "options": [
+            {"value": "stacked", "label": "Stacked (Name | Stars | Icon)"},
+            {"value": "horizontal", "label": "Horizontal (Icon + Name/Stars)"}
+          ],
+          "default": "stacked"
+        },
+        {
+          "type": "header",
+          "content": "Google Reviews"
         },
         {
           "type": "url",
           "id": "google_reviews_url",
-          "label": "Direct Google Reviews URL",
-          "info": "Full Google Reviews link"
+          "label": "Google Reviews URL",
+          "info": "Direct link to your Google Reviews"
+        },
+        {
+          "type": "text",
+          "id": "google_rating",
+          "label": "Google Rating",
+          "info": "Enter rating like 4.9",
+          "placeholder": "4.9"
+        },
+        {
+          "type": "number",
+          "id": "google_count",
+          "label": "Google Review Count",
+          "placeholder": "127"
+        },
+        {
+          "type": "header",
+          "content": "Yelp Reviews"
         },
         {
           "type": "url",
@@ -541,26 +640,39 @@
           "label": "Yelp Reviews URL"
         },
         {
+          "type": "text",
+          "id": "yelp_rating",
+          "label": "Yelp Rating",
+          "info": "Enter rating like 4.5",
+          "placeholder": "4.5"
+        },
+        {
+          "type": "number",
+          "id": "yelp_count",
+          "label": "Yelp Review Count",
+          "placeholder": "89"
+        },
+        {
+          "type": "header",
+          "content": "Facebook Reviews"
+        },
+        {
           "type": "url",
           "id": "facebook_url",
           "label": "Facebook Reviews URL"
         },
         {
-          "type": "checkbox",
-          "id": "show_review_icons",
-          "label": "Show Review Platform Icons",
-          "default": true
+          "type": "text",
+          "id": "facebook_rating",
+          "label": "Facebook Rating",
+          "info": "Enter rating like 4.8",
+          "placeholder": "4.8"
         },
         {
-          "type": "select",
-          "id": "icon_style",
-          "label": "Icon Style",
-          "options": [
-            {"value": "color", "label": "Full Color"},
-            {"value": "monochrome", "label": "Monochrome"},
-            {"value": "outline", "label": "Outline"}
-          ],
-          "default": "color"
+          "type": "number",
+          "id": "facebook_count",
+          "label": "Facebook Review Count",
+          "placeholder": "42"
         }
       ]
     },
@@ -568,6 +680,20 @@
       "type": "social_media",
       "name": "Social Media",
       "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 2,
+          "info": "Which column should this block appear in?"
+        },
         {
           "type": "text",
           "id": "heading",
@@ -633,6 +759,20 @@
       "name": "Custom Text",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 1,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading"
@@ -659,6 +799,20 @@
       "type": "newsletter",
       "name": "Newsletter Signup",
       "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 4,
+          "info": "Which column should this block appear in?"
+        },
         {
           "type": "text",
           "id": "heading",
@@ -706,6 +860,60 @@
           "type": "social_media",
           "settings": {
             "heading": "Follow Us"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dothan Nurseries Footer",
+      "settings": {
+        "columns": 3,
+        "background_color": "#f8f9fa",
+        "text_color": "#495057",
+        "heading_color": "#6c757d",
+        "copyright_text": "© 2024 Dothan Nurseries. All rights reserved."
+      },
+      "blocks": [
+        {
+          "type": "business_info",
+          "settings": {
+            "heading": "VISIT US",
+            "show_logo": true,
+            "logo_text": "DN",
+            "business_name": "DOTHAN NURSERIES",
+            "address": "1300 Montgomery Hwy\nDothan, AL 36303",
+            "phone": "334.793.6244",
+            "phone_2": "334.794.3480",
+            "email": "orders@dothannursery.com"
+          }
+        },
+        {
+          "type": "store_hours",
+          "settings": {
+            "heading": "HOURS",
+            "monday": "Closed",
+            "tuesday": "9AM - 5PM",
+            "wednesday": "9AM - 5PM",
+            "thursday": "9AM - 5PM",
+            "friday": "9AM - 5PM",
+            "saturday": "9AM - 4PM",
+            "sunday": "Closed",
+            "combine_weekdays": true,
+            "weekdays_label": "Tuesday - Friday"
+          }
+        },
+        {
+          "type": "google_reviews",
+          "settings": {
+            "heading": "Reviews",
+            "layout_style": "stacked",
+            "google_reviews_url": "",
+            "google_rating": "4.8",
+            "google_count": 127,
+            "yelp_url": "",
+            "yelp_rating": "4.5",
+            "yelp_count": 89,
+            "icon_size": 20
           }
         }
       ]

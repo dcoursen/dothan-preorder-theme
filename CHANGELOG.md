@@ -1,77 +1,42 @@
-# Changelog - Retail Savage Preorder Template
+# Changelog
 
-All notable changes to the Retail Savage Preorder Template will be documented in this file.
+All notable changes to this theme will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-### Planned
-- Advanced inventory forecasting
-- Multi-language support for preorder messages
-- Email notification system for preorder updates
-- Admin dashboard for preorder analytics
+## [1.0.1] - 2025-08-09
 
-## [1.0.0] - 2025-08-09 "Genesis"
 ### Added
-- Initial release of Retail Savage Preorder Template
-- Preorder functionality for out-of-stock products
-- Smart date formatting with relative dates (e.g., "This Friday @ 2PM")
-- Klaviyo Back in Stock (BIS) integration
-- "Get Early Access" button for preorder items
-- Automated testing suite with Puppeteer
-- Multi-client architecture support
-- Automated backup system
-- Theme migration tools
-- Comprehensive documentation
+- New flexible `custom-footer` section replacing hardcoded footer
+- Column-based layout system (1-4 columns) with responsive design
+- Multiple footer block types:
+  - Business Info (with logo, contact details)
+  - Store Hours (with weekday combining option)
+  - Reviews (Google, Yelp, Facebook with partial star ratings)
+  - Google Map (embed or links)
+  - Social Media links
+  - Custom Text/HTML
+  - Newsletter signup
+- Column assignment for precise block placement
+- Backup and deployment script (`backup-and-push.sh`)
+- Theme versioning system
 
-### Features
-- **Preorder System**
-  - Automatic detection of sold-out variants
-  - Customizable preorder messages
-  - Availability date display
-  - Mobile-responsive design
+### Changed
+- Footer is now fully customizable through Theme Customizer
+- Improved review display with clickable cards and partial star fills
+- Better mobile responsiveness for footer blocks
 
-- **Klaviyo Integration**
-  - Seamless BIS form integration
-  - Custom styling for preorder buttons
-  - Anti-flicker optimization
-  - Conversion tracking
+### Fixed
+- Settings persistence issues with proper backup workflow
+- Review star ratings now show decimal values (e.g., 4.9 stars)
 
-- **Developer Tools**
-  - Git hooks for automated testing
-  - GitHub Actions CI/CD pipeline
-  - Theme update migration scripts
-  - Client configuration management
+### Removed
+- Old hardcoded `dothan-footer` implementation (kept as backup)
 
-### Technical
-- Based on Shopify Horizon theme v1.0.0
-- Compatible with Shopify API 2024-01
-- Minimum requirement: Basic Shopify plan
-- Node.js 18+ for development tools
+## [1.0.0] - 2025-08-08
 
-### Clients
-- Dothan Nurseries - Initial deployment
-
----
-
-## Version Guide
-
-### Version Numbers
-- **MAJOR** version for incompatible changes
-- **MINOR** version for backwards-compatible features
-- **PATCH** version for backwards-compatible fixes
-
-### Codenames
-- 1.x.x - "Genesis" series
-- 2.x.x - "Evolution" series (planned)
-- 3.x.x - "Revolution" series (future)
-
-### Update Policy
-- Security patches: Immediate release
-- Bug fixes: Weekly releases
-- New features: Monthly releases
-- Major versions: Quarterly releases
-
-[Unreleased]: https://github.com/dcoursen/dothan-preorder-theme/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/dcoursen/dothan-preorder-theme/releases/tag/v1.0.0
+### Added
+- Initial theme setup with preorder functionality
+- Klaviyo BIS integration for sold-out products
+- Base theme structure

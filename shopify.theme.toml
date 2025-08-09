@@ -1,0 +1,47 @@
+# Shopify Theme Configuration
+# This file defines how your local theme connects to your Shopify themes
+
+[environments]
+
+# Production/Live Theme
+[environments.production]
+theme_id = "142915502242"
+store = "vzgxcj-h9"
+
+# Staging Theme  
+[environments.staging]
+theme_id = "143102967970"
+store = "vzgxcj-h9"
+
+# Development Theme (preorder branch work)
+[environments.development]
+theme_id = "142914289826"
+store = "vzgxcj-h9"
+
+# Default environment when no --environment is specified
+[environments.default]
+theme_id = "143102967970"  # Points to staging by default
+store = "vzgxcj-h9"
+
+# Theme settings
+[theme]
+name = "Retail Savage x Dothan Nurseries"
+version = "2.0.3"
+
+# Ignore patterns for theme sync
+[theme.ignore]
+patterns = [
+  "*.tmp",
+  "*.backup", 
+  "node_modules/",
+  ".git/",
+  "tests/",
+  "scripts/",
+  "backups/",
+  "*.md",
+  "CLAUDE.md"
+]
+
+# Watch patterns for local development
+[theme.watch]
+extensions = [".liquid", ".js", ".css", ".json"]

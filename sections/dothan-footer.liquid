@@ -179,10 +179,66 @@
                 {% if block.settings.heading != blank %}
                   <h4>{{ block.settings.heading }}</h4>
                 {% endif %}
+                
+                {% comment %} Review Stats Display {% endcomment %}
+                {% if block.settings.show_review_stats %}
+                  <div class="review-stats">
+                    {% if block.settings.google_rating != blank %}
+                      <div class="rating-display google-rating">
+                        <div class="platform-label">Google</div>
+                        <div class="rating-content">
+                          <span class="rating-stars">
+                            {% assign rating = block.settings.google_rating | times: 1.0 %}
+                            {% for i in (1..5) %}
+                              {% assign half_star = i | minus: 0.5 %}
+                              {% if rating >= i %}
+                                <span class="star full">★</span>
+                              {% elsif rating >= half_star %}
+                                <span class="star half">☆</span>
+                              {% else %}
+                                <span class="star empty">☆</span>
+                              {% endif %}
+                            {% endfor %}
+                          </span>
+                          <span class="rating-number">{{ block.settings.google_rating }}</span>
+                          {% if block.settings.google_review_count != blank %}
+                            <span class="review-count">({{ block.settings.google_review_count }})</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endif %}
+                    
+                    {% if block.settings.yelp_rating != blank %}
+                      <div class="rating-display yelp-rating">
+                        <div class="platform-label">Yelp</div>
+                        <div class="rating-content">
+                          <span class="rating-stars">
+                            {% assign yelp_rating = block.settings.yelp_rating | times: 1.0 %}
+                            {% for i in (1..5) %}
+                              {% assign half_star = i | minus: 0.5 %}
+                              {% if yelp_rating >= i %}
+                                <span class="star full">★</span>
+                              {% elsif yelp_rating >= half_star %}
+                                <span class="star half">☆</span>
+                              {% else %}
+                                <span class="star empty">☆</span>
+                              {% endif %}
+                            {% endfor %}
+                          </span>
+                          <span class="rating-number">{{ block.settings.yelp_rating }}</span>
+                          {% if block.settings.yelp_review_count != blank %}
+                            <span class="review-count">({{ block.settings.yelp_review_count }})</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+                
                 <div class="review-icons">
                   {% if block.settings.google_reviews_url != blank %}
                     <a href="{{ block.settings.google_reviews_url }}" target="_blank" aria-label="Google Reviews">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <svg width="{{ block.settings.icon_size | default: 24 }}" height="{{ block.settings.icon_size | default: 24 }}" viewBox="0 0 24 24" fill="none">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -192,8 +248,13 @@
                   {% endif %}
                   {% if block.settings.yelp_url != blank %}
                     <a href="{{ block.settings.yelp_url }}" target="_blank" aria-label="Yelp Reviews">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M21.111 18.226c-.141.969-2.119 3.483-3.029 3.483-.339 0-.708-.151-.922-.379-.283-.244-.381-.578-.489-1.035l-1.155-5.132c-.134-.591-.24-1.201.147-1.666.485-.598 1.337-.844 2.032-.844 2.076 0 4.027.531 4.027 2.831 0 .936-.245 2.089-.611 2.742zm-3.284-9.187c-.195.641-.559 1.242-1.319 1.514l-4.805 1.726c-.559.201-1.163.232-1.613-.126-.584-.468-.675-1.258-.675-1.958 0-2.076 1.333-3.734 3.409-3.734.751 0 1.507.247 2.143.721 1.155.859 1.859 1.859 1.859 2.947 0-.011 1.001-.09 1.001-.09zm-7.071 5.701c.175-.316.316-.644.316-1.016 0-.708-.422-1.371-1.07-1.595l-4.125-1.456c-.513-.18-.997-.18-1.399.135-.469.367-1.002 1.373-1.002 1.987 0 1.778 1.184 3.258 2.962 3.258.649 0 1.331-.202 1.891-.675 1.07-.901 1.594-2.187 1.427-3.638zm-8.565 3.034c.175-.015 4.866-.859 5.756-.859.533 0 1.07.253 1.369.686.42.611.42 1.402.191 2.074l-1.546 4.553c-.176.518-.597.867-1.07.867-.422 0-.855-.244-1.121-.606-.533-.721-1.013-1.553-1.013-2.434 0-1.294.434-2.595.434-4.281zm7.132-8.989c-.351.011-.351.671-.532 1.001l-2.163 3.944c-.316.577-.614 1.07-.316 1.668.316.641.938.844 1.579.844 1.896 0 3.157-1.262 3.157-3.157 0-.721-.211-1.443-.617-2.021-.422-.598-.982-1.121-1.639-1.227-.184-.030-.469-.052-.469-.052z" fill="#D32323"/>
+                      <svg width="{{ block.settings.icon_size | default: 24 }}" height="{{ block.settings.icon_size | default: 24 }}" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="11" fill="#D32323"/>
+                        <path d="M8.5 7.5h7c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-7c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1zm0 4h7c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-7c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1z" fill="white"/>
+                        <circle cx="6" cy="8.5" r="1" fill="white"/>
+                        <circle cx="18" cy="8.5" r="1" fill="white"/>
+                        <circle cx="6" cy="12.5" r="1" fill="white"/>
+                        <circle cx="18" cy="12.5" r="1" fill="white"/>
                       </svg>
                     </a>
                   {% endif %}
@@ -453,6 +514,64 @@
 
   .review-icons a:hover {
     color: #28a745;
+  }
+
+  /* Review Stats */
+  .review-stats {
+    margin-bottom: 20px;
+  }
+
+  .rating-display {
+    margin-bottom: 12px;
+    padding: 8px 0;
+  }
+
+  .platform-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .rating-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rating-stars {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  .star {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .star.full {
+    color: #ffd700;
+  }
+
+  .star.half {
+    color: #ffd700;
+  }
+
+  .star.empty {
+    color: #ddd;
+  }
+
+  .rating-number {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+  }
+
+  .review-count {
+    font-size: 13px;
+    color: #666;
   }
 
   /* Copyright Section */
@@ -966,7 +1085,7 @@
     },
     {
       "type": "google_reviews",
-      "name": "Google Reviews",
+      "name": "Reviews",
       "settings": [
         {
           "type": "header",
@@ -989,6 +1108,45 @@
           "default": "LEAVE US A REVIEW"
         },
         {
+          "type": "header",
+          "content": "Review Stats (Optional)"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_review_stats",
+          "label": "Show Review Stats",
+          "default": true,
+          "info": "Display star ratings and review counts above the icons"
+        },
+        {
+          "type": "text",
+          "id": "google_rating",
+          "label": "Google Rating (1.0 - 5.0)",
+          "info": "Enter your Google star rating (e.g., 4.5)"
+        },
+        {
+          "type": "text",
+          "id": "google_review_count",
+          "label": "Google Review Count",
+          "info": "Number of Google reviews (e.g., 127)"
+        },
+        {
+          "type": "text",
+          "id": "yelp_rating",
+          "label": "Yelp Rating (1.0 - 5.0)",
+          "info": "Enter your Yelp star rating (e.g., 4.8)"
+        },
+        {
+          "type": "text",
+          "id": "yelp_review_count",
+          "label": "Yelp Review Count",
+          "info": "Number of Yelp reviews (e.g., 89)"
+        },
+        {
+          "type": "header",
+          "content": "Review Links"
+        },
+        {
           "type": "url",
           "id": "google_reviews_url",
           "label": "Google Reviews URL"
@@ -997,6 +1155,29 @@
           "type": "url",
           "id": "yelp_url",
           "label": "Yelp Reviews URL"
+        },
+        {
+          "type": "header",
+          "content": "Icon Settings"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "min": 20,
+          "max": 48,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon Size",
+          "default": 32,
+          "info": "Size of review platform icons"
+        },
+        {
+          "type": "header",
+          "content": "💡 How to Get Review URLs"
+        },
+        {
+          "type": "paragraph",
+          "content": "**Google Reviews:** Go to your Google Business profile, click 'Ask for reviews' and copy the link.\n\n**Yelp Reviews:** Go to your Yelp business page and copy the URL.\n\n**Tip:** The icons will automatically link to your review pages when visitors click them."
         }
       ]
     },
@@ -1184,17 +1365,23 @@
           }
         },
         {
-          "type": "policy_links",
-          "settings": {
-            "column_assignment": 3,
-            "heading": "STORE POLICY"
-          }
-        },
-        {
           "type": "google_reviews",
           "settings": {
             "column_assignment": 3,
-            "heading": "LEAVE US A REVIEW"
+            "heading": "LEAVE US A REVIEW",
+            "show_review_stats": true,
+            "google_rating": "4.8",
+            "google_review_count": "127",
+            "yelp_rating": "4.5",
+            "yelp_review_count": "89",
+            "icon_size": 32
+          }
+        },
+        {
+          "type": "google_map_embed",
+          "settings": {
+            "column_assignment": 4,
+            "heading": "FIND US"
           }
         }
       ]

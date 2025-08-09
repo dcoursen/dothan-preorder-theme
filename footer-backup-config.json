@@ -1,0 +1,80 @@
+{
+  "custom-footer": {
+    "type": "custom-footer",
+    "blocks": {
+      "business_info_backup": {
+        "type": "business_info",
+        "settings": {
+          "column_assignment": 1,
+          "heading": "CONTACT US",
+          "show_logo": true,
+          "logo_text": "DN",
+          "business_name": "DOTHAN NURSERIES", 
+          "address": "1300 Montgomery Hwy\nDothan, AL 36303",
+          "phone": "334.793.6244",
+          "phone_2": "334.794.3480",
+          "email": "orders@dothannursery.com"
+        }
+      },
+      "store_hours_backup": {
+        "type": "store_hours",
+        "settings": {
+          "column_assignment": 2,
+          "heading": "STORE HOURS",
+          "monday": "Closed",
+          "tuesday": "9AM - 5PM", 
+          "wednesday": "9AM - 5PM",
+          "thursday": "9AM - 5PM",
+          "friday": "9AM - 5PM",
+          "saturday": "9AM - 4PM",
+          "sunday": "Closed",
+          "combine_weekdays": true,
+          "weekdays_label": "Tuesday - Friday"
+        }
+      },
+      "reviews_backup": {
+        "type": "google_reviews",
+        "settings": {
+          "column_assignment": 3,
+          "heading": "REVIEWS",
+          "layout_style": "stacked",
+          "google_reviews_url": "",
+          "google_rating": "4.9",
+          "google_count": 2674,
+          "yelp_url": "",
+          "yelp_rating": "4.9", 
+          "yelp_count": 9,
+          "facebook_url": "",
+          "facebook_rating": "4.2",
+          "facebook_count": 345,
+          "icon_size": 20
+        }
+      }
+    },
+    "block_order": [
+      "business_info_backup",
+      "store_hours_backup", 
+      "reviews_backup"
+    ],
+    "settings": {
+      "columns": 3,
+      "columns_tablet": 2,
+      "column_gap": 60,
+      "container_width": 1200,
+      "background_color": "#f8f9fa",
+      "text_color": "#495057",
+      "heading_color": "#6c757d",
+      "heading_size": 18,
+      "heading_weight": "400",
+      "heading_uppercase": true,
+      "border_width": 1,
+      "border_color": "#e9ecef",
+      "show_copyright": true,
+      "copyright_text": "© 2024 Dothan Nurseries. All rights reserved.",
+      "copyright_color": "#6c757d",
+      "show_powered_by": false,
+      "padding-block-start": 60,
+      "padding-block-end": 32
+    }
+  }
+}
