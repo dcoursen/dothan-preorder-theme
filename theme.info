@@ -1,0 +1,22 @@
+name = "Retail Savage Preorder Template"
+version = "1.0.0"
+author = "Retail Savage"
+author_url = "https://retailsavage.com"
+documentation_url = "https://docs.retailsavage.com/preorder-template"
+support_url = "https://support.retailsavage.com"
+theme_store_id = ""
+base_theme = "Shopify Horizon"
+base_theme_version = "1.0.0"
+
+[features]
+preorder = true
+klaviyo_integration = true
+multi_client = true
+automated_backups = true
+
+[requirements]
+shopify_plan = "Basic Shopify"
+api_version = "2024-01"
+
+[changelog]
+latest = "https://github.com/dcoursen/dothan-preorder-theme/releases"

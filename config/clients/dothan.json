@@ -1,0 +1,23 @@
+{
+  "client": "dothan",
+  "client_name": "Dothan Nurseries",
+  "theme_name": "Retail Savage x Dothan Nurseries",
+  "store_url": "vzgxcj-h9.myshopify.com",
+  "theme_version": "1.0.0",
+  "base_theme": "Retail Savage Preorder Template",
+  "customizations": {
+    "preorder": true,
+    "custom_footer": true,
+    "klaviyo_integration": true,
+    "custom_branding": true
+  },
+  "preserved_files": [
+    "sections/dothan-footer.liquid",
+    "snippets/preorder-logic.liquid",
+    "snippets/klaviyo-bis-integration.liquid"
+  ],
+  "production_theme_id": "142915502242",
+  "staging_theme_id": null,
+  "last_updated": "2025-08-09",
+  "support_contact": "support@retailsavage.com"
+}
