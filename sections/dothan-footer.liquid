@@ -9,12 +9,17 @@
          data-columns="{{ section.settings.columns | default: 3 }}"
          style="grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: {{ section.settings.column_gap | default: 60 }}px;">
       
-      {% for block in section.blocks %}
-        <div class="dothan-footer-section" 
-             id="block-{{ block.id }}"
-             {{ block.shopify_attributes }}>
-          
-          {% case block.type %}
+      {% comment %} Create columns first, then populate with blocks {% endcomment %}
+      {% for i in (1..section.settings.columns) %}
+        <div class="dothan-footer-column" data-column="{{ i }}">
+          {% for block in section.blocks %}
+            {% assign target_column = block.settings.column_assignment | default: 1 %}
+            {% if target_column == i %}
+              <div class="dothan-footer-section" 
+                   id="block-{{ block.id }}"
+                   {{ block.shopify_attributes }}>
+                
+                {% case block.type %}
             
             {% when 'business_info' %}
               <div class="details-section">
@@ -194,9 +199,61 @@
                     </a>
                   {% endif %}
                 </div>
+            {% when 'html_liquid' %}
+              <div class="html-liquid-section">
+                {% if block.settings.heading != blank %}
+                  <h3>{{ block.settings.heading }}</h3>
+                {% endif %}
+                {{ block.settings.html_content }}
+                {{ block.settings.liquid_code }}
               </div>
               
-          {% endcase %}
+            {% when 'image' %}
+              <div class="image-section">
+                {% if block.settings.heading != blank %}
+                  <h3>{{ block.settings.heading }}</h3>
+                {% endif %}
+                {% if block.settings.image %}
+                  {% if block.settings.link_url != blank %}<a href="{{ block.settings.link_url }}" target="_blank">{% endif %}
+                    <img src="{{ block.settings.image | image_url: width: block.settings.image_width }}" 
+                         alt="{{ block.settings.image.alt | default: block.settings.heading }}"
+                         style="max-width: {{ block.settings.image_width }}px; height: auto;">
+                  {% if block.settings.link_url != blank %}</a>{% endif %}
+                {% endif %}
+                {% if block.settings.caption != blank %}
+                  <p class="image-caption">{{ block.settings.caption }}</p>
+                {% endif %}
+              </div>
+              
+            {% when 'google_map_embed' %}
+              <div class="google-map-section">
+                {% if block.settings.heading != blank %}
+                  <h3>{{ block.settings.heading }}</h3>
+                {% endif %}
+                {% if block.settings.embed_url != blank %}
+                  <div class="map-container">
+                    <iframe 
+                      src="{{ block.settings.embed_url }}"
+                      width="100%" 
+                      height="{{ block.settings.map_height | default: 300 }}"
+                      style="border:0;" 
+                      allowfullscreen="" 
+                      loading="lazy" 
+                      referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                  </div>
+                {% endif %}
+                {% if block.settings.show_directions_link and block.settings.directions_url != blank %}
+                  <a href="{{ block.settings.directions_url }}" target="_blank" class="directions-link">
+                    Get Directions
+                  </a>
+                {% endif %}
+              </div>
+              
+            {% endcase %}
+            </div>
+          {% endif %}
+        {% endfor %}
         </div>
       {% endfor %}
     </div>
@@ -230,6 +287,12 @@
   .dothan-footer-content {
     display: grid;
     margin-bottom: 40px;
+  }
+
+  .dothan-footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
   }
 
   /* Logo Section */
@@ -454,6 +517,54 @@
     }
   }
 
+  /* New Block Types */
+  .html-liquid-section h3,
+  .image-section h3,
+  .google-map-section h3 {
+    color: #6c757d;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .image-section img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  .image-caption {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6c757d;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .map-container {
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+
+  .directions-link {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+  }
+
+  .directions-link:hover {
+    background-color: #218838;
+  }
+
   /* Mobile responsive */
   @media (max-width: 968px) {
     .dothan-footer-content {
@@ -616,6 +727,20 @@
       "name": "Business Info",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 1,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -695,6 +820,20 @@
       "name": "Store Hours",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 2,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -761,6 +900,20 @@
       "name": "Policy Links",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 3,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -806,6 +959,20 @@
       "name": "Google Reviews",
       "settings": [
         {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 3,
+          "info": "Which column should this block appear in?"
+        },
+        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -822,6 +989,148 @@
           "label": "Yelp Reviews URL"
         }
       ]
+    },
+    {
+      "type": "html_liquid",
+      "name": "HTML / Custom Liquid",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 1,
+          "info": "Which column should this block appear in?"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading (Optional)"
+        },
+        {
+          "type": "html",
+          "id": "html_content",
+          "label": "HTML Content",
+          "info": "Add custom HTML content"
+        },
+        {
+          "type": "liquid",
+          "id": "liquid_code",
+          "label": "Custom Liquid Code",
+          "info": "Add custom Liquid code for dynamic content"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image Block",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 1,
+          "info": "Which column should this block appear in?"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading (Optional)"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "min": 100,
+          "max": 500,
+          "step": 25,
+          "unit": "px",
+          "label": "Image Width",
+          "default": 200
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL (Optional)",
+          "info": "Make the image clickable"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Image Caption (Optional)"
+        }
+      ]
+    },
+    {
+      "type": "google_map_embed",
+      "name": "Google Maps Embed",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Column Settings"
+        },
+        {
+          "type": "range",
+          "id": "column_assignment",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "label": "Assign to Column",
+          "default": 1,
+          "info": "Which column should this block appear in?"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Find Us"
+        },
+        {
+          "type": "url",
+          "id": "embed_url",
+          "label": "Google Maps Embed URL",
+          "info": "Get embed URL from Google Maps: Share > Embed a map > Copy HTML src"
+        },
+        {
+          "type": "range",
+          "id": "map_height",
+          "min": 200,
+          "max": 500,
+          "step": 50,
+          "unit": "px",
+          "label": "Map Height",
+          "default": 300
+        },
+        {
+          "type": "checkbox",
+          "id": "show_directions_link",
+          "label": "Show 'Get Directions' Link",
+          "default": true
+        },
+        {
+          "type": "url",
+          "id": "directions_url",
+          "label": "Directions URL",
+          "info": "Direct Google Maps directions link"
+        }
+      ]
     }
   ],
   "presets": [
@@ -831,6 +1140,7 @@
         {
           "type": "business_info",
           "settings": {
+            "column_assignment": 1,
             "heading": "VISIT US",
             "show_logo": true,
             "logo_text": "DN",
@@ -844,6 +1154,7 @@
         {
           "type": "store_hours",
           "settings": {
+            "column_assignment": 2,
             "heading": "HOURS",
             "monday": "Closed",
             "tuesday": "9AM - 5PM",
@@ -859,12 +1170,14 @@
         {
           "type": "policy_links",
           "settings": {
+            "column_assignment": 3,
             "heading": "STORE POLICY"
           }
         },
         {
           "type": "google_reviews",
           "settings": {
+            "column_assignment": 3,
             "heading": "LEAVE US A REVIEW"
           }
         }
