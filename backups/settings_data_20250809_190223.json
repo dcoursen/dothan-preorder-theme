@@ -81,22 +81,6 @@
       "custom-footer": {
         "type": "custom-footer",
         "blocks": {
-          "store_hours_rcmQtD": {
-            "type": "store_hours",
-            "settings": {
-              "column_assignment": 2,
-              "heading": "Store Hours",
-              "monday": "Closed",
-              "tuesday": "9AM - 5PM",
-              "wednesday": "9AM - 5PM",
-              "thursday": "9AM - 5PM",
-              "friday": "9AM - 5PM",
-              "saturday": "9AM - 4PM",
-              "sunday": "Closed",
-              "combine_weekdays": true,
-              "weekdays_label": "Tuesday - Friday"
-            }
-          },
           "business_info_fHzDrm": {
             "type": "business_info",
             "settings": {
@@ -112,56 +96,10 @@
               "website": "",
               "website_text": "Visit our main website"
             }
-          },
-          "google_reviews_kw3Mqb": {
-            "type": "google_reviews",
-            "settings": {
-              "column_assignment": 3,
-              "heading": "Reviews",
-              "icon_size": 20,
-              "layout_style": "stacked",
-              "google_reviews_url": "https://www.google.com/search?sca_esv=9e9838c08b3e3a3b&rlz=1C5CHFA_enUS1090US1091&si=AMgyJEuzsz2NflaaWzrzdpjxXXRaJ2hfdMsbe_mSWso6src8s-AMEybWTrjW8XrKWRXAQCWERfS6NQmmxX0GdAdDEXyps91LO9VXsBUsRDwkGai7cUExRG2cu8jmqcvwk7joytRlLTvzpD7ygRiXAlC6Rk1YBBbrjf1aGJfWlhyj-Yl7BkRWpjc%3D&q=Dothan+Nurseries+Greenhouse,+Gardens,+%26+Gifts+Reviews&sa=X&ved=2ahUKEwiq0byp4P6OAxX6mYQIHV2WCTEQ0bkNegQINBAE&biw=1728&bih=920&dpr=2",
-              "google_rating": "4.9",
-              "google_count": 568,
-              "yelp_url": "https://www.yelp.com/biz/dothan-nurseries-dothan",
-              "yelp_rating": "4.9",
-              "yelp_count": 9,
-              "facebook_url": "https://www.facebook.com/dothannurseries/reviews",
-              "facebook_rating": "4.9",
-              "facebook_count": 311
-            }
-          },
-          "custom_text_P6zQAU": {
-            "type": "custom_text",
-            "settings": {
-              "column_assignment": 2,
-              "heading": "Policies",
-              "content": "<p><a href=\"https://www.dothannurseries.com/happiness-gurantee\" title=\"https://www.dothannurseries.com/happiness-gurantee\">Warranty</a></p>",
-              "text_alignment": "left"
-            }
-          },
-          "social_media_w683AK": {
-            "type": "social_media",
-            "settings": {
-              "column_assignment": 1,
-              "heading": "Follow Us",
-              "facebook_url": "https://www.facebook.com/dothannurseries/",
-              "instagram_url": "https://www.instagram.com/dothan.nurseries/",
-              "twitter_url": "",
-              "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
-              "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en",
-              "linkedin_url": "",
-              "icon_style": "plain",
-              "icon_size": 28
-            }
           }
         },
         "block_order": [
-          "store_hours_rcmQtD",
-          "business_info_fHzDrm",
-          "google_reviews_kw3Mqb",
-          "custom_text_P6zQAU",
-          "social_media_w683AK"
+          "business_info_fHzDrm"
         ],
         "settings": {
           "columns": 3,

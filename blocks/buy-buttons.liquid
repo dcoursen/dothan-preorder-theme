@@ -141,9 +141,9 @@
     # Before drop date - always disabled, regardless of inventory
     assign can_add_to_cart = false
     if preorder_smart_drop_text != blank
-      assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_smart_drop_text
+      assign add_to_cart_text = 'Exclusively for Garden VIPs: ' | append: preorder_smart_drop_text
     else
-      assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_formatted_drop_date
+      assign add_to_cart_text = 'Exclusively for Garden VIPs: ' | append: preorder_formatted_drop_date
     endif
   endif
   
@@ -234,7 +234,7 @@ onclick="
                   formId: formId
                 });
                 ">
-          {% if preorder_is_preorder %}{{ settings.preorder_button_text | default: 'Get Early Access' }}{% else %}{{ settings.bis_button_text | default: 'Notify me when back in stock' }}{% endif %}
+          {% if preorder_is_preorder %}{{ settings.preorder_button_text | default: 'Join Garden VIP List' }}{% else %}{{ settings.bis_button_text | default: 'Get Notified First' }}{% endif %}
         </button>
       </div>
       

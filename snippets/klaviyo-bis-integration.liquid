@@ -58,9 +58,9 @@
   # Determine button text for sold-out products
   if inventory_quantity < 1 and product_available == false
     if has_future_preorder
-      assign klaviyo_button_text = settings.preorder_button_text | default: 'Get Early Access'
+      assign klaviyo_button_text = settings.preorder_button_text | default: 'Join Garden VIP List'
     else
-      assign klaviyo_button_text = settings.bis_button_text | default: 'Notify When Back in Stock'
+      assign klaviyo_button_text = settings.bis_button_text | default: 'Get Notified First'
     endif
   endif
 -%}
