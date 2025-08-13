@@ -80,15 +80,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Hide sold-out button immediately to prevent flicker
-  if (shouldHideSoldOutButton()) {
-    hideSoldOutButton();
+  try {
+    // Hide sold-out button immediately to prevent flicker
+    if (shouldHideSoldOutButton()) {
+      hideSoldOutButton();
+    }
+    
+    // Initialize with minimal delay
+    setTimeout(function() {
+      initializePreorderBIS();
+    }, 100);
+  } catch (e) {
+    console.error('Preorder BIS initialization error:', e);
   }
-  
-  // Initialize with minimal delay
-  setTimeout(function() {
-    initializePreorderBIS();
-  }, 100);
   
   function shouldHideSoldOutButton() {
     const container = document.getElementById('preorder-bis-container');
@@ -176,11 +180,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'klaviyo-bis-button';
-    button.id = 'klaviyo-bis-trigger-{{ target_product.id }}';
+    button.id = 'klaviyo-bis-trigger-' + {{ target_product.id }};
     button.textContent = buttonText;
     
     button.addEventListener('click', function() {
-      console.log('BIS button clicked, trying to open Klaviyo form:', formId);
+      try {
+        console.log('BIS button clicked, trying to open Klaviyo form:', formId);
       
       // Method 1: Try _learnq with multiple commands
       if (typeof window._learnq !== 'undefined' && window._learnq.push && formId) {
@@ -268,6 +273,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formId: formId,
         allKlaviyoGlobals: Object.keys(window).filter(key => key.toLowerCase().includes('klaviyo'))
       });
+      } catch (e) {
+        console.error('BIS button click handler error:', e);
+      }
     });
     
     bisDiv.appendChild(button);
