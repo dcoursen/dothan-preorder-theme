@@ -140,8 +140,8 @@
   if preorder_is_preorder and preorder_is_coming_soon
     # Before drop date - always disabled, regardless of inventory
     assign can_add_to_cart = false
-    # Customizable preorder button text - Theme settings with block overrides
-    assign preorder_prefix = block.settings.preorder_coming_soon_text | default: settings.preorder_coming_soon_text | default: 'Available'
+    # Simplified preorder button text using theme settings only
+    assign preorder_prefix = settings.preorder_info_prefix | default: 'Available'
     
     if preorder_smart_drop_text != blank
       assign add_to_cart_text = preorder_prefix | append: ' ' | append: preorder_smart_drop_text
@@ -158,40 +158,9 @@
   {{ block.shopify_attributes }}
 >
   {%- if product != blank -%}
-    {%- comment -%} Show styled preorder info box instead of disabled button {%- endcomment -%}
-    {%- if preorder_is_preorder and preorder_is_coming_soon -%}
-      <div class="preorder-info-box" style="
-        background: {{ block.settings.preorder_box_background | default: settings.preorder_box_background | default: '#f0f7f0' }};
-        border: 2px solid {{ block.settings.preorder_box_border | default: settings.preorder_box_border | default: '#4a7c4a' }};
-        color: {{ block.settings.preorder_box_text | default: settings.preorder_box_text | default: '#2d5a2d' }};
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-        margin: 16px 0;
-      ">
-        <div style="font-size: 1.1em; font-weight: 600; margin-bottom: 8px;">
-          {{ block.settings.preorder_box_heading | default: settings.preorder_box_heading | default: 'Coming Soon' }}
-        </div>
-        <div style="font-size: 1em;">
-          {%- if preorder_smart_drop_text != blank -%}
-            {{ preorder_smart_drop_text }}
-          {%- else -%}
-            {{ preorder_formatted_drop_date }}
-          {%- endif -%}
-        </div>
-        {%- if block.settings.show_preorder_notify or settings.show_preorder_notify -%}
-          <button type="button" 
-                  class="button button--secondary" 
-                  style="margin-top: 12px;"
-                  onclick="document.getElementById('klaviyo-bis-trigger-{{ product.id }}').click();">
-            {{ block.settings.preorder_notify_text | default: settings.preorder_notify_text | default: 'Notify Me' }}
-          </button>
-        {%- endif -%}
-      </div>
-      {%- comment -%} Hidden Klaviyo trigger {%- endcomment -%}
-      <div style="display: none;">
-        {% render 'klaviyo-bis-integration' %}
-      </div>
+    {%- comment -%} Simplified preorder display using theme settings only {%- endcomment -%}
+    {%- if preorder_is_preorder and preorder_is_coming_soon and settings.enable_preorders != false -%}
+      {% render 'preorder-display', product: product, date_text: preorder_smart_drop_text, formatted_date: preorder_formatted_drop_date %}
     {%- elsif show_bis_button -%}
       {% comment %} Include enhanced preorder + BIS integration {% endcomment %}
       {% render 'klaviyo-bis-integration' %}
@@ -271,7 +240,7 @@ onclick="
                   formId: formId
                 });
                 ">
-          {% if preorder_is_preorder %}{{ block.settings.preorder_button_text | default: settings.preorder_button_text | default: 'Get Early Access' }}{% else %}{{ block.settings.bis_button_text | default: settings.bis_button_text | default: 'Notify When Available' }}{% endif %}
+          {{ settings.bis_button_text | default: 'Notify When Available' }}
         </button>
       </div>
       
@@ -285,24 +254,20 @@ onclick="
           min-height: var(--height-buy-buttons, 48px);
           padding-inline: var(--padding-4xl);
           padding-block: var(--padding-lg);
-          background: {{ settings.bis_button_background | default: '#ffffff' }};
-          color: {{ settings.bis_button_text_color | default: '#000000' }};
-          {% case settings.bis_button_text_case %}
-            {% when 'uppercase' %}
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            {% when 'capitalize' %}
-              text-transform: capitalize;
-              letter-spacing: 0.2px;
-            {% when 'lowercase' %}
-              text-transform: lowercase;
-              letter-spacing: 0.2px;
-            {% when 'as-typed' %}
-              text-transform: none;
-              letter-spacing: normal;
-            {% else %}
-              text-transform: var(--button-text-case-primary);
-          {% endcase %}
+          background: #ffffff;
+          color: #000000;
+          border: 2px solid #cccccc;
+          border-radius: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          transition: all 0.3s ease;
+        }
+        
+        .bis-button:hover {
+          background: #f5f5f5;
+          border-color: #999999;
         }
       </style>
     {%- else -%}
@@ -429,74 +394,6 @@ onclick="
       "id": "show_pickup_availability",
       "label": "t:settings.show_pickup_availability",
       "default": true
-    },
-    {
-      "type": "header",
-      "content": "Preorder Settings"
-    },
-    {
-      "type": "text",
-      "id": "preorder_coming_soon_text",
-      "label": "Preorder Coming Soon Text",
-      "info": "Text shown on disabled preorder buttons (e.g., 'Available', 'Coming Soon', 'Exclusively for Members'). Leave blank to use theme default.",
-      "placeholder": "Available"
-    },
-    {
-      "type": "text",
-      "id": "preorder_button_text",
-      "label": "Preorder Button Text",
-      "info": "Text for preorder notification buttons. Leave blank to use theme default.",
-      "placeholder": "Get Early Access"
-    },
-    {
-      "type": "text",
-      "id": "bis_button_text",
-      "label": "Back in Stock Button Text",
-      "info": "Text for back-in-stock notification buttons. Leave blank to use theme default.",
-      "placeholder": "Notify When Available"
-    },
-    {
-      "type": "header",
-      "content": "Preorder Info Box"
-    },
-    {
-      "type": "text",
-      "id": "preorder_box_heading",
-      "label": "Info Box Heading",
-      "placeholder": "Coming Soon",
-      "info": "Heading shown in the preorder info box"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_preorder_notify",
-      "label": "Show Notify Button",
-      "default": true,
-      "info": "Show a notify button inside the preorder info box"
-    },
-    {
-      "type": "text",
-      "id": "preorder_notify_text",
-      "label": "Notify Button Text",
-      "placeholder": "Notify Me",
-      "default": "Notify Me When Available"
-    },
-    {
-      "type": "color",
-      "id": "preorder_box_background",
-      "label": "Box Background Color",
-      "info": "Leave blank for theme default"
-    },
-    {
-      "type": "color",
-      "id": "preorder_box_border",
-      "label": "Box Border Color",
-      "info": "Leave blank for theme default"
-    },
-    {
-      "type": "color",
-      "id": "preorder_box_text",
-      "label": "Box Text Color",
-      "info": "Leave blank for theme default"
     },
     {
       "type": "header",
