@@ -176,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'klaviyo-bis-button';
+    button.id = 'klaviyo-bis-trigger-{{ target_product.id }}';
     button.textContent = buttonText;
     
     button.addEventListener('click', function() {

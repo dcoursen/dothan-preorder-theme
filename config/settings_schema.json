@@ -2737,6 +2737,48 @@
         ],
         "default": "inherit",
         "info": "Font weight for the preorder date text"
+      },
+      {
+        "type": "header",
+        "content": "Preorder Info Box"
+      },
+      {
+        "type": "text",
+        "id": "preorder_box_heading",
+        "label": "Default Info Box Heading",
+        "default": "Coming Soon",
+        "info": "Default heading for the preorder info box"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_preorder_notify",
+        "label": "Show Notify Button by Default",
+        "default": true,
+        "info": "Show a notify button inside the preorder info box"
+      },
+      {
+        "type": "text",
+        "id": "preorder_notify_text",
+        "label": "Default Notify Button Text",
+        "default": "Notify Me When Available"
+      },
+      {
+        "type": "color",
+        "id": "preorder_box_background",
+        "label": "Info Box Background",
+        "default": "#f0f7f0"
+      },
+      {
+        "type": "color",
+        "id": "preorder_box_border",
+        "label": "Info Box Border",
+        "default": "#4a7c4a"
+      },
+      {
+        "type": "color",
+        "id": "preorder_box_text",
+        "label": "Info Box Text",
+        "default": "#2d5a2d"
       }
     ]
   },

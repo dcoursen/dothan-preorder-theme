@@ -158,7 +158,41 @@
   {{ block.shopify_attributes }}
 >
   {%- if product != blank -%}
-    {%- if show_bis_button -%}
+    {%- comment -%} Show styled preorder info box instead of disabled button {%- endcomment -%}
+    {%- if preorder_is_preorder and preorder_is_coming_soon -%}
+      <div class="preorder-info-box" style="
+        background: {{ block.settings.preorder_box_background | default: settings.preorder_box_background | default: '#f0f7f0' }};
+        border: 2px solid {{ block.settings.preorder_box_border | default: settings.preorder_box_border | default: '#4a7c4a' }};
+        color: {{ block.settings.preorder_box_text | default: settings.preorder_box_text | default: '#2d5a2d' }};
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 16px 0;
+      ">
+        <div style="font-size: 1.1em; font-weight: 600; margin-bottom: 8px;">
+          {{ block.settings.preorder_box_heading | default: settings.preorder_box_heading | default: 'Coming Soon' }}
+        </div>
+        <div style="font-size: 1em;">
+          {%- if preorder_smart_drop_text != blank -%}
+            {{ preorder_smart_drop_text }}
+          {%- else -%}
+            {{ preorder_formatted_drop_date }}
+          {%- endif -%}
+        </div>
+        {%- if block.settings.show_preorder_notify or settings.show_preorder_notify -%}
+          <button type="button" 
+                  class="button button--secondary" 
+                  style="margin-top: 12px;"
+                  onclick="document.getElementById('klaviyo-bis-trigger-{{ product.id }}').click();">
+            {{ block.settings.preorder_notify_text | default: settings.preorder_notify_text | default: 'Notify Me' }}
+          </button>
+        {%- endif -%}
+      </div>
+      {%- comment -%} Hidden Klaviyo trigger {%- endcomment -%}
+      <div style="display: none;">
+        {% render 'klaviyo-bis-integration' %}
+      </div>
+    {%- elsif show_bis_button -%}
       {% comment %} Include enhanced preorder + BIS integration {% endcomment %}
       {% render 'klaviyo-bis-integration' %}
       
@@ -420,6 +454,49 @@ onclick="
       "label": "Back in Stock Button Text",
       "info": "Text for back-in-stock notification buttons. Leave blank to use theme default.",
       "placeholder": "Notify When Available"
+    },
+    {
+      "type": "header",
+      "content": "Preorder Info Box"
+    },
+    {
+      "type": "text",
+      "id": "preorder_box_heading",
+      "label": "Info Box Heading",
+      "placeholder": "Coming Soon",
+      "info": "Heading shown in the preorder info box"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_preorder_notify",
+      "label": "Show Notify Button",
+      "default": true,
+      "info": "Show a notify button inside the preorder info box"
+    },
+    {
+      "type": "text",
+      "id": "preorder_notify_text",
+      "label": "Notify Button Text",
+      "placeholder": "Notify Me",
+      "default": "Notify Me When Available"
+    },
+    {
+      "type": "color",
+      "id": "preorder_box_background",
+      "label": "Box Background Color",
+      "info": "Leave blank for theme default"
+    },
+    {
+      "type": "color",
+      "id": "preorder_box_border",
+      "label": "Box Border Color",
+      "info": "Leave blank for theme default"
+    },
+    {
+      "type": "color",
+      "id": "preorder_box_text",
+      "label": "Box Text Color",
+      "info": "Leave blank for theme default"
     },
     {
       "type": "header",
