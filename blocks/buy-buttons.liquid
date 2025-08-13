@@ -158,6 +158,9 @@
   {{ block.shopify_attributes }}
 >
   {%- if product != blank -%}
+    {%- comment -%} Debug preorder status {%- endcomment -%}
+    <!-- DEBUG: preorder_is_preorder: {{ preorder_is_preorder }}, preorder_is_coming_soon: {{ preorder_is_coming_soon }}, enable_preorders: {{ settings.enable_preorders }}, drop_date: {{ preorder_drop_date }} -->
+    
     {%- comment -%} Simplified preorder display using theme settings only {%- endcomment -%}
     {%- if preorder_is_preorder and preorder_is_coming_soon and settings.enable_preorders != false -%}
       {% render 'preorder-display', product: product, date_text: preorder_smart_drop_text, formatted_date: preorder_formatted_drop_date %}
@@ -297,7 +300,8 @@ onclick="
           class="product-form-buttons spacing-style{% if block.settings.stacking %} product-form-buttons--stacked{% endif %}"
           style="{% render 'spacing-style', settings: block.settings %}"
         >
-          {% if can_add_to_cart %}
+          {% comment %} Show quantity for regular products or preorder products {% endcomment %}
+          {% if can_add_to_cart or preorder_is_preorder %}
             {% content_for 'block', type: 'quantity', id: 'quantity' %}
           {% endif %}
 
