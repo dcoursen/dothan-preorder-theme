@@ -158,19 +158,6 @@
   {{ block.shopify_attributes }}
 >
   {%- if product != blank -%}
-    {%- comment -%} Debug preorder status {%- endcomment -%}
-    <script>
-      console.log('🌱 PREORDER DEBUG:', {
-        product_id: {{ product.id | json }},
-        preorder_is_preorder: {{ preorder_is_preorder | json }},
-        preorder_is_coming_soon: {{ preorder_is_coming_soon | json }},
-        enable_preorders: {{ settings.enable_preorders | json }},
-        drop_date: {{ preorder_drop_date | json }},
-        smart_drop_text: {{ preorder_smart_drop_text | json }},
-        can_add_to_cart: {{ can_add_to_cart | json }},
-        show_bis_button: {{ show_bis_button | json }}
-      });
-    </script>
     
     {%- comment -%} Simplified preorder display using theme settings only {%- endcomment -%}
     {%- if preorder_is_preorder and preorder_is_coming_soon and settings.enable_preorders != false -%}
