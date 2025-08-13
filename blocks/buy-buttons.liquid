@@ -140,10 +140,13 @@
   if preorder_is_preorder and preorder_is_coming_soon
     # Before drop date - always disabled, regardless of inventory
     assign can_add_to_cart = false
+    # Customizable preorder button text - Theme settings with block overrides
+    assign preorder_prefix = block.settings.preorder_coming_soon_text | default: settings.preorder_coming_soon_text | default: 'Available'
+    
     if preorder_smart_drop_text != blank
-      assign add_to_cart_text = 'Exclusively for Garden VIPs: ' | append: preorder_smart_drop_text
+      assign add_to_cart_text = preorder_prefix | append: ' ' | append: preorder_smart_drop_text
     else
-      assign add_to_cart_text = 'Exclusively for Garden VIPs: ' | append: preorder_formatted_drop_date
+      assign add_to_cart_text = preorder_prefix | append: ' ' | append: preorder_formatted_drop_date
     endif
   endif
   
@@ -234,7 +237,7 @@ onclick="
                   formId: formId
                 });
                 ">
-          {% if preorder_is_preorder %}{{ settings.preorder_button_text | default: 'Join Garden VIP List' }}{% else %}{{ settings.bis_button_text | default: 'Get Notified First' }}{% endif %}
+          {% if preorder_is_preorder %}{{ block.settings.preorder_button_text | default: settings.preorder_button_text | default: 'Get Early Access' }}{% else %}{{ block.settings.bis_button_text | default: settings.bis_button_text | default: 'Notify When Available' }}{% endif %}
         </button>
       </div>
       
@@ -392,6 +395,31 @@ onclick="
       "id": "show_pickup_availability",
       "label": "t:settings.show_pickup_availability",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Preorder Settings"
+    },
+    {
+      "type": "text",
+      "id": "preorder_coming_soon_text",
+      "label": "Preorder Coming Soon Text",
+      "info": "Text shown on disabled preorder buttons (e.g., 'Available', 'Coming Soon', 'Exclusively for Members'). Leave blank to use theme default.",
+      "placeholder": "Available"
+    },
+    {
+      "type": "text",
+      "id": "preorder_button_text",
+      "label": "Preorder Button Text",
+      "info": "Text for preorder notification buttons. Leave blank to use theme default.",
+      "placeholder": "Get Early Access"
+    },
+    {
+      "type": "text",
+      "id": "bis_button_text",
+      "label": "Back in Stock Button Text",
+      "info": "Text for back-in-stock notification buttons. Leave blank to use theme default.",
+      "placeholder": "Notify When Available"
     },
     {
       "type": "header",

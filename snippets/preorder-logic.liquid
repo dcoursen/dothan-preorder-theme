@@ -82,7 +82,7 @@
 {%- if show_preorder_info and settings.enable_preorder_display != false -%}
   <div class="preorder-info-display" style="margin: 0.5rem 0 1rem 0; padding: 8px 12px; background: rgb(var(--color-background-accent)); border-left: 3px solid rgb(var(--color-accent)); font-size: 0.9rem; color: rgb(var(--color-foreground-heading)); border-radius: 4px;">
     <span class="preorder-icon" style="margin-right: 6px;">🌱</span>
-    <strong>For gardeners who plan ahead:</strong> {{ preorder_text }}
+    <strong>{{ settings.preorder_info_prefix | default: 'Coming Soon' }}:</strong> {{ preorder_text }}
   </div>
 {%- endif -%}
 

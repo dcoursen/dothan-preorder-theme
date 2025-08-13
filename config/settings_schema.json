@@ -2562,6 +2562,13 @@
         "info": "Text displayed on the preorder button"
       },
       {
+        "type": "text",
+        "id": "preorder_coming_soon_text",
+        "label": "Coming Soon Button Prefix",
+        "default": "Available",
+        "info": "Text shown on disabled preorder buttons before the date (e.g., 'Available', 'Coming Soon', 'Exclusively for Members')"
+      },
+      {
         "type": "select",
         "id": "preorder_button_text_case",
         "label": "Text Capitalization",
@@ -2617,6 +2624,13 @@
         "label": "Show Preorder Date",
         "default": true,
         "info": "Display availability dates for preorder products"
+      },
+      {
+        "type": "text",
+        "id": "preorder_info_prefix",
+        "label": "Preorder Info Label",
+        "default": "Coming Soon",
+        "info": "Label shown before preorder date info (e.g., 'Coming Soon', 'For gardeners who plan ahead', 'Available Soon')"
       },
       {
         "type": "color",
