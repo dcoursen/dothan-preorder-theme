@@ -4,9 +4,9 @@
     assign product = collections.all.products.first
   endif
   
-  assign preorder_drop_date = product.metafields.custom.preorder_drop_date
-  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start
-  assign pickup_duration_days = product.metafields.custom.pickup_duration_days | default: 14
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
+  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
+  assign pickup_duration_days = product.metafields.custom.pickup_duration_days.value | default: 14
   
   assign now = 'now' | date: '%s'
   assign show_preorder = false
