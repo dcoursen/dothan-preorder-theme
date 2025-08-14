@@ -1,0 +1,312 @@
+{% liquid
+  assign product = product | default: closest.product
+  if product == blank
+    assign product = collections.all.products.first
+  endif
+  
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date
+  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start
+  assign pickup_duration_days = product.metafields.custom.pickup_duration_days | default: 14
+  
+  assign now = 'now' | date: '%s'
+  assign show_preorder = false
+  assign show_pickup = false
+  assign is_coming_soon = false
+  assign pickup_message = ''
+  assign drop_message = ''
+  
+  if preorder_drop_date != blank
+    assign drop_timestamp = preorder_drop_date | date: '%s'
+    if drop_timestamp > now
+      assign show_preorder = true
+      assign is_coming_soon = true
+      assign drop_message = preorder_drop_date | date: '%B %d at %l:%M%p %Z'
+    endif
+  endif
+  
+  if preorder_pickup_start != blank and is_coming_soon == false
+    assign pickup_start_timestamp = preorder_pickup_start | date: '%s'
+    assign pickup_end_timestamp = pickup_start_timestamp | plus: pickup_duration_days | times: 86400
+    assign pickup_end_date = pickup_end_timestamp | date: '%B %d'
+    
+    assign show_pickup = true
+    assign pickup_message = preorder_pickup_start | date: '%B %d'
+    if pickup_duration_days > 1
+      assign pickup_message = pickup_message | append: ' - ' | append: pickup_end_date
+    endif
+  endif
+  
+  assign show_display = false
+  if show_preorder or show_pickup
+    assign show_display = true
+  endif
+  
+  if settings.enable_preorder_display == false
+    assign show_display = false
+  endif
+  
+  if show_when_available == false and is_coming_soon == false and show_pickup == false
+    assign show_display = false
+  endif
+%}
+
+{%- if show_display -%}
+  <div class="preorder-display" 
+       data-preorder="{{ is_coming_soon }}"
+       data-pickup="{{ show_pickup }}"
+       data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
+       style="{% render 'spacing-style', settings: block.settings %}">
+    
+    <div class="preorder-display__container">
+      <div class="preorder-display__icon">
+        {%- if is_coming_soon -%}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z" fill="currentColor"/>
+          </svg>
+        {%- else -%}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 3H18V1H16V3H8V1H6V3H5C3.89 3 3.01 3.9 3.01 5L3 19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19ZM7 10H12V15H7V10Z" fill="currentColor"/>
+          </svg>
+        {%- endif -%}
+      </div>
+      
+      <div class="preorder-display__content">
+        {%- if is_coming_soon -%}
+          <div class="preorder-display__badge">Early Access</div>
+          <h3 class="preorder-display__title">Coming Soon</h3>
+          <p class="preorder-display__message">
+            Available {{ drop_message }}
+          </p>
+          <div class="preorder-display__countdown" data-target="{{ preorder_drop_date | date: '%s' }}"></div>
+        {%- elsif show_pickup -%}
+          <div class="preorder-display__badge preorder-display__badge--ready">Ready for Pickup</div>
+          <h3 class="preorder-display__title">Available Now</h3>
+          <p class="preorder-display__message">
+            Pickup available {{ pickup_message }}
+          </p>
+          <p class="preorder-display__note">
+            Visit our garden center during business hours
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    {%- if is_coming_soon -%}
+      document.addEventListener('DOMContentLoaded', function() {
+        const countdownEl = document.querySelector('.preorder-display__countdown[data-target]');
+        if (!countdownEl) return;
+        
+        const targetTime = parseInt(countdownEl.dataset.target) * 1000;
+        
+        function updateCountdown() {
+          const now = new Date().getTime();
+          const distance = targetTime - now;
+          
+          if (distance < 0) {
+            countdownEl.innerHTML = '<span class="preorder-display__countdown-live">Available now!</span>';
+            return;
+          }
+          
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          
+          let countdownText = '';
+          if (days > 0) {
+            countdownText = `${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+          } else if (hours > 0) {
+            countdownText = `${hours} hour${hours !== 1 ? 's' : ''}, ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+          } else {
+            countdownText = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+          }
+          
+          countdownEl.innerHTML = `<span class="preorder-display__countdown-live">Available in ${countdownText}</span>`;
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 60000); // Update every minute
+      });
+    {%- endif -%}
+  </script>
+{%- endif -%}
+
+{% stylesheet %}
+  .preorder-display {
+    width: 100%;
+    margin: var(--spacing-md, 16px) 0;
+  }
+  
+  .preorder-display__container {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md, 16px);
+    padding: var(--spacing-lg, 24px);
+    background: linear-gradient(135deg, #f0f7f0 0%, #e8f4e8 100%);
+    border: 2px solid #4c7c4c;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(76, 124, 76, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .preorder-display__container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4c7c4c 0%, #6ba46b 50%, #4c7c4c 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0%, 100% { background-position: 200% 0; }
+    50% { background-position: -200% 0; }
+  }
+  
+  .preorder-display__icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #4c7c4c 0%, #6ba46b 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 124, 76, 0.3);
+  }
+  
+  .preorder-display__content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .preorder-display__badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #4c7c4c;
+    color: white;
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .preorder-display__badge--ready {
+    background: #2d5a2d;
+  }
+  
+  .preorder-display__title {
+    margin: 0 0 8px 0;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 700;
+    color: #2d5a2d;
+    line-height: 1.2;
+  }
+  
+  .preorder-display__message {
+    margin: 0 0 8px 0;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    color: #4c7c4c;
+    line-height: 1.4;
+  }
+  
+  .preorder-display__note {
+    margin: 0;
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+    color: #6ba46b;
+    font-style: italic;
+  }
+  
+  .preorder-display__countdown {
+    margin-top: 12px;
+  }
+  
+  .preorder-display__countdown-live {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(76, 124, 76, 0.1);
+    border: 1px solid #4c7c4c;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #2d5a2d;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  /* Mobile optimizations */
+  @media screen and (max-width: 640px) {
+    .preorder-display__container {
+      padding: var(--spacing-md, 16px);
+      gap: var(--spacing-sm, 12px);
+    }
+    
+    .preorder-display__icon {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .preorder-display__icon svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .preorder-display__container {
+      background: linear-gradient(135deg, #2a3f2a 0%, #1f2f1f 100%);
+      border-color: #6ba46b;
+      color: #e8f4e8;
+    }
+    
+    .preorder-display__title {
+      color: #badcba;
+    }
+    
+    .preorder-display__message {
+      color: #a0c4a0;
+    }
+    
+    .preorder-display__note {
+      color: #8ab08a;
+    }
+  }
+  
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .preorder-display__container::before,
+    .preorder-display__countdown-live {
+      animation: none;
+    }
+    
+    .preorder-display__container {
+      transition: none;
+    }
+  }
+  
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .preorder-display__container {
+      border-width: 3px;
+      box-shadow: none;
+    }
+    
+    .preorder-display__badge {
+      border: 2px solid currentColor;
+    }
+  }
+{% endstylesheet %}

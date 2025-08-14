@@ -153,14 +153,18 @@
                   },
                   "blocks": {}
                 },
-                "pickup_date_block": {
-                  "type": "pickup-date",
-                  "settings": {}
+                "preorder_display_modern": {
+                  "type": "preorder-display",
+                  "settings": {
+                    "show_when_available": true,
+                    "padding-block-start": 12,
+                    "padding-block-end": 12
+                  }
                 }
               },
               "block_order": [
                 "text_xrnftG",
-                "pickup_date_block",
+                "preorder_display_modern",
                 "price_tVjtKg"
               ]
             },
