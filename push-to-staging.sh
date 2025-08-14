@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Push to Staging Script with Git Integration
-# Theme: [STAGING] Retail Savage x Dothan Nurseries v1.0.0
-# Theme ID: 143102967970
+# Theme: [STAGING] Retail Savage x Dothan Nurseries v1.1.0
+# Theme ID: 143188983970
 
 echo "🚀 Push to Staging - Complete Workflow"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -51,12 +51,12 @@ echo "🚀 Deploying to STAGING theme..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Run the backup and push script with staging theme ID
-./backup-and-push.sh 143102967970
+./backup-and-push.sh 143188983970
 
 echo "
 ✅ Complete deployment to STAGING!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📱 Preview: https://vzgxcj-h9.myshopify.com?preview_theme_id=143102967970
-⚙️  Customize: https://vzgxcj-h9.myshopify.com/admin/themes/143102967970/editor
+📱 Preview: https://vzgxcj-h9.myshopify.com?preview_theme_id=143188983970
+⚙️  Customize: https://vzgxcj-h9.myshopify.com/admin/themes/143188983970/editor
 🐙 GitHub: $(git remote get-url origin | sed 's/\.git$//')
 "

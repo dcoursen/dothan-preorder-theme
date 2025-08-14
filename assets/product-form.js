@@ -55,6 +55,8 @@ export class AddToCartComponent extends Component {
    * @param {MouseEvent & {target: HTMLElement}} event - The click event.
    */
   handleClick(event) {
+    if (!this.#checkFormValidity()) return;
+
     this.animateAddToCart();
 
     if (!event.target.closest('.quick-add-modal')) this.#animateFlyToCart();
@@ -106,6 +108,42 @@ export class AddToCartComponent extends Component {
         this.refs.addToCartButton.classList.remove('atc-added');
       }, 10);
     }, ADD_TO_CART_TEXT_ANIMATION_DURATION);
+  }
+
+  /**
+   * Checks if the form is valid when the user adds an item to cart.
+   * Currently only checks the gift card recipient form.
+   * @returns {boolean} - True if the form is valid, false otherwise.
+   */
+  #checkFormValidity() {
+    const form = this.closest('form');
+    if (!form) return true;
+
+    const allInputs = Array.from(form.querySelectorAll('input, select, textarea')).filter((input) =>
+      input.id.includes('Recipient')
+    );
+    let allInputsValid = true;
+    for (const input of allInputs) {
+      if (
+        !(
+          input instanceof HTMLInputElement ||
+          input instanceof HTMLSelectElement ||
+          input instanceof HTMLTextAreaElement
+        )
+      ) {
+        continue;
+      }
+
+      // Skip disabled inputs
+      if (input.disabled) continue;
+
+      // Check validity on all input elements
+      if (!input.checkValidity()) {
+        allInputsValid = false;
+        break;
+      }
+    }
+    return allInputsValid;
   }
 }
 
@@ -190,7 +228,9 @@ class ProductFormComponent extends Component {
       .then((response) => response.json())
       .then((response) => {
         if (response.status) {
-          window.dispatchEvent(new CartErrorEvent(this.id, response.message));
+          this.dispatchEvent(
+            new CartErrorEvent(form.getAttribute('id') || '', response.message, response.description, response.errors)
+          );
 
           if (!addToCartTextError) return;
           addToCartTextError.classList.remove('hidden');
@@ -291,24 +331,14 @@ class ProductFormComponent extends Component {
     } else if (event.detail.data.productId !== this.dataset.productId) {
       return;
     }
-  
+
     const { variantId, addToCartButtonContainer } = this.refs;
-  
+
     const currentAddToCartButton = addToCartButtonContainer?.refs.addToCartButton;
     const newAddToCartButton = event.detail.data.html.querySelector('[ref="addToCartButton"]');
-  
+
     if (!currentAddToCartButton) return;
-  
-    // Check if this is a notify-me/preorder product - skip morphing if so
-    const currentContainer = currentAddToCartButton.closest('.product-form-buttons');
-    const hasNotifyText = currentContainer?.querySelector('.notify-me-text');
-    
-    if (hasNotifyText) {
-      // Skip button morphing for notify-me products
-      variantId.value = event.detail.resource?.id ?? '';
-      return;
-    }
-  
+
     // Update the button state
     if (event.detail.resource == null || event.detail.resource.available == false) {
       addToCartButtonContainer.disable();
@@ -317,15 +347,15 @@ class ProductFormComponent extends Component {
       addToCartButtonContainer.enable();
       this.refs.acceleratedCheckoutButtonContainer?.removeAttribute('hidden');
     }
-  
+
     // Update the add to cart button text and icon
     if (newAddToCartButton) {
       morph(currentAddToCartButton, newAddToCartButton);
     }
-  
+
     // Update the variant ID
-    variantId.value = event.detail.resource?.id ?? '';
-  
+    variantId.value = event.detail.resource.id ?? '';
+
     // Set the data attribute for the add to cart button to the product variant media if it exists
     if (event.detail.resource) {
       const productVariantMedia = event.detail.resource.featured_media?.preview_image?.src;

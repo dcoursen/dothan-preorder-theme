@@ -1,4 +1,5 @@
 
+
 {% if closest.product == blank %}
   {% assign text = 'placeholders.product_title' | t %}
   {% assign product_title = '<p>' | append: text | append: '</p>' %}
@@ -13,23 +14,6 @@
   >
     {% render 'text', fallback_text: product_title, block: block %}
   </a>
-  
-  
-  {% comment %} Add pickup dates below title for preorder products {% endcomment %}
-  {% if preorder_is_preorder %}
-    <div class="product-card__pickup-info" style="margin-top: 0.5rem; font-size: 0.875rem; color: rgb(var(--color-foreground)); opacity: 0.8;">
-      {% if preorder_is_coming_soon %}
-
-      {% endif %}
-      
-      {% if preorder_show_pickup_dates %}
-        <div class="pickup-dates-display">
-          <span style="font-weight: 500;">Pickup:</span>
-          <span>{{ preorder_smart_pickup_start }} - {{ preorder_smart_pickup_end }}</span>
-        </div>
-      {% endif %}
-    </div>
-  {% endif %}
 {% endif %}
 
 {% schema %}

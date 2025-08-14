@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Horizon",
-    "theme_version": "2.0.3",
+    "theme_version": "2.1.1",
     "theme_author": "Shopify",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1492,88 +1492,6 @@
           }
         ],
         "default": "none"
-      }
-    ]
-  },
-  {
-    "name": "Preorder Settings",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Essential Settings"
-      },
-      {
-        "type": "checkbox",
-        "id": "enable_preorders",
-        "label": "Enable preorder system",
-        "default": true,
-        "info": "Master switch for all preorder functionality"
-      },
-      {
-        "type": "select",
-        "id": "preorder_style_preset",
-        "label": "Visual style",
-        "options": [
-          {
-            "value": "garden",
-            "label": "Garden (green theme)"
-          },
-          {
-            "value": "standard",
-            "label": "Standard (neutral theme)"
-          },
-          {
-            "value": "premium",
-            "label": "Premium (gold theme)"
-          }
-        ],
-        "default": "garden",
-        "info": "Choose a preset style that matches your brand"
-      },
-      {
-        "type": "text",
-        "id": "preorder_info_prefix",
-        "label": "Coming soon text",
-        "default": "Coming Soon",
-        "info": "Text shown before the preorder date (e.g., 'Coming Soon', 'Available')"
-      },
-      {
-        "type": "text",
-        "id": "preorder_icon",
-        "label": "Preorder icon",
-        "default": "🌱",
-        "info": "Emoji or symbol to show with preorder info"
-      },
-      {
-        "type": "checkbox",
-        "id": "preorder_show_icon",
-        "label": "Show icon",
-        "default": true
-      },
-      {
-        "type": "header",
-        "content": "Back-in-Stock Integration"
-      },
-      {
-        "type": "checkbox",
-        "id": "enable_back_in_stock",
-        "label": "Enable back-in-stock notifications",
-        "default": true,
-        "info": "Show notify buttons for sold-out products"
-      },
-      {
-        "type": "text",
-        "id": "klaviyo_bis_form_id",
-        "label": "Klaviyo form ID",
-        "default": "WQZSWn",
-        "info": "Your Klaviyo back-in-stock form ID"
-      },
-      {
-        "type": "text",
-        "id": "bis_button_text",
-        "label": "Back-in-stock button text",
-        "default": "Notify When Available",
-        "info": "Text for sold-out products without preorder dates"
       }
     ]
   },

@@ -14,11 +14,11 @@
     "footer": {
       "type": "footer",
       "blocks": {
-        "divider_3HLdM9": {
+        "divider_hFm3am": {
           "type": "_divider",
           "name": "t:names.divider",
           "settings": {
-            "thickness": 5,
+            "thickness": 1,
             "corner_radius": "square",
             "width_percent": 100,
             "padding-block-start": 0,
@@ -26,46 +26,179 @@
           },
           "blocks": {}
         },
-        "logo_KgLUdt": {
-          "type": "logo",
-          "name": "t:names.logo",
+        "group_tbFfTQ": {
+          "type": "group",
+          "name": "Email signup",
           "settings": {
-            "inverse": false,
-            "font": "heading",
-            "unit": "pixel",
-            "percent_width": 100,
-            "pixel_height": 48,
-            "custom_mobile_size": false,
-            "unit_mobile": "percent",
-            "percent_width_mobile": 100,
-            "pixel_height_mobile": 120,
+            "link": "",
+            "open_in_new_tab": false,
+            "content_direction": "row",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "space-between",
+            "vertical_alignment": "flex-end",
+            "align_baseline": false,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 32,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "custom",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "toggle_overlay": false,
+            "overlay_color": "#00000026",
+            "overlay_style": "solid",
+            "gradient_direction": "to top",
             "padding-block-start": 0,
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
-          "blocks": {}
-        },
-        "payment_icons_LJqyHX": {
-          "type": "payment-icons",
-          "name": "t:names.payment_icons",
-          "settings": {
-            "horizontal_alignment": "flex-end",
-            "gap": 10,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+          "blocks": {
+            "group_4aCyy7": {
+              "type": "group",
+              "name": "Content",
+              "settings": {
+                "link": "",
+                "open_in_new_tab": false,
+                "content_direction": "column",
+                "vertical_on_mobile": true,
+                "horizontal_alignment": "flex-start",
+                "vertical_alignment": "center",
+                "align_baseline": false,
+                "horizontal_alignment_flex_direction_column": "flex-start",
+                "vertical_alignment_flex_direction_column": "center",
+                "gap": 12,
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fill",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "custom_height": 100,
+                "inherit_color_scheme": true,
+                "color_scheme": "",
+                "background_media": "none",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "toggle_overlay": false,
+                "overlay_color": "#00000026",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "text_3L9Fjq": {
+                  "type": "text",
+                  "name": "Heading",
+                  "settings": {
+                    "text": "<p>Join our email list</p>",
+                    "width": "fit-content",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "h4",
+                    "font": "var(--font-primary--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "",
+                    "background": false,
+                    "background_color": "#00000026",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                },
+                "text_eC4rXd": {
+                  "type": "text",
+                  "name": "Text",
+                  "settings": {
+                    "text": "<p>Get exclusive deals and early access to new products. </p>",
+                    "width": "fit-content",
+                    "max_width": "normal",
+                    "alignment": "left",
+                    "type_preset": "rte",
+                    "font": "var(--font-primary--family)",
+                    "font_size": "",
+                    "line_height": "normal",
+                    "letter_spacing": "normal",
+                    "case": "none",
+                    "wrap": "pretty",
+                    "color": "",
+                    "background": false,
+                    "background_color": "#00000026",
+                    "corner_radius": 0,
+                    "padding-block-start": 0,
+                    "padding-block-end": 0,
+                    "padding-inline-start": 0,
+                    "padding-inline-end": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "text_3L9Fjq",
+                "text_eC4rXd"
+              ]
+            },
+            "email_signup_NcLwNb": {
+              "type": "email-signup",
+              "name": "Email input",
+              "settings": {
+                "width": "custom",
+                "custom_width": 50,
+                "inherit_color_scheme": true,
+                "color_scheme": "scheme-1",
+                "border_style": "all",
+                "border_width": 1,
+                "border_radius": 39,
+                "input_type_preset": "paragraph",
+                "style_class": "button-unstyled",
+                "display_type": "arrow",
+                "label": "Sign up",
+                "integrated_button": true,
+                "button_type_preset": "paragraph",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
           },
-          "blocks": {}
+          "block_order": [
+            "group_4aCyy7",
+            "email_signup_NcLwNb"
+          ]
         },
-        "footer_utilities_HpATtm": {
+        "footer_utilities_KRaGcH": {
           "type": "footer-utilities",
           "name": "t:names.footer_utilities",
           "settings": {
-            "divider_thickness": 1,
-            "padding-block-start": 20,
-            "padding-block-end": 20
+            "divider_thickness": 0,
+            "padding-block-start": 12,
+            "padding-block-end": 0
           },
           "blocks": {
             "copyright": {
@@ -91,44 +224,53 @@
               "static": true,
               "settings": {},
               "blocks": {
-                "social_link_xFt9mA": {
+                "social_link_JnLXB6": {
                   "type": "_social-link",
-                  "name": "t:names.social_link",
+                  "name": "Facebook",
                   "settings": {
-                    "link": "https://www.instagram.com/dothan.nurseries/?hl=en"
+                    "link": "https://www.facebook.com/"
                   },
                   "blocks": {}
                 },
-                "social_link_fnDqTf": {
+                "social_link_9i9EqD": {
                   "type": "_social-link",
-                  "name": "t:names.social_link",
+                  "name": "Instagram ",
                   "settings": {
-                    "link": "https://www.facebook.com/dothannurseries/"
+                    "link": "https://www.instagram.com/"
                   },
                   "blocks": {}
                 },
-                "social_link_qpzpNX": {
+                "social_link_kd8UUt": {
                   "type": "_social-link",
-                  "name": "t:names.social_link",
+                  "name": "TikTok",
                   "settings": {
-                    "link": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw"
+                    "link": "https://www.tiktok.com/"
                   },
                   "blocks": {}
                 },
-                "social_link_HwzKUC": {
+                "social_link_Qw9AXL": {
                   "type": "_social-link",
-                  "name": "t:names.social_link",
+                  "name": "X / Twitter",
                   "settings": {
-                    "link": "https://www.tiktok.com/@dothan.nurseries?lang=en"
+                    "link": "https://x.com/"
+                  },
+                  "blocks": {}
+                },
+                "social_link_aAH768": {
+                  "type": "_social-link",
+                  "name": "YouTube",
+                  "settings": {
+                    "link": "https://www.youtube.com/"
                   },
                   "blocks": {}
                 }
               },
               "block_order": [
-                "social_link_xFt9mA",
-                "social_link_fnDqTf",
-                "social_link_qpzpNX",
-                "social_link_HwzKUC"
+                "social_link_JnLXB6",
+                "social_link_9i9EqD",
+                "social_link_kd8UUt",
+                "social_link_Qw9AXL",
+                "social_link_aAH768"
               ]
             }
           },
@@ -136,10 +278,9 @@
         }
       },
       "block_order": [
-        "divider_3HLdM9",
-        "logo_KgLUdt",
-        "payment_icons_LJqyHX",
-        "footer_utilities_HpATtm"
+        "divider_hFm3am",
+        "group_tbFfTQ",
+        "footer_utilities_KRaGcH"
       ],
       "name": "Footer",
       "settings": {
@@ -158,7 +299,7 @@
         "video_position": "cover",
         "background_image_position": "cover",
         "padding-block-start": 0,
-        "padding-block-end": 48
+        "padding-block-end": 30
       }
     }
   },

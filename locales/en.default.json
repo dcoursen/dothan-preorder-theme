@@ -63,6 +63,7 @@
     "clear": "Clear",
     "clear_all": "Clear all",
     "close": "Close",
+    // Continue shopping link on the cart page which takes the user back to a collection page
     "continue_shopping": "Continue shopping",
     "enter_password": "Enter password",
     "log_in_html": "Have an account? <a href=\"{{ link }}\">Log in</a> to check out faster.",
@@ -242,7 +243,19 @@
     "your_cart_is_empty": "Your cart is empty",
     "product_count": "Product count",
     "errors": "Errors",
-    "wrong_password": "Wrong password"
+    "wrong_password": "Wrong password",
+    "recipient_form_send_to": "Send to",
+    "recipient_form_email_label": "Recipient’s email",
+    "recipient_form_email_label_my_email": "My email",
+    "recipient_form_email_address": "Recipient email address",
+    "recipient_form_name_label": "Recipient name (optional)",
+    "recipient_form_message": "Message (optional)",
+    "recipient_form_characters_used": "{{ used_chars }}/{{ max_chars }} characters used",
+    "recipient_form_send_on": "YYYY-MM-DD",
+    "recipient_form_send_on_label": "Send on (optional)",
+    "recipient_form_fields_visible": "Recipient form fields are now visible",
+    "recipient_form_fields_hidden": "Recipient form fields are now hidden",
+    "recipient_form_error": "There was an error with the form submission"
   },
   "fields": {
     "separator": "to"
@@ -274,14 +287,7 @@
       "added_to_cart": "Added to cart",
       "add_to_cart_error": "Error adding to cart",
       "sold_out": "Sold out",
-      "unavailable": "Unavailable",
-      "coming_soon": "Coming Soon",
-      "available": "Available"
-    }
-  },
-  "shopify": {
-    "links": {
-      "powered_by_shopify": " "
+      "unavailable": "Unavailable"
     }
   }
 }
