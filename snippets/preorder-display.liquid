@@ -169,7 +169,8 @@
           <div class="preorder-display__badge">{{ settings.preorder_badge_coming_text }}</div>
           <h3 class="preorder-display__title">{{ settings.preorder_title_coming }}</h3>
           <p class="preorder-display__message">
-            {{ settings.preorder_available_format | replace: '{date}', drop_message }}
+            {%- assign formatted_message = settings.preorder_available_format | replace: '{date}', drop_message -%}
+            {{ formatted_message }}
           </p>
           {%- if settings.preorder_show_countdown -%}
             <div class="preorder-display__countdown" data-target="{{ preorder_drop_date | date: '%s' }}"></div>
@@ -178,7 +179,8 @@
           <div class="preorder-display__badge preorder-display__badge--ready">{{ settings.preorder_badge_ready_text }}</div>
           <h3 class="preorder-display__title">{{ settings.preorder_title_ready }}</h3>
           <p class="preorder-display__message">
-            {{ settings.preorder_pickup_format | replace: '{date}', pickup_message }}
+            {%- assign formatted_pickup = settings.preorder_pickup_format | replace: '{date}', pickup_message -%}
+            {{ formatted_pickup }}
           </p>
           <p class="preorder-display__note">
             {{ settings.preorder_note_text }}
