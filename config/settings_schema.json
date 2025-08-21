@@ -2609,120 +2609,404 @@
       },
       {
         "type": "header",
-        "content": "Preorder Date Display"
+        "content": "Preorder Display Configuration"
+      }
+    ]
+  },
+  {
+    "name": "Preorder Display",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General Settings"
       },
       {
         "type": "checkbox",
         "id": "enable_preorder_display",
-        "label": "Show Preorder Date",
+        "label": "Enable Preorder Display",
         "default": true,
-        "info": "Display availability dates for preorder products"
+        "info": "Show preorder information and pickup dates for products"
+      },
+      {
+        "type": "select",
+        "id": "preorder_color_mode",
+        "label": "Color Mode",
+        "options": [
+          {
+            "value": "scheme",
+            "label": "Use Color Scheme"
+          },
+          {
+            "value": "custom",
+            "label": "Custom Colors"
+          }
+        ],
+        "default": "custom",
+        "info": "Choose between theme color schemes or custom colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "preorder_color_scheme",
+        "label": "Color Scheme",
+        "default": "scheme-1",
+        "info": "Select color scheme when using scheme mode"
+      },
+      {
+        "type": "header",
+        "content": "Container Styling"
+      },
+      {
+        "type": "select",
+        "id": "preorder_bg_type",
+        "label": "Background Type",
+        "options": [
+          {
+            "value": "solid",
+            "label": "Solid Color"
+          },
+          {
+            "value": "gradient",
+            "label": "Gradient"
+          },
+          {
+            "value": "transparent",
+            "label": "Transparent"
+          }
+        ],
+        "default": "gradient"
       },
       {
         "type": "color",
-        "id": "preorder_date_background",
+        "id": "preorder_bg_color",
         "label": "Background Color",
-        "default": "#e8f5e8",
-        "info": "Background color for the preorder date display"
+        "default": "#f0f7f0",
+        "info": "Used when background type is solid or as gradient start"
       },
       {
         "type": "color",
-        "id": "preorder_date_border",
-        "label": "Border Color",
-        "default": "#4a7c4a",
-        "info": "Border color for the preorder date display"
-      },
-      {
-        "type": "color",
-        "id": "preorder_date_text",
-        "label": "Text Color",
-        "default": "#2d5a2d",
-        "info": "Text color for the preorder date"
+        "id": "preorder_bg_gradient_end",
+        "label": "Gradient End Color",
+        "default": "#e8f4e8",
+        "info": "End color for gradient backgrounds"
       },
       {
         "type": "range",
-        "id": "preorder_date_border_radius",
+        "id": "preorder_bg_gradient_angle",
+        "label": "Gradient Angle",
+        "min": 0,
+        "max": 360,
+        "step": 15,
+        "unit": "deg",
+        "default": 135
+      },
+      {
+        "type": "range",
+        "id": "preorder_bg_opacity",
+        "label": "Background Opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Border Settings"
+      },
+      {
+        "type": "select",
+        "id": "preorder_border_style",
+        "label": "Border Style",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "solid",
+            "label": "Solid"
+          },
+          {
+            "value": "dashed",
+            "label": "Dashed"
+          },
+          {
+            "value": "double",
+            "label": "Double"
+          }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "range",
+        "id": "preorder_border_width",
+        "label": "Border Width",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "default": 2
+      },
+      {
+        "type": "color",
+        "id": "preorder_border_color",
+        "label": "Border Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "range",
+        "id": "preorder_border_radius",
         "label": "Corner Radius",
         "min": 0,
         "max": 50,
-        "step": 1,
+        "step": 2,
         "unit": "px",
-        "default": 8,
-        "info": "Corner radius for the preorder date display"
+        "default": 12
+      },
+      {
+        "type": "header",
+        "content": "Shadow Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_shadow_enable",
+        "label": "Enable Shadow",
+        "default": true
       },
       {
         "type": "select",
-        "id": "preorder_date_font_size",
-        "label": "Font Size",
+        "id": "preorder_shadow_style",
+        "label": "Shadow Style",
         "options": [
           {
-            "value": "inherit",
-            "label": "Inherit from theme"
+            "value": "subtle",
+            "label": "Subtle"
           },
           {
-            "value": "12",
-            "label": "12px"
-          },
-          {
-            "value": "13",
-            "label": "13px"
-          },
-          {
-            "value": "14",
-            "label": "14px"
-          },
-          {
-            "value": "15",
-            "label": "15px"
-          },
-          {
-            "value": "16",
-            "label": "16px"
-          },
-          {
-            "value": "18",
-            "label": "18px"
-          },
-          {
-            "value": "20",
-            "label": "20px"
-          }
-        ],
-        "default": "inherit",
-        "info": "Font size for the preorder date text"
-      },
-      {
-        "type": "select",
-        "id": "preorder_date_font_weight",
-        "label": "Font Weight",
-        "options": [
-          {
-            "value": "inherit",
-            "label": "Inherit from theme"
-          },
-          {
-            "value": "300",
-            "label": "Light"
-          },
-          {
-            "value": "400",
-            "label": "Normal"
-          },
-          {
-            "value": "500",
+            "value": "medium",
             "label": "Medium"
           },
           {
-            "value": "600",
-            "label": "Semi-Bold"
+            "value": "strong",
+            "label": "Strong"
           },
           {
-            "value": "700",
-            "label": "Bold"
+            "value": "custom",
+            "label": "Custom"
           }
         ],
-        "default": "inherit",
-        "info": "Font weight for the preorder date text"
+        "default": "subtle"
+      },
+      {
+        "type": "color",
+        "id": "preorder_shadow_color",
+        "label": "Shadow Color",
+        "default": "#4c7c4c",
+        "info": "Used when shadow style is custom"
+      },
+      {
+        "type": "header",
+        "content": "Icon Settings"
+      },
+      {
+        "type": "select",
+        "id": "preorder_icon_type",
+        "label": "Icon Type",
+        "options": [
+          {
+            "value": "calendar",
+            "label": "Calendar"
+          },
+          {
+            "value": "clock",
+            "label": "Clock"
+          },
+          {
+            "value": "star",
+            "label": "Star"
+          },
+          {
+            "value": "package",
+            "label": "Package"
+          },
+          {
+            "value": "truck",
+            "label": "Truck"
+          }
+        ],
+        "default": "calendar"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_icon_circle",
+        "label": "Show Icon Background Circle",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "preorder_icon_color",
+        "label": "Icon Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "preorder_icon_bg_color",
+        "label": "Icon Background Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "header",
+        "content": "Badge/Label Settings"
+      },
+      {
+        "type": "text",
+        "id": "preorder_badge_coming_text",
+        "label": "Coming Soon Badge Text",
+        "default": "Early Access"
+      },
+      {
+        "type": "text",
+        "id": "preorder_badge_ready_text",
+        "label": "Ready Badge Text",
+        "default": "Ready for Pickup"
+      },
+      {
+        "type": "color",
+        "id": "preorder_badge_bg_color",
+        "label": "Badge Background Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "color",
+        "id": "preorder_badge_text_color",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "preorder_badge_ready_bg_color",
+        "label": "Ready Badge Background Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "header",
+        "content": "Text Content"
+      },
+      {
+        "type": "text",
+        "id": "preorder_title_coming",
+        "label": "Coming Soon Title",
+        "default": "Coming Soon"
+      },
+      {
+        "type": "text",
+        "id": "preorder_title_ready",
+        "label": "Ready Title",
+        "default": "Available Now"
+      },
+      {
+        "type": "text",
+        "id": "preorder_available_format",
+        "label": "Available Text Format",
+        "default": "Available {date}",
+        "info": "Use {date} as placeholder for the date"
+      },
+      {
+        "type": "text",
+        "id": "preorder_pickup_format",
+        "label": "Pickup Text Format",
+        "default": "Pickup available {date}",
+        "info": "Use {date} as placeholder for the date"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_note_text",
+        "label": "Bottom Note Text",
+        "default": "Visit our garden center during business hours"
+      },
+      {
+        "type": "header",
+        "content": "Date & Time Settings"
+      },
+      {
+        "type": "select",
+        "id": "preorder_date_format",
+        "label": "Date Format",
+        "options": [
+          {
+            "value": "month_day",
+            "label": "September 15"
+          },
+          {
+            "value": "mm_dd",
+            "label": "09/15"
+          },
+          {
+            "value": "dd_mm",
+            "label": "15/09"
+          },
+          {
+            "value": "relative",
+            "label": "Relative (e.g., Tomorrow, Next Friday)"
+          },
+          {
+            "value": "full",
+            "label": "September 15 at 2:00PM EST"
+          }
+        ],
+        "default": "month_day"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_show_countdown",
+        "label": "Show Countdown Timer",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Typography"
+      },
+      {
+        "type": "color",
+        "id": "preorder_title_color",
+        "label": "Title Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "color",
+        "id": "preorder_message_color",
+        "label": "Message Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "color",
+        "id": "preorder_note_color",
+        "label": "Note Color",
+        "default": "#6ba46b"
+      },
+      {
+        "type": "header",
+        "content": "Animation"
+      },
+      {
+        "type": "select",
+        "id": "preorder_animation_style",
+        "label": "Animation Style",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "subtle",
+            "label": "Subtle"
+          },
+          {
+            "value": "prominent",
+            "label": "Prominent"
+          }
+        ],
+        "default": "subtle"
       }
     ]
   }

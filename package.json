@@ -12,7 +12,7 @@
     "dev": "shopify theme dev --store=${SHOPIFY_STORE_URL}",
     "dev:hot": "shopify theme dev --store=${SHOPIFY_STORE_URL} --live-reload hot",
     "pull": "shopify theme pull --store=${SHOPIFY_STORE_URL}",
-    "push": "shopify theme push --store=${SHOPIFY_STORE_URL}",
+    "push": "shopify theme push --store=${SHOPIFY_STORE_URL} --theme=${SHOPIFY_THEME_ID}",
     "preview": "shopify theme open --store=${SHOPIFY_STORE_URL}",
     "lint:theme": "theme-check",
     "lint": "npm run lint:theme",

@@ -20,20 +20,78 @@
     if drop_timestamp > now
       assign show_preorder = true
       assign is_coming_soon = true
-      assign drop_message = preorder_drop_date | date: '%B %d at %l:%M%p %Z'
+      
+      case settings.preorder_date_format
+        when 'month_day'
+          assign drop_message = preorder_drop_date | date: '%B %d'
+        when 'mm_dd'
+          assign drop_message = preorder_drop_date | date: '%m/%d'
+        when 'dd_mm'
+          assign drop_message = preorder_drop_date | date: '%d/%m'
+        when 'relative'
+          assign days_until = drop_timestamp | minus: now | divided_by: 86400
+          if days_until == 0
+            assign drop_message = 'Today'
+          elsif days_until == 1
+            assign drop_message = 'Tomorrow'
+          elsif days_until <= 7
+            assign drop_message = preorder_drop_date | date: 'This %A'
+          else
+            assign drop_message = preorder_drop_date | date: '%B %d'
+          endif
+        when 'full'
+          assign drop_message = preorder_drop_date | date: '%B %d at %l:%M%p %Z'
+        else
+          assign drop_message = preorder_drop_date | date: '%B %d'
+      endcase
     endif
   endif
   
   if preorder_pickup_start != blank and is_coming_soon == false
     assign pickup_start_timestamp = preorder_pickup_start | date: '%s'
     assign pickup_end_timestamp = pickup_start_timestamp | plus: pickup_duration_days | times: 86400
-    assign pickup_end_date = pickup_end_timestamp | date: '%B %d'
     
     assign show_pickup = true
-    assign pickup_message = preorder_pickup_start | date: '%B %d'
-    if pickup_duration_days > 1
-      assign pickup_message = pickup_message | append: ' - ' | append: pickup_end_date
-    endif
+    
+    case settings.preorder_date_format
+      when 'month_day'
+        assign pickup_message = preorder_pickup_start | date: '%B %d'
+        if pickup_duration_days > 1
+          assign pickup_end_date = pickup_end_timestamp | date: '%B %d'
+          assign pickup_message = pickup_message | append: ' - ' | append: pickup_end_date
+        endif
+      when 'mm_dd'
+        assign pickup_message = preorder_pickup_start | date: '%m/%d'
+        if pickup_duration_days > 1
+          assign pickup_end_date = pickup_end_timestamp | date: '%m/%d'
+          assign pickup_message = pickup_message | append: ' - ' | append: pickup_end_date
+        endif
+      when 'dd_mm'
+        assign pickup_message = preorder_pickup_start | date: '%d/%m'
+        if pickup_duration_days > 1
+          assign pickup_end_date = pickup_end_timestamp | date: '%d/%m'
+          assign pickup_message = pickup_message | append: ' - ' | append: pickup_end_date
+        endif
+      when 'relative'
+        assign days_until = pickup_start_timestamp | minus: now | divided_by: 86400
+        if days_until <= 0
+          assign pickup_message = 'Now'
+        elsif days_until == 1
+          assign pickup_message = 'Starting Tomorrow'
+        elsif days_until <= 7
+          assign pickup_message = preorder_pickup_start | date: 'Starting %A'
+        else
+          assign pickup_message = preorder_pickup_start | date: 'Starting %B %d'
+        endif
+      when 'full'
+        assign pickup_message = preorder_pickup_start | date: '%B %d at %l:%M%p %Z'
+      else
+        assign pickup_message = preorder_pickup_start | date: '%B %d'
+        if pickup_duration_days > 1
+          assign pickup_end_date = pickup_end_timestamp | date: '%B %d'
+          assign pickup_message = pickup_message | append: ' - ' | append: pickup_end_date
+        endif
+    endcase
   endif
   
   assign show_display = false
@@ -48,6 +106,29 @@
   if show_when_available == false and is_coming_soon == false and show_pickup == false
     assign show_display = false
   endif
+  
+  comment
+    Determine color scheme or custom colors
+  endcomment
+  
+  if settings.preorder_color_mode == 'scheme'
+    assign color_scheme = settings.color_schemes[settings.preorder_color_scheme]
+    assign bg_color = color_scheme.background
+    assign border_color = color_scheme.foreground | color_modify: 'alpha', 0.2
+    assign text_color = color_scheme.foreground
+    assign badge_bg = color_scheme.button
+    assign badge_text = color_scheme.button_label
+    assign icon_bg = color_scheme.button
+    assign icon_color = color_scheme.button_label
+  else
+    assign bg_color = settings.preorder_bg_color
+    assign border_color = settings.preorder_border_color
+    assign text_color = settings.preorder_title_color
+    assign badge_bg = settings.preorder_badge_bg_color
+    assign badge_text = settings.preorder_badge_text_color
+    assign icon_bg = settings.preorder_icon_bg_color
+    assign icon_color = settings.preorder_icon_color
+  endif
 %}
 
 {%- if show_display -%}
@@ -59,41 +140,56 @@
     
     <div class="preorder-display__container">
       <div class="preorder-display__icon">
-        {%- if is_coming_soon -%}
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z" fill="currentColor"/>
-          </svg>
-        {%- else -%}
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 3H18V1H16V3H8V1H6V3H5C3.89 3 3.01 3.9 3.01 5L3 19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19ZM7 10H12V15H7V10Z" fill="currentColor"/>
-          </svg>
-        {%- endif -%}
+        {%- case settings.preorder_icon_type -%}
+          {%- when 'clock' -%}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" fill="currentColor"/>
+            </svg>
+          {%- when 'star' -%}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+          {%- when 'package' -%}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 8H17.19C16.74 7.22 16.12 6.55 15.37 6.04L12 4L8.63 6.04C7.88 6.55 7.26 7.22 6.81 8H4C2.9 8 2 8.9 2 10V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V10C22 8.9 21.1 8 20 8ZM12 6L13.5 7H10.5L12 6ZM20 19H4V10H20V19Z" fill="currentColor"/>
+            </svg>
+          {%- when 'truck' -%}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 8H17V4H3C1.9 4 1 4.9 1 6V17H3C3 18.66 4.34 20 6 20S9 18.66 9 17H15C15 18.66 16.34 20 18 20S21 18.66 21 17H23V12L20 8ZM6 18C5.45 18 5 17.55 5 17S5.45 16 6 16 7 16.45 7 17 6.55 18 6 18ZM19.5 9.5L21.46 12H17V9.5H19.5ZM18 18C17.45 18 17 17.55 17 17S17.45 16 18 16 19 16.45 19 17 18.55 18 18 18Z" fill="currentColor"/>
+            </svg>
+          {%- else -%}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 3H18V1H16V3H8V1H6V3H5C3.89 3 3.01 3.9 3.01 5L3 19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19ZM7 10H12V15H7V10Z" fill="currentColor"/>
+            </svg>
+        {%- endcase -%}
       </div>
       
       <div class="preorder-display__content">
         {%- if is_coming_soon -%}
-          <div class="preorder-display__badge">Early Access</div>
-          <h3 class="preorder-display__title">Coming Soon</h3>
+          <div class="preorder-display__badge">{{ settings.preorder_badge_coming_text }}</div>
+          <h3 class="preorder-display__title">{{ settings.preorder_title_coming }}</h3>
           <p class="preorder-display__message">
-            Available {{ drop_message }}
+            {{ settings.preorder_available_format | replace: '{date}', drop_message }}
           </p>
-          <div class="preorder-display__countdown" data-target="{{ preorder_drop_date | date: '%s' }}"></div>
+          {%- if settings.preorder_show_countdown -%}
+            <div class="preorder-display__countdown" data-target="{{ preorder_drop_date | date: '%s' }}"></div>
+          {%- endif -%}
         {%- elsif show_pickup -%}
-          <div class="preorder-display__badge preorder-display__badge--ready">Ready for Pickup</div>
-          <h3 class="preorder-display__title">Available Now</h3>
+          <div class="preorder-display__badge preorder-display__badge--ready">{{ settings.preorder_badge_ready_text }}</div>
+          <h3 class="preorder-display__title">{{ settings.preorder_title_ready }}</h3>
           <p class="preorder-display__message">
-            Pickup available {{ pickup_message }}
+            {{ settings.preorder_pickup_format | replace: '{date}', pickup_message }}
           </p>
           <p class="preorder-display__note">
-            Visit our garden center during business hours
+            {{ settings.preorder_note_text }}
           </p>
         {%- endif -%}
       </div>
     </div>
   </div>
 
-  <script>
-    {%- if is_coming_soon -%}
+  {%- if is_coming_soon and settings.preorder_show_countdown -%}
+    <script>
       document.addEventListener('DOMContentLoaded', function() {
         const countdownEl = document.querySelector('.preorder-display__countdown[data-target]');
         if (!countdownEl) return;
@@ -128,14 +224,64 @@
         updateCountdown();
         setInterval(updateCountdown, 60000); // Update every minute
       });
-    {%- endif -%}
-  </script>
+    </script>
+  {%- endif -%}
 {%- endif -%}
 
 {% stylesheet %}
+  {% liquid
+    comment 
+      Generate CSS based on theme settings 
+    endcomment
+    
+    if settings.preorder_color_mode == 'scheme'
+      assign color_scheme = settings.color_schemes[settings.preorder_color_scheme]
+      assign container_bg = color_scheme.background
+      assign container_border = color_scheme.foreground | color_modify: 'alpha', 0.2
+      assign title_color = color_scheme.foreground
+      assign message_color = color_scheme.foreground | color_modify: 'alpha', 0.8
+      assign note_color = color_scheme.foreground | color_modify: 'alpha', 0.6
+      assign badge_bg = color_scheme.button
+      assign badge_text = color_scheme.button_label
+      assign icon_bg = color_scheme.button
+      assign icon_color = color_scheme.button_label
+    else
+      assign container_bg = settings.preorder_bg_color
+      assign container_border = settings.preorder_border_color
+      assign title_color = settings.preorder_title_color
+      assign message_color = settings.preorder_message_color
+      assign note_color = settings.preorder_note_color
+      assign badge_bg = settings.preorder_badge_bg_color
+      assign badge_text = settings.preorder_badge_text_color
+      assign icon_bg = settings.preorder_icon_bg_color
+      assign icon_color = settings.preorder_icon_color
+    endif
+    
+    assign bg_opacity = settings.preorder_bg_opacity | divided_by: 100.0
+    
+    case settings.preorder_shadow_style
+      when 'subtle'
+        assign shadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+      when 'medium'
+        assign shadow = '0 8px 24px rgba(0, 0, 0, 0.15)'
+      when 'strong'
+        assign shadow = '0 12px 36px rgba(0, 0, 0, 0.2)'
+      when 'custom'
+        assign shadow_color = settings.preorder_shadow_color | color_modify: 'alpha', 0.2
+        assign shadow = '0 8px 24px ' | append: shadow_color
+      else
+        assign shadow = 'none'
+    endcase
+    
+    unless settings.preorder_shadow_enable
+      assign shadow = 'none'
+    endunless
+  %}
+  
   .preorder-display {
     width: 100%;
-    margin: var(--spacing-md, 16px) 0;
+    margin: 0;
+    padding: var(--spacing-md, 16px) 0;
   }
   
   .preorder-display__container {
@@ -143,43 +289,69 @@
     align-items: flex-start;
     gap: var(--spacing-md, 16px);
     padding: var(--spacing-lg, 24px);
-    background: linear-gradient(135deg, #f0f7f0 0%, #e8f4e8 100%);
-    border: 2px solid #4c7c4c;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(76, 124, 76, 0.1);
+    
+    {% case settings.preorder_bg_type %}
+      {% when 'solid' %}
+        background: {{ container_bg | color_modify: 'alpha', bg_opacity }};
+      {% when 'gradient' %}
+        background: linear-gradient(
+          {{ settings.preorder_bg_gradient_angle }}deg,
+          {{ container_bg | color_modify: 'alpha', bg_opacity }} 0%,
+          {{ settings.preorder_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
+        );
+      {% when 'transparent' %}
+        background: transparent;
+    {% endcase %}
+    
+    {% if settings.preorder_border_style != 'none' %}
+      border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} {{ container_border }};
+    {% endif %}
+    
+    border-radius: {{ settings.preorder_border_radius }}px;
+    box-shadow: {{ shadow }};
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
   }
   
-  .preorder-display__container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #4c7c4c 0%, #6ba46b 50%, #4c7c4c 100%);
-    background-size: 200% 100%;
-    animation: shimmer 3s ease-in-out infinite;
-  }
-  
-  @keyframes shimmer {
-    0%, 100% { background-position: 200% 0; }
-    50% { background-position: -200% 0; }
-  }
+  {% if settings.preorder_animation_style != 'none' %}
+    .preorder-display__container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, {{ container_border }} 0%, {{ container_border | color_modify: 'alpha', 0.5 }} 50%, {{ container_border }} 100%);
+      background-size: 200% 100%;
+      {% if settings.preorder_animation_style == 'prominent' %}
+        animation: shimmer 3s ease-in-out infinite;
+      {% elsif settings.preorder_animation_style == 'subtle' %}
+        animation: shimmer 6s ease-in-out infinite;
+      {% endif %}
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { background-position: 200% 0; }
+      50% { background-position: -200% 0; }
+    }
+  {% endif %}
   
   .preorder-display__icon {
     flex-shrink: 0;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #4c7c4c 0%, #6ba46b 100%);
-    border-radius: 50%;
+    {% if settings.preorder_icon_circle %}
+      background: linear-gradient(135deg, {{ icon_bg }} 0%, {{ icon_bg | color_modify: 'lightness', 60 }} 100%);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px {{ icon_bg | color_modify: 'alpha', 0.3 }};
+    {% endif %}
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    box-shadow: 0 2px 8px rgba(76, 124, 76, 0.3);
+    color: {{ icon_color }};
   }
   
   .preorder-display__content {
@@ -190,8 +362,8 @@
   .preorder-display__badge {
     display: inline-block;
     padding: 4px 12px;
-    background: #4c7c4c;
-    color: white;
+    background: {{ badge_bg }};
+    color: {{ badge_text }};
     font-size: clamp(0.75rem, 2vw, 0.875rem);
     font-weight: 600;
     text-transform: uppercase;
@@ -201,28 +373,28 @@
   }
   
   .preorder-display__badge--ready {
-    background: #2d5a2d;
+    background: {{ settings.preorder_badge_ready_bg_color | default: badge_bg }};
   }
   
   .preorder-display__title {
     margin: 0 0 8px 0;
     font-size: clamp(1.25rem, 3vw, 1.5rem);
     font-weight: 700;
-    color: #2d5a2d;
+    color: {{ title_color }};
     line-height: 1.2;
   }
   
   .preorder-display__message {
     margin: 0 0 8px 0;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
-    color: #4c7c4c;
+    color: {{ message_color }};
     line-height: 1.4;
   }
   
   .preorder-display__note {
     margin: 0;
     font-size: clamp(0.75rem, 2vw, 0.875rem);
-    color: #6ba46b;
+    color: {{ note_color }};
     font-style: italic;
   }
   
@@ -233,13 +405,15 @@
   .preorder-display__countdown-live {
     display: inline-block;
     padding: 8px 16px;
-    background: rgba(76, 124, 76, 0.1);
-    border: 1px solid #4c7c4c;
+    background: {{ container_border | color_modify: 'alpha', 0.1 }};
+    border: 1px solid {{ container_border }};
     border-radius: 8px;
     font-weight: 600;
-    color: #2d5a2d;
+    color: {{ title_color }};
     font-size: clamp(0.875rem, 2.5vw, 1rem);
-    animation: pulse 2s ease-in-out infinite;
+    {% if settings.preorder_animation_style != 'none' %}
+      animation: pulse 2s ease-in-out infinite;
+    {% endif %}
   }
   
   @keyframes pulse {
@@ -267,23 +441,23 @@
   
   /* Dark mode support */
   @media (prefers-color-scheme: dark) {
-    .preorder-display__container {
-      background: linear-gradient(135deg, #2a3f2a 0%, #1f2f1f 100%);
-      border-color: #6ba46b;
-      color: #e8f4e8;
-    }
-    
-    .preorder-display__title {
-      color: #badcba;
-    }
-    
-    .preorder-display__message {
-      color: #a0c4a0;
-    }
-    
-    .preorder-display__note {
-      color: #8ab08a;
-    }
+    {% if settings.preorder_color_mode != 'scheme' %}
+      .preorder-display__container {
+        background: {{ container_bg | color_modify: 'lightness', 20 | color_modify: 'alpha', bg_opacity }};
+      }
+      
+      .preorder-display__title {
+        color: {{ title_color | color_modify: 'lightness', 80 }};
+      }
+      
+      .preorder-display__message {
+        color: {{ message_color | color_modify: 'lightness', 70 }};
+      }
+      
+      .preorder-display__note {
+        color: {{ note_color | color_modify: 'lightness', 60 }};
+      }
+    {% endif %}
   }
   
   /* Reduced motion */
@@ -301,7 +475,9 @@
   /* High contrast mode */
   @media (prefers-contrast: high) {
     .preorder-display__container {
-      border-width: 3px;
+      {% if settings.preorder_border_style != 'none' %}
+        border-width: {{ settings.preorder_border_width | plus: 1 }}px;
+      {% endif %}
       box-shadow: none;
     }
     
