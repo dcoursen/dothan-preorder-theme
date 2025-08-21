@@ -108,26 +108,15 @@
   endif
   
   comment
-    Determine color scheme or custom colors
+    Determine CSS class and approach based on color mode
   endcomment
   
   if settings.preorder_color_mode == 'scheme'
-    assign color_scheme = settings.color_schemes[settings.preorder_color_scheme]
-    assign bg_color = color_scheme.background
-    assign border_color = color_scheme.foreground | color_modify: 'alpha', 0.2
-    assign text_color = color_scheme.foreground
-    assign badge_bg = color_scheme.button
-    assign badge_text = color_scheme.button_label
-    assign icon_bg = color_scheme.button
-    assign icon_color = color_scheme.button_label
+    assign preorder_css_class = 'color-' | append: settings.preorder_color_scheme
+    assign use_scheme_colors = true
   else
-    assign bg_color = settings.preorder_bg_color
-    assign border_color = settings.preorder_border_color
-    assign text_color = settings.preorder_title_color
-    assign badge_bg = settings.preorder_badge_bg_color
-    assign badge_text = settings.preorder_badge_text_color
-    assign icon_bg = settings.preorder_icon_bg_color
-    assign icon_color = settings.preorder_icon_color
+    assign preorder_css_class = ''
+    assign use_scheme_colors = false
   endif
 %}
 
@@ -138,7 +127,7 @@
        data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
        style="{% render 'spacing-style', settings: block.settings %}">
     
-    <div class="preorder-display__container">
+    <div class="preorder-display__container {{ preorder_css_class }}">
       <div class="preorder-display__icon">
         {%- case settings.preorder_icon_type -%}
           {%- when 'clock' -%}
@@ -236,29 +225,6 @@
       Generate CSS based on theme settings 
     endcomment
     
-    if settings.preorder_color_mode == 'scheme'
-      assign color_scheme = settings.color_schemes[settings.preorder_color_scheme]
-      assign container_bg = color_scheme.background
-      assign container_border = color_scheme.foreground | color_modify: 'alpha', 0.2
-      assign title_color = color_scheme.foreground
-      assign message_color = color_scheme.foreground | color_modify: 'alpha', 0.8
-      assign note_color = color_scheme.foreground | color_modify: 'alpha', 0.6
-      assign badge_bg = color_scheme.button
-      assign badge_text = color_scheme.button_label
-      assign icon_bg = color_scheme.button
-      assign icon_color = color_scheme.button_label
-    else
-      assign container_bg = settings.preorder_bg_color
-      assign container_border = settings.preorder_border_color
-      assign title_color = settings.preorder_title_color
-      assign message_color = settings.preorder_message_color
-      assign note_color = settings.preorder_note_color
-      assign badge_bg = settings.preorder_badge_bg_color
-      assign badge_text = settings.preorder_badge_text_color
-      assign icon_bg = settings.preorder_icon_bg_color
-      assign icon_color = settings.preorder_icon_color
-    endif
-    
     assign bg_opacity = settings.preorder_bg_opacity | divided_by: 100.0
     
     case settings.preorder_shadow_style
@@ -291,24 +257,6 @@
     align-items: flex-start;
     gap: var(--spacing-md, 16px);
     padding: var(--spacing-lg, 24px);
-    
-    {% case settings.preorder_bg_type %}
-      {% when 'solid' %}
-        background: {{ container_bg | color_modify: 'alpha', bg_opacity }};
-      {% when 'gradient' %}
-        background: linear-gradient(
-          {{ settings.preorder_bg_gradient_angle }}deg,
-          {{ container_bg | color_modify: 'alpha', bg_opacity }} 0%,
-          {{ settings.preorder_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
-        );
-      {% when 'transparent' %}
-        background: transparent;
-    {% endcase %}
-    
-    {% if settings.preorder_border_style != 'none' %}
-      border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} {{ container_border }};
-    {% endif %}
-    
     border-radius: {{ settings.preorder_border_radius }}px;
     box-shadow: {{ shadow }};
     transition: all 0.3s ease;
@@ -318,42 +266,130 @@
     box-sizing: border-box;
   }
   
-  {% if settings.preorder_animation_style != 'none' %}
-    .preorder-display__container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, {{ container_border }} 0%, {{ container_border | color_modify: 'alpha', 0.5 }} 50%, {{ container_border }} 100%);
-      background-size: 200% 100%;
-      {% if settings.preorder_animation_style == 'prominent' %}
-        animation: shimmer 3s ease-in-out infinite;
-      {% elsif settings.preorder_animation_style == 'subtle' %}
-        animation: shimmer 6s ease-in-out infinite;
+  /* Color scheme mode - uses CSS custom properties */
+  {% if settings.preorder_color_mode == 'scheme' %}
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} {
+      {% case settings.preorder_bg_type %}
+        {% when 'solid' %}
+          background: rgba(var(--color-background-rgb), {{ bg_opacity }});
+        {% when 'gradient' %}
+          background: linear-gradient(
+            {{ settings.preorder_bg_gradient_angle }}deg,
+            rgba(var(--color-background-rgb), {{ bg_opacity }}) 0%,
+            rgba(var(--color-foreground-rgb), 0.05) 100%
+          );
+        {% when 'transparent' %}
+          background: transparent;
+      {% endcase %}
+      
+      {% if settings.preorder_border_style != 'none' %}
+        border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} rgba(var(--color-border-rgb), 0.3);
       {% endif %}
     }
     
-    @keyframes shimmer {
-      0%, 100% { background-position: 200% 0; }
-      50% { background-position: -200% 0; }
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__title {
+      color: var(--color-foreground-heading);
+    }
+    
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__message {
+      color: rgba(var(--color-foreground-rgb), 0.8);
+    }
+    
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__note {
+      color: rgba(var(--color-foreground-rgb), 0.6);
+    }
+    
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge {
+      background: var(--color-primary-button-background);
+      color: var(--color-primary-button-text);
+    }
+    
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge--ready {
+      background: var(--color-primary);
+      color: var(--color-primary-button-text);
+    }
+    
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__icon {
+      {% if settings.preorder_icon_circle %}
+        background: var(--color-primary-button-background);
+        box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+      {% endif %}
+      color: var(--color-primary-button-text);
+    }
+    
+    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__countdown-live {
+      background: rgba(var(--color-border-rgb), 0.1);
+      border-color: var(--color-border);
+      color: var(--color-foreground-heading);
+    }
+  {% else %}
+    /* Custom color mode - uses theme settings directly */
+    .preorder-display__container {
+      {% case settings.preorder_bg_type %}
+        {% when 'solid' %}
+          background: {{ settings.preorder_bg_color | color_modify: 'alpha', bg_opacity }};
+        {% when 'gradient' %}
+          background: linear-gradient(
+            {{ settings.preorder_bg_gradient_angle }}deg,
+            {{ settings.preorder_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
+            {{ settings.preorder_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
+          );
+        {% when 'transparent' %}
+          background: transparent;
+      {% endcase %}
+      
+      {% if settings.preorder_border_style != 'none' %}
+        border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} {{ settings.preorder_border_color }};
+      {% endif %}
+    }
+    
+    .preorder-display__title {
+      color: {{ settings.preorder_title_color }};
+    }
+    
+    .preorder-display__message {
+      color: {{ settings.preorder_message_color }};
+    }
+    
+    .preorder-display__note {
+      color: {{ settings.preorder_note_color }};
+    }
+    
+    .preorder-display__badge {
+      background: {{ settings.preorder_badge_bg_color }};
+      color: {{ settings.preorder_badge_text_color }};
+    }
+    
+    .preorder-display__badge--ready {
+      background: {{ settings.preorder_badge_ready_bg_color }};
+    }
+    
+    .preorder-display__icon {
+      {% if settings.preorder_icon_circle %}
+        background: linear-gradient(135deg, {{ settings.preorder_icon_bg_color }} 0%, {{ settings.preorder_icon_bg_color | color_modify: 'lightness', 60 }} 100%);
+        box-shadow: 0 2px 8px {{ settings.preorder_icon_bg_color | color_modify: 'alpha', 0.3 }};
+      {% endif %}
+      color: {{ settings.preorder_icon_color }};
+    }
+    
+    .preorder-display__countdown-live {
+      background: {{ settings.preorder_border_color | color_modify: 'alpha', 0.1 }};
+      border-color: {{ settings.preorder_border_color }};
+      color: {{ settings.preorder_title_color }};
     }
   {% endif %}
   
+  /* Common styles for both modes */
   .preorder-display__icon {
     flex-shrink: 0;
     width: 48px;
     height: 48px;
     {% if settings.preorder_icon_circle %}
-      background: linear-gradient(135deg, {{ icon_bg }} 0%, {{ icon_bg | color_modify: 'lightness', 60 }} 100%);
       border-radius: 50%;
-      box-shadow: 0 2px 8px {{ icon_bg | color_modify: 'alpha', 0.3 }};
     {% endif %}
     display: flex;
     align-items: center;
     justify-content: center;
-    color: {{ icon_color }};
   }
   
   .preorder-display__content {
@@ -364,8 +400,6 @@
   .preorder-display__badge {
     display: inline-block;
     padding: 4px 12px;
-    background: {{ badge_bg }};
-    color: {{ badge_text }};
     font-size: clamp(0.75rem, 2vw, 0.875rem);
     font-weight: 600;
     text-transform: uppercase;
@@ -374,29 +408,22 @@
     margin-bottom: 8px;
   }
   
-  .preorder-display__badge--ready {
-    background: {{ settings.preorder_badge_ready_bg_color | default: badge_bg }};
-  }
-  
   .preorder-display__title {
     margin: 0 0 8px 0;
     font-size: clamp(1.25rem, 3vw, 1.5rem);
     font-weight: 700;
-    color: {{ title_color }};
     line-height: 1.2;
   }
   
   .preorder-display__message {
     margin: 0 0 8px 0;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
-    color: {{ message_color }};
     line-height: 1.4;
   }
   
   .preorder-display__note {
     margin: 0;
     font-size: clamp(0.75rem, 2vw, 0.875rem);
-    color: {{ note_color }};
     font-style: italic;
   }
   
@@ -407,21 +434,52 @@
   .preorder-display__countdown-live {
     display: inline-block;
     padding: 8px 16px;
-    background: {{ container_border | color_modify: 'alpha', 0.1 }};
-    border: 1px solid {{ container_border }};
+    border: 1px solid;
     border-radius: 8px;
     font-weight: 600;
-    color: {{ title_color }};
     font-size: clamp(0.875rem, 2.5vw, 1rem);
     {% if settings.preorder_animation_style != 'none' %}
       animation: pulse 2s ease-in-out infinite;
     {% endif %}
   }
   
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-  }
+  /* Animation styles */
+  {% if settings.preorder_animation_style != 'none' %}
+    .preorder-display__container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background-size: 200% 100%;
+      {% if settings.preorder_animation_style == 'prominent' %}
+        animation: shimmer 3s ease-in-out infinite;
+      {% elsif settings.preorder_animation_style == 'subtle' %}
+        animation: shimmer 6s ease-in-out infinite;
+      {% endif %}
+    }
+    
+    {% if settings.preorder_color_mode == 'scheme' %}
+      .preorder-display__container.color-{{ settings.preorder_color_scheme }}::before {
+        background: linear-gradient(90deg, var(--color-border) 0%, rgba(var(--color-border-rgb), 0.5) 50%, var(--color-border) 100%);
+      }
+    {% else %}
+      .preorder-display__container::before {
+        background: linear-gradient(90deg, {{ settings.preorder_border_color }} 0%, {{ settings.preorder_border_color | color_modify: 'alpha', 0.5 }} 50%, {{ settings.preorder_border_color }} 100%);
+      }
+    {% endif %}
+    
+    @keyframes shimmer {
+      0%, 100% { background-position: 200% 0; }
+      50% { background-position: -200% 0; }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+  {% endif %}
   
   /* Mobile optimizations */
   @media screen and (max-width: 640px) {
