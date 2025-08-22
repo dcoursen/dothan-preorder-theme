@@ -135,7 +135,9 @@
        data-color-mode="{{ settings.preorder_color_mode | default: 'custom' }}"
        data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
        data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
+       {% if block %}{{ block.shopify_attributes }}{% endif %}
        style="
+         {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
          --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
          --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
          --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
@@ -249,19 +251,8 @@
 {% stylesheet %}
   .preorder-display {
     width: 100%;
-    margin: 0;
-    padding: 0;
     display: block;
     box-sizing: border-box;
-  }
-  
-  /* Match buy-buttons pattern exactly */
-  .preorder-display.spacing-style {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
-    min-width: 0 !important;
   }
   
   .preorder-display__container {
@@ -269,13 +260,9 @@
     align-items: flex-start;
     gap: var(--spacing-md, 16px);
     padding: var(--spacing-lg, 24px);
-    margin: 0;
     position: relative;
     overflow: hidden;
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    flex: 1 1 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
     
