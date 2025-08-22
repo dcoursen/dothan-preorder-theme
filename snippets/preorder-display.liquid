@@ -136,7 +136,6 @@
        data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
        data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
        style="
-         {% render 'spacing-style', settings: block.settings %}
          --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
          --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
          --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
@@ -261,6 +260,7 @@
     align-items: flex-start;
     gap: var(--spacing-md, 16px);
     padding: var(--spacing-lg, 24px);
+    margin: 0;
     position: relative;
     overflow: hidden;
     width: 100%;
@@ -313,7 +313,8 @@
   }
   
   .preorder-display__container:not([class*="color-"]) .preorder-display__badge--ready {
-    background: var(--preorder-badge-ready-bg);
+    background: var(--preorder-badge-ready-bg) !important;
+    color: var(--preorder-badge-text) !important;
   }
   
   .preorder-display__container:not([class*="color-"]) .preorder-display__title {
@@ -358,8 +359,8 @@
   }
   
   .preorder-display__container[class*="color-"] .preorder-display__badge--ready {
-    background: var(--color-primary);
-    color: var(--color-primary-button-text);
+    background: var(--color-primary) !important;
+    color: var(--color-primary-button-text) !important;
   }
   
   .preorder-display__container[class*="color-"] .preorder-display__title {
