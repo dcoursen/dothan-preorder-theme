@@ -128,17 +128,8 @@
     Border Style: {{ settings.preorder_border_style | default: 'not set' }}
     Icon Type: {{ settings.preorder_icon_type | default: 'not set' }}
   -->
-  <div class="preorder-display spacing-style" 
-       data-preorder="{{ is_coming_soon }}"
-       data-pickup="{{ show_pickup }}"
-       data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
-       data-color-mode="{{ settings.preorder_color_mode | default: 'custom' }}"
-       data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
-       data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
-       {% if block %}{{ block.shopify_attributes }}{% endif %}
-       style="
-         {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
-         --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
+  <div class="preorder-display" 
+       {% if block %}{{ block.shopify_attributes }}{% endif %}>
          --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
          --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
          --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
@@ -154,9 +145,19 @@
          --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
          --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
          --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
-       ">
+         ">
     
-    <div class="preorder-display__container {{ preorder_css_class }}" data-color-class="{{ preorder_css_class }}">
+    <div class="preorder-display__container spacing-style {{ preorder_css_class }}" 
+         data-color-class="{{ preorder_css_class }}"
+         data-preorder="{{ is_coming_soon }}"
+         data-pickup="{{ show_pickup }}"
+         data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
+         data-color-mode="{{ settings.preorder_color_mode | default: 'custom' }}"
+         data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
+         data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
+         style="
+           {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
+           --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
       <div class="preorder-display__icon">
         {%- case settings.preorder_icon_type -%}
           {%- when 'clock' -%}
