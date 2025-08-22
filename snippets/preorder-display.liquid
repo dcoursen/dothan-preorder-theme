@@ -129,7 +129,7 @@
          data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
          data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
          style="
-           {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
+           {% if block %}{% render 'spacing-style', settings: block.settings %}{% else %}padding: var(--spacing-lg, 24px);{% endif %}
            --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
            --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
            --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
@@ -250,7 +250,8 @@
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-md, 16px);
-    padding: var(--spacing-lg, 24px);
+    padding: 0;
+    margin: 0;
     position: relative;
     overflow: hidden;
     width: 100%;
