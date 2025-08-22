@@ -280,6 +280,51 @@
     box-sizing: border-box;
   }
   
+  /* Apply all custom settings with defaults */
+  {%- assign custom_bg_color = settings.preorder_bg_color | default: '#f0f7f0' -%}
+  {%- assign custom_bg_gradient_end = settings.preorder_bg_gradient_end | default: '#e8f4e8' -%}
+  {%- assign custom_gradient_angle = settings.preorder_bg_gradient_angle | default: 135 -%}
+  {%- assign custom_bg_type = settings.preorder_bg_type | default: 'gradient' -%}
+  {%- assign custom_border_width = settings.preorder_border_width | default: 2 -%}
+  {%- assign custom_border_style = settings.preorder_border_style | default: 'solid' -%}
+  {%- assign custom_border_color = settings.preorder_border_color | default: '#4c7c4c' -%}
+  {%- assign custom_title_color = settings.preorder_title_color | default: '#2d5a2d' -%}
+  {%- assign custom_message_color = settings.preorder_message_color | default: '#4c7c4c' -%}
+  {%- assign custom_note_color = settings.preorder_note_color | default: '#6ba46b' -%}
+  {%- assign custom_badge_bg = settings.preorder_badge_bg_color | default: '#4c7c4c' -%}
+  {%- assign custom_badge_text = settings.preorder_badge_text_color | default: '#ffffff' -%}
+  {%- assign custom_badge_ready_bg = settings.preorder_badge_ready_bg_color | default: '#2d5a2d' -%}
+  {%- assign custom_icon_bg = settings.preorder_icon_bg_color | default: '#4c7c4c' -%}
+  {%- assign custom_icon_color = settings.preorder_icon_color | default: '#ffffff' -%}
+  
+  /* Container background and border - always applied */
+  .preorder-display__container {
+    {% case custom_bg_type %}
+      {% when 'solid' %}
+        background: {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} !important;
+      {% when 'gradient' %}
+        background: linear-gradient(
+          {{ custom_gradient_angle }}deg,
+          {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
+          {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
+        ) !important;
+      {% when 'transparent' %}
+        background: transparent !important;
+      {% else %}
+        background: linear-gradient(
+          {{ custom_gradient_angle }}deg,
+          {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
+          {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
+        ) !important;
+    {% endcase %}
+    
+    {% if custom_border_style != 'none' %}
+      border: {{ custom_border_width }}px {{ custom_border_style }} {{ custom_border_color }} !important;
+    {% else %}
+      border: none !important;
+    {% endif %}
+  }
+  
   /* Color scheme mode - uses CSS custom properties */
   {% if settings.preorder_color_mode == 'scheme' %}
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} {
@@ -336,48 +381,10 @@
       border-color: var(--color-border);
       color: var(--color-foreground-heading);
     }
-  {% else %}
-    /* Custom color mode - uses theme settings directly */
-    {%- assign custom_bg_color = settings.preorder_bg_color | default: '#f0f7f0' -%}
-    {%- assign custom_bg_gradient_end = settings.preorder_bg_gradient_end | default: '#e8f4e8' -%}
-    {%- assign custom_gradient_angle = settings.preorder_bg_gradient_angle | default: 135 -%}
-    {%- assign custom_bg_type = settings.preorder_bg_type | default: 'gradient' -%}
-    
-    .preorder-display__container {
-      {% case custom_bg_type %}
-        {% when 'solid' %}
-          background: {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} !important;
-        {% when 'gradient' %}
-          background: linear-gradient(
-            {{ custom_gradient_angle }}deg,
-            {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
-            {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
-          ) !important;
-        {% when 'transparent' %}
-          background: transparent !important;
-        {% else %}
-          background: linear-gradient(
-            {{ custom_gradient_angle }}deg,
-            {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
-            {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
-          ) !important;
-      {% endcase %}
-      
-      {% if settings.preorder_border_style != 'none' %}
-        border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} {{ settings.preorder_border_color }} !important;
-      {% endif %}
-    }
-    
-    {%- assign custom_title_color = settings.preorder_title_color | default: '#2d5a2d' -%}
-    {%- assign custom_message_color = settings.preorder_message_color | default: '#4c7c4c' -%}
-    {%- assign custom_note_color = settings.preorder_note_color | default: '#6ba46b' -%}
-    {%- assign custom_badge_bg = settings.preorder_badge_bg_color | default: '#4c7c4c' -%}
-    {%- assign custom_badge_text = settings.preorder_badge_text_color | default: '#ffffff' -%}
-    {%- assign custom_badge_ready_bg = settings.preorder_badge_ready_bg_color | default: '#2d5a2d' -%}
-    {%- assign custom_icon_bg = settings.preorder_icon_bg_color | default: '#4c7c4c' -%}
-    {%- assign custom_icon_color = settings.preorder_icon_color | default: '#ffffff' -%}
-    {%- assign custom_border_color = settings.preorder_border_color | default: '#4c7c4c' -%}
-    
+  {% endif %}
+  
+  /* Text and element colors - applied for custom mode or as fallback */
+  {% if settings.preorder_color_mode != 'scheme' %}
     .preorder-display__container .preorder-display__title {
       color: {{ custom_title_color }} !important;
     }
