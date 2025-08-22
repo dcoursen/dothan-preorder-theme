@@ -121,11 +121,20 @@
 %}
 
 {%- if show_display -%}
+  <!-- Preorder Settings Debug:
+    Color Mode: {{ settings.preorder_color_mode | default: 'not set' }}
+    BG Type: {{ settings.preorder_bg_type | default: 'not set' }}
+    BG Color: {{ settings.preorder_bg_color | default: 'not set' }}
+    Border Style: {{ settings.preorder_border_style | default: 'not set' }}
+    Icon Type: {{ settings.preorder_icon_type | default: 'not set' }}
+  -->
   <div class="preorder-display" 
        data-preorder="{{ is_coming_soon }}"
        data-pickup="{{ show_pickup }}"
        data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
-       data-color-mode="{{ settings.preorder_color_mode }}"
+       data-color-mode="{{ settings.preorder_color_mode | default: 'custom' }}"
+       data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
+       data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
        style="{% render 'spacing-style', settings: block.settings %}">
     
     <div class="preorder-display__container {{ preorder_css_class }}" data-color-class="{{ preorder_css_class }}">
