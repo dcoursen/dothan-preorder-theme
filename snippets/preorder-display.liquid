@@ -330,7 +330,7 @@
     
     .preorder-display__container .preorder-display__icon {
       color: var(--preorder-icon-color) !important;
-      {% if settings.preorder_icon_circle != false %}
+      {% if settings.preorder_icon_circle %}
         background: linear-gradient(135deg, var(--preorder-icon-bg) 0%, color-mix(in srgb, var(--preorder-icon-bg) 60%, white) 100%) !important;
         box-shadow: 0 2px 8px color-mix(in srgb, var(--preorder-icon-bg) 30%, transparent) !important;
       {% endif %}
@@ -353,39 +353,46 @@
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge {
-      background: var(--color-primary-button-background);
-      color: var(--color-primary-button-text);
+      background: var(--color-primary-button-background) !important;
+      color: var(--color-primary-button-text) !important;
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge--ready {
-      background: var(--color-primary);
-      color: var(--color-primary-button-text);
+      background: var(--color-primary) !important;
+      color: var(--color-primary-button-text) !important;
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__title {
-      color: var(--color-foreground-heading);
+      color: var(--color-foreground-heading) !important;
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__message {
-      color: rgba(var(--color-foreground-rgb), 0.8);
+      color: rgba(var(--color-foreground-rgb), 0.8) !important;
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__note {
-      color: rgba(var(--color-foreground-rgb), 0.6);
+      color: rgba(var(--color-foreground-rgb), 0.6) !important;
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__icon {
-      color: var(--color-primary-button-text);
+      color: var(--color-primary-button-text) !important;
       {% if settings.preorder_icon_circle %}
-        background: var(--color-primary-button-background);
-        box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+        background: var(--color-primary-button-background) !important;
+        box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3) !important;
       {% endif %}
     }
     
     .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__countdown-live {
-      border-color: var(--color-border);
-      background: rgba(var(--color-border-rgb), 0.1);
-      color: var(--color-foreground-heading);
+      border-color: var(--color-border) !important;
+      background: rgba(var(--color-border-rgb), 0.1) !important;
+      color: var(--color-foreground-heading) !important;
+    }
+  {% endif %}
+  
+  /* Ensure scheme mode colors always override when using scheme */
+  {% if settings.preorder_color_mode == 'scheme' %}
+    .preorder-display__container[data-color-mode="scheme"] {
+      /* Force scheme mode styles to take precedence */
     }
   {% endif %}
   
