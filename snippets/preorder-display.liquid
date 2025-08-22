@@ -264,6 +264,7 @@
     position: relative;
     overflow: hidden;
     width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
     
@@ -288,113 +289,104 @@
     {% endunless %}
   }
   
-  /* Custom color mode - apply custom styling */
-  {% if settings.preorder_color_mode != 'scheme' %}
-    .preorder-display__container {
-      border: var(--preorder-border-width) var(--preorder-border-style) var(--preorder-border-color);
-      
-      /* Background based on type */
-      {% if settings.preorder_bg_type == 'solid' %}
-        background: color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent);
-      {% elsif settings.preorder_bg_type == 'transparent' %}
-        background: transparent;
-      {% else %}
-        background: linear-gradient(
-          var(--preorder-bg-gradient-angle),
-          color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent) 0%,
-          color-mix(in srgb, var(--preorder-bg-gradient-end) var(--preorder-bg-opacity), transparent) 100%
-        );
-      {% endif %}
-    }
+  /* Custom color mode styles - only apply when NO color scheme class is present */
+  .preorder-display__container:not([class*="color-"]) {
+    border: var(--preorder-border-width) var(--preorder-border-style) var(--preorder-border-color);
     
-    .preorder-display__container .preorder-display__badge {
-      background: var(--preorder-badge-bg) !important;
-      color: var(--preorder-badge-text) !important;
-    }
-    
-    .preorder-display__container .preorder-display__badge--ready {
-      background: var(--preorder-badge-ready-bg) !important;
-    }
-    
-    .preorder-display__container .preorder-display__title {
-      color: var(--preorder-title-color) !important;
-    }
-    
-    .preorder-display__container .preorder-display__message {
-      color: var(--preorder-message-color) !important;
-    }
-    
-    .preorder-display__container .preorder-display__note {
-      color: var(--preorder-note-color) !important;
-    }
-    
-    .preorder-display__container .preorder-display__icon {
-      color: var(--preorder-icon-color) !important;
-      {% if settings.preorder_icon_circle %}
-        background: linear-gradient(135deg, var(--preorder-icon-bg) 0%, color-mix(in srgb, var(--preorder-icon-bg) 60%, white) 100%) !important;
-        box-shadow: 0 2px 8px color-mix(in srgb, var(--preorder-icon-bg) 30%, transparent) !important;
-      {% endif %}
-    }
-    
-    .preorder-display__container .preorder-display__countdown-live {
-      border-color: var(--preorder-border-color) !important;
-      background: color-mix(in srgb, var(--preorder-border-color) 10%, transparent) !important;
-      color: var(--preorder-title-color) !important;
-    }
-  {% else %}
-    /* Color scheme mode - use scheme colors */
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} {
-      border: 2px solid rgba(var(--color-border-rgb), 0.3);
-      {% if settings.preorder_bg_type == 'transparent' %}
-        background: transparent;
-      {% else %}
-        background: rgba(var(--color-background-rgb), 0.8);
-      {% endif %}
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge {
-      background: var(--color-primary-button-background) !important;
-      color: var(--color-primary-button-text) !important;
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge--ready {
-      background: var(--color-primary) !important;
-      color: var(--color-primary-button-text) !important;
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__title {
-      color: var(--color-foreground-heading) !important;
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__message {
-      color: rgba(var(--color-foreground-rgb), 0.8) !important;
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__note {
-      color: rgba(var(--color-foreground-rgb), 0.6) !important;
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__icon {
-      color: var(--color-primary-button-text) !important;
-      {% if settings.preorder_icon_circle %}
-        background: var(--color-primary-button-background) !important;
-        box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3) !important;
-      {% endif %}
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__countdown-live {
-      border-color: var(--color-border) !important;
-      background: rgba(var(--color-border-rgb), 0.1) !important;
-      color: var(--color-foreground-heading) !important;
-    }
-  {% endif %}
+    /* Background based on type */
+    {% if settings.preorder_bg_type == 'solid' %}
+      background: color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent);
+    {% elsif settings.preorder_bg_type == 'transparent' %}
+      background: transparent;
+    {% else %}
+      background: linear-gradient(
+        var(--preorder-bg-gradient-angle),
+        color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent) 0%,
+        color-mix(in srgb, var(--preorder-bg-gradient-end) var(--preorder-bg-opacity), transparent) 100%
+      );
+    {% endif %}
+  }
   
-  /* Ensure scheme mode colors always override when using scheme */
-  {% if settings.preorder_color_mode == 'scheme' %}
-    .preorder-display__container[data-color-mode="scheme"] {
-      /* Force scheme mode styles to take precedence */
-    }
-  {% endif %}
+  .preorder-display__container:not([class*="color-"]) .preorder-display__badge {
+    background: var(--preorder-badge-bg);
+    color: var(--preorder-badge-text);
+  }
+  
+  .preorder-display__container:not([class*="color-"]) .preorder-display__badge--ready {
+    background: var(--preorder-badge-ready-bg);
+  }
+  
+  .preorder-display__container:not([class*="color-"]) .preorder-display__title {
+    color: var(--preorder-title-color);
+  }
+  
+  .preorder-display__container:not([class*="color-"]) .preorder-display__message {
+    color: var(--preorder-message-color);
+  }
+  
+  .preorder-display__container:not([class*="color-"]) .preorder-display__note {
+    color: var(--preorder-note-color);
+  }
+  
+  .preorder-display__container:not([class*="color-"]) .preorder-display__icon {
+    color: var(--preorder-icon-color);
+    {% if settings.preorder_icon_circle %}
+      background: linear-gradient(135deg, var(--preorder-icon-bg) 0%, color-mix(in srgb, var(--preorder-icon-bg) 60%, white) 100%);
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--preorder-icon-bg) 30%, transparent);
+    {% endif %}
+  }
+  
+  .preorder-display__container:not([class*="color-"]) .preorder-display__countdown-live {
+    border-color: var(--preorder-border-color);
+    background: color-mix(in srgb, var(--preorder-border-color) 10%, transparent);
+    color: var(--preorder-title-color);
+  }
+  
+  /* Color scheme mode styles - apply when ANY color scheme class is present */
+  .preorder-display__container[class*="color-"] {
+    border: 2px solid var(--color-border);
+    {% if settings.preorder_bg_type == 'transparent' %}
+      background: transparent;
+    {% else %}
+      background: var(--color-background);
+    {% endif %}
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__badge {
+    background: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__badge--ready {
+    background: var(--color-primary);
+    color: var(--color-primary-button-text);
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__title {
+    color: var(--color-foreground-heading);
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__message {
+    color: var(--color-foreground);
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__note {
+    color: rgba(var(--color-foreground-rgb), 0.8);
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__icon {
+    color: var(--color-primary-button-text);
+    {% if settings.preorder_icon_circle %}
+      background: var(--color-primary-button-background);
+      box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+    {% endif %}
+  }
+  
+  .preorder-display__container[class*="color-"] .preorder-display__countdown-live {
+    border-color: var(--color-border);
+    background: rgba(var(--color-background-rgb), 0.1);
+    color: var(--color-foreground-heading);
+  }
   
   .preorder-display__icon {
     flex-shrink: 0;
