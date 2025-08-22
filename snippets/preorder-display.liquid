@@ -108,45 +108,18 @@
   endif
   
   comment
-    Determine CSS class and approach based on color mode
+    Apply color scheme class if using scheme mode
   endcomment
   
   if settings.preorder_color_mode == 'scheme'
     assign preorder_css_class = 'color-' | append: settings.preorder_color_scheme
-    assign use_scheme_colors = true
   else
     assign preorder_css_class = ''
-    assign use_scheme_colors = false
   endif
 %}
 
 {%- if show_display -%}
-  <!-- Preorder Settings Debug:
-    Color Mode: {{ settings.preorder_color_mode | default: 'not set' }}
-    BG Type: {{ settings.preorder_bg_type | default: 'not set' }}
-    BG Color: {{ settings.preorder_bg_color | default: 'not set' }}
-    Border Style: {{ settings.preorder_border_style | default: 'not set' }}
-    Icon Type: {{ settings.preorder_icon_type | default: 'not set' }}
-  -->
-  <div class="preorder-display" 
-       {% if block %}{{ block.shopify_attributes }}{% endif %}>
-         --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
-         --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
-         --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
-         --preorder-border-width: {{ settings.preorder_border_width | default: 2 }}px;
-         --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
-         --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
-         --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
-         --preorder-title-color: {{ settings.preorder_title_color | default: '#2d5a2d' }};
-         --preorder-message-color: {{ settings.preorder_message_color | default: '#4c7c4c' }};
-         --preorder-note-color: {{ settings.preorder_note_color | default: '#6ba46b' }};
-         --preorder-badge-bg: {{ settings.preorder_badge_bg_color | default: '#4c7c4c' }};
-         --preorder-badge-text: {{ settings.preorder_badge_text_color | default: '#ffffff' }};
-         --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
-         --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
-         --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
-         ">
-    
+  <div class="preorder-display" {% if block %}{{ block.shopify_attributes }}{% endif %}>
     <div class="preorder-display__container spacing-style {{ preorder_css_class }}" 
          data-color-class="{{ preorder_css_class }}"
          data-preorder="{{ is_coming_soon }}"
@@ -158,6 +131,23 @@
          style="
            {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
            --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
+           --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
+           --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
+           --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
+           --preorder-border-width: {{ settings.preorder_border_width | default: 2 }}px;
+           --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
+           --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
+           --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
+           --preorder-title-color: {{ settings.preorder_title_color | default: '#2d5a2d' }};
+           --preorder-message-color: {{ settings.preorder_message_color | default: '#4c7c4c' }};
+           --preorder-note-color: {{ settings.preorder_note_color | default: '#6ba46b' }};
+           --preorder-badge-bg: {{ settings.preorder_badge_bg_color | default: '#4c7c4c' }};
+           --preorder-badge-text: {{ settings.preorder_badge_text_color | default: '#ffffff' }};
+           --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
+           --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
+           --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
+         ">
+      
       <div class="preorder-display__icon">
         {%- case settings.preorder_icon_type -%}
           {%- when 'clock' -%}
@@ -243,7 +233,7 @@
         }
         
         updateCountdown();
-        setInterval(updateCountdown, 60000); // Update every minute
+        setInterval(updateCountdown, 60000);
       });
     </script>
   {%- endif -%}
@@ -266,7 +256,6 @@
     width: 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
-    
     border-radius: var(--preorder-border-radius);
     
     /* Shadow */
@@ -451,44 +440,6 @@
     {% endif %}
   }
   
-  /* Animation styles */
-  {% if settings.preorder_animation_style != 'none' %}
-    .preorder-display__container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background-size: 200% 100%;
-      {% if settings.preorder_animation_style == 'prominent' %}
-        animation: shimmer 3s ease-in-out infinite;
-      {% elsif settings.preorder_animation_style == 'subtle' %}
-        animation: shimmer 6s ease-in-out infinite;
-      {% endif %}
-    }
-    
-    {% if settings.preorder_color_mode == 'scheme' %}
-      .preorder-display__container.color-{{ settings.preorder_color_scheme }}::before {
-        background: linear-gradient(90deg, var(--color-border) 0%, rgba(var(--color-border-rgb), 0.5) 50%, var(--color-border) 100%);
-      }
-    {% else %}
-      .preorder-display__container::before {
-        background: linear-gradient(90deg, {{ settings.preorder_border_color }} 0%, {{ settings.preorder_border_color | color_modify: 'alpha', 0.5 }} 50%, {{ settings.preorder_border_color }} 100%);
-      }
-    {% endif %}
-    
-    @keyframes shimmer {
-      0%, 100% { background-position: 200% 0; }
-      50% { background-position: -200% 0; }
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
-    }
-  {% endif %}
-  
   /* Mobile optimizations */
   @media screen and (max-width: 640px) {
     .preorder-display__container {
@@ -504,53 +455,6 @@
     .preorder-display__icon svg {
       width: 20px;
       height: 20px;
-    }
-  }
-  
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    {% if settings.preorder_color_mode != 'scheme' %}
-      .preorder-display__container {
-        background: {{ container_bg | color_modify: 'lightness', 20 | color_modify: 'alpha', bg_opacity }};
-      }
-      
-      .preorder-display__title {
-        color: {{ title_color | color_modify: 'lightness', 80 }};
-      }
-      
-      .preorder-display__message {
-        color: {{ message_color | color_modify: 'lightness', 70 }};
-      }
-      
-      .preorder-display__note {
-        color: {{ note_color | color_modify: 'lightness', 60 }};
-      }
-    {% endif %}
-  }
-  
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .preorder-display__container::before,
-    .preorder-display__countdown-live {
-      animation: none;
-    }
-    
-    .preorder-display__container {
-      transition: none;
-    }
-  }
-  
-  /* High contrast mode */
-  @media (prefers-contrast: high) {
-    .preorder-display__container {
-      {% if settings.preorder_border_style != 'none' %}
-        border-width: {{ settings.preorder_border_width | plus: 1 }}px;
-      {% endif %}
-      box-shadow: none;
-    }
-    
-    .preorder-display__badge {
-      border: 2px solid currentColor;
     }
   }
 {% endstylesheet %}
