@@ -128,7 +128,7 @@
     Border Style: {{ settings.preorder_border_style | default: 'not set' }}
     Icon Type: {{ settings.preorder_icon_type | default: 'not set' }}
   -->
-  <div class="preorder-display" 
+  <div class="preorder-display spacing-style" 
        data-preorder="{{ is_coming_soon }}"
        data-pickup="{{ show_pickup }}"
        data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
@@ -255,6 +255,15 @@
     box-sizing: border-box;
   }
   
+  /* Match buy-buttons pattern exactly */
+  .preorder-display.spacing-style {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+  
   .preorder-display__container {
     display: flex;
     align-items: flex-start;
@@ -265,6 +274,8 @@
     overflow: hidden;
     width: 100%;
     max-width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
     
