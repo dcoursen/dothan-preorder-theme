@@ -152,19 +152,10 @@
                     "padding-inline-end": 0
                   },
                   "blocks": {}
-                },
-                "preorder_display_modern": {
-                  "type": "preorder-display",
-                  "settings": {
-                    "show_when_available": true,
-                    "padding-block-start": 12,
-                    "padding-block-end": 12
-                  }
                 }
               },
               "block_order": [
                 "text_xrnftG",
-                "preorder_display_modern",
                 "price_tVjtKg"
               ]
             },
@@ -192,6 +183,14 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
+            },
+            "preorder_display_modern": {
+              "type": "preorder-display",
+              "settings": {
+                "show_when_available": true,
+                "padding-block-start": 12,
+                "padding-block-end": 12
+              }
             },
             "buy_buttons_eYQEYi": {
               "type": "buy-buttons",
@@ -467,6 +466,7 @@
             "group_icgrde",
             "divider_VJhene",
             "variant_picker_R3rGDr",
+            "preorder_display_modern",
             "buy_buttons_eYQEYi",
             "group_JbmQwr",
             "text_aEtTtq"
