@@ -125,9 +125,10 @@
        data-preorder="{{ is_coming_soon }}"
        data-pickup="{{ show_pickup }}"
        data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
+       data-color-mode="{{ settings.preorder_color_mode }}"
        style="{% render 'spacing-style', settings: block.settings %}">
     
-    <div class="preorder-display__container {{ preorder_css_class }}">
+    <div class="preorder-display__container {{ preorder_css_class }}" data-color-class="{{ preorder_css_class }}">
       <div class="preorder-display__icon">
         {%- case settings.preorder_icon_type -%}
           {%- when 'clock' -%}
@@ -220,12 +221,16 @@
 {%- endif -%}
 
 {% stylesheet %}
+  /* Preorder Display Styles - Mode: {{ settings.preorder_color_mode | default: 'custom' }} */
   {% liquid
     comment 
       Generate CSS based on theme settings 
     endcomment
     
     assign bg_opacity = settings.preorder_bg_opacity | divided_by: 100.0
+    if bg_opacity == 0
+      assign bg_opacity = 1
+    endif
     
     case settings.preorder_shadow_style
       when 'subtle'
@@ -324,58 +329,79 @@
     }
   {% else %}
     /* Custom color mode - uses theme settings directly */
+    {%- assign custom_bg_color = settings.preorder_bg_color | default: '#f0f7f0' -%}
+    {%- assign custom_bg_gradient_end = settings.preorder_bg_gradient_end | default: '#e8f4e8' -%}
+    {%- assign custom_gradient_angle = settings.preorder_bg_gradient_angle | default: 135 -%}
+    {%- assign custom_bg_type = settings.preorder_bg_type | default: 'gradient' -%}
+    
     .preorder-display__container {
-      {% case settings.preorder_bg_type %}
+      {% case custom_bg_type %}
         {% when 'solid' %}
-          background: {{ settings.preorder_bg_color | color_modify: 'alpha', bg_opacity }};
+          background: {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} !important;
         {% when 'gradient' %}
           background: linear-gradient(
-            {{ settings.preorder_bg_gradient_angle }}deg,
-            {{ settings.preorder_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
-            {{ settings.preorder_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
-          );
+            {{ custom_gradient_angle }}deg,
+            {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
+            {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
+          ) !important;
         {% when 'transparent' %}
-          background: transparent;
+          background: transparent !important;
+        {% else %}
+          background: linear-gradient(
+            {{ custom_gradient_angle }}deg,
+            {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
+            {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
+          ) !important;
       {% endcase %}
       
       {% if settings.preorder_border_style != 'none' %}
-        border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} {{ settings.preorder_border_color }};
+        border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} {{ settings.preorder_border_color }} !important;
       {% endif %}
     }
     
-    .preorder-display__title {
-      color: {{ settings.preorder_title_color }};
+    {%- assign custom_title_color = settings.preorder_title_color | default: '#2d5a2d' -%}
+    {%- assign custom_message_color = settings.preorder_message_color | default: '#4c7c4c' -%}
+    {%- assign custom_note_color = settings.preorder_note_color | default: '#6ba46b' -%}
+    {%- assign custom_badge_bg = settings.preorder_badge_bg_color | default: '#4c7c4c' -%}
+    {%- assign custom_badge_text = settings.preorder_badge_text_color | default: '#ffffff' -%}
+    {%- assign custom_badge_ready_bg = settings.preorder_badge_ready_bg_color | default: '#2d5a2d' -%}
+    {%- assign custom_icon_bg = settings.preorder_icon_bg_color | default: '#4c7c4c' -%}
+    {%- assign custom_icon_color = settings.preorder_icon_color | default: '#ffffff' -%}
+    {%- assign custom_border_color = settings.preorder_border_color | default: '#4c7c4c' -%}
+    
+    .preorder-display__container .preorder-display__title {
+      color: {{ custom_title_color }} !important;
     }
     
-    .preorder-display__message {
-      color: {{ settings.preorder_message_color }};
+    .preorder-display__container .preorder-display__message {
+      color: {{ custom_message_color }} !important;
     }
     
-    .preorder-display__note {
-      color: {{ settings.preorder_note_color }};
+    .preorder-display__container .preorder-display__note {
+      color: {{ custom_note_color }} !important;
     }
     
-    .preorder-display__badge {
-      background: {{ settings.preorder_badge_bg_color }};
-      color: {{ settings.preorder_badge_text_color }};
+    .preorder-display__container .preorder-display__badge {
+      background: {{ custom_badge_bg }} !important;
+      color: {{ custom_badge_text }} !important;
     }
     
-    .preorder-display__badge--ready {
-      background: {{ settings.preorder_badge_ready_bg_color }};
+    .preorder-display__container .preorder-display__badge--ready {
+      background: {{ custom_badge_ready_bg }} !important;
     }
     
-    .preorder-display__icon {
-      {% if settings.preorder_icon_circle %}
-        background: linear-gradient(135deg, {{ settings.preorder_icon_bg_color }} 0%, {{ settings.preorder_icon_bg_color | color_modify: 'lightness', 60 }} 100%);
-        box-shadow: 0 2px 8px {{ settings.preorder_icon_bg_color | color_modify: 'alpha', 0.3 }};
+    .preorder-display__container .preorder-display__icon {
+      {% if settings.preorder_icon_circle != false %}
+        background: linear-gradient(135deg, {{ custom_icon_bg }} 0%, {{ custom_icon_bg | color_modify: 'lightness', 60 }} 100%) !important;
+        box-shadow: 0 2px 8px {{ custom_icon_bg | color_modify: 'alpha', 0.3 }} !important;
       {% endif %}
-      color: {{ settings.preorder_icon_color }};
+      color: {{ custom_icon_color }} !important;
     }
     
-    .preorder-display__countdown-live {
-      background: {{ settings.preorder_border_color | color_modify: 'alpha', 0.1 }};
-      border-color: {{ settings.preorder_border_color }};
-      color: {{ settings.preorder_title_color }};
+    .preorder-display__container .preorder-display__countdown-live {
+      background: {{ custom_border_color | color_modify: 'alpha', 0.1 }} !important;
+      border-color: {{ custom_border_color }} !important;
+      color: {{ custom_title_color }} !important;
     }
   {% endif %}
   
