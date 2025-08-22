@@ -135,7 +135,25 @@
        data-color-mode="{{ settings.preorder_color_mode | default: 'custom' }}"
        data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
        data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
-       style="{% render 'spacing-style', settings: block.settings %}">
+       style="
+         {% render 'spacing-style', settings: block.settings %}
+         --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
+         --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
+         --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
+         --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
+         --preorder-border-width: {{ settings.preorder_border_width | default: 2 }}px;
+         --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
+         --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
+         --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
+         --preorder-title-color: {{ settings.preorder_title_color | default: '#2d5a2d' }};
+         --preorder-message-color: {{ settings.preorder_message_color | default: '#4c7c4c' }};
+         --preorder-note-color: {{ settings.preorder_note_color | default: '#6ba46b' }};
+         --preorder-badge-bg: {{ settings.preorder_badge_bg_color | default: '#4c7c4c' }};
+         --preorder-badge-text: {{ settings.preorder_badge_text_color | default: '#ffffff' }};
+         --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
+         --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
+         --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
+       ">
     
     <div class="preorder-display__container {{ preorder_css_class }}" data-color-class="{{ preorder_css_class }}">
       <div class="preorder-display__icon">
@@ -230,36 +248,6 @@
 {%- endif -%}
 
 {% stylesheet %}
-  /* Preorder Display Styles - Mode: {{ settings.preorder_color_mode | default: 'custom' }} */
-  {% liquid
-    comment 
-      Generate CSS based on theme settings 
-    endcomment
-    
-    assign bg_opacity = settings.preorder_bg_opacity | divided_by: 100.0
-    if bg_opacity == 0
-      assign bg_opacity = 1
-    endif
-    
-    case settings.preorder_shadow_style
-      when 'subtle'
-        assign shadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
-      when 'medium'
-        assign shadow = '0 8px 24px rgba(0, 0, 0, 0.15)'
-      when 'strong'
-        assign shadow = '0 12px 36px rgba(0, 0, 0, 0.2)'
-      when 'custom'
-        assign shadow_color = settings.preorder_shadow_color | color_modify: 'alpha', 0.2
-        assign shadow = '0 8px 24px ' | append: shadow_color
-      else
-        assign shadow = 'none'
-    endcase
-    
-    unless settings.preorder_shadow_enable
-      assign shadow = 'none'
-    endunless
-  %}
-  
   .preorder-display {
     width: 100%;
     margin: 0;
@@ -271,167 +259,62 @@
     align-items: flex-start;
     gap: var(--spacing-md, 16px);
     padding: var(--spacing-lg, 24px);
-    border-radius: {{ settings.preorder_border_radius }}px;
-    box-shadow: {{ shadow }};
-    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
-  }
-  
-  /* Apply all custom settings with defaults */
-  {%- assign custom_bg_color = settings.preorder_bg_color | default: '#f0f7f0' -%}
-  {%- assign custom_bg_gradient_end = settings.preorder_bg_gradient_end | default: '#e8f4e8' -%}
-  {%- assign custom_gradient_angle = settings.preorder_bg_gradient_angle | default: 135 -%}
-  {%- assign custom_bg_type = settings.preorder_bg_type | default: 'gradient' -%}
-  {%- assign custom_border_width = settings.preorder_border_width | default: 2 -%}
-  {%- assign custom_border_style = settings.preorder_border_style | default: 'solid' -%}
-  {%- assign custom_border_color = settings.preorder_border_color | default: '#4c7c4c' -%}
-  {%- assign custom_title_color = settings.preorder_title_color | default: '#2d5a2d' -%}
-  {%- assign custom_message_color = settings.preorder_message_color | default: '#4c7c4c' -%}
-  {%- assign custom_note_color = settings.preorder_note_color | default: '#6ba46b' -%}
-  {%- assign custom_badge_bg = settings.preorder_badge_bg_color | default: '#4c7c4c' -%}
-  {%- assign custom_badge_text = settings.preorder_badge_text_color | default: '#ffffff' -%}
-  {%- assign custom_badge_ready_bg = settings.preorder_badge_ready_bg_color | default: '#2d5a2d' -%}
-  {%- assign custom_icon_bg = settings.preorder_icon_bg_color | default: '#4c7c4c' -%}
-  {%- assign custom_icon_color = settings.preorder_icon_color | default: '#ffffff' -%}
-  
-  /* Container background and border - always applied */
-  .preorder-display__container {
-    {% case custom_bg_type %}
-      {% when 'solid' %}
-        background: {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} !important;
-      {% when 'gradient' %}
-        background: linear-gradient(
-          {{ custom_gradient_angle }}deg,
-          {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
-          {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
-        ) !important;
-      {% when 'transparent' %}
-        background: transparent !important;
+    transition: all 0.3s ease;
+    
+    /* Use CSS custom properties from the style attribute */
+    border-radius: var(--preorder-border-radius);
+    border: var(--preorder-border-width) var(--preorder-border-style) var(--preorder-border-color);
+    
+    /* Background based on type */
+    {% if settings.preorder_bg_type == 'solid' %}
+      background: color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent);
+    {% elsif settings.preorder_bg_type == 'transparent' %}
+      background: transparent;
+    {% else %}
+      background: linear-gradient(
+        var(--preorder-bg-gradient-angle),
+        color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent) 0%,
+        color-mix(in srgb, var(--preorder-bg-gradient-end) var(--preorder-bg-opacity), transparent) 100%
+      );
+    {% endif %}
+    
+    /* Shadow */
+    {% case settings.preorder_shadow_style %}
+      {% when 'subtle' %}
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      {% when 'medium' %}
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      {% when 'strong' %}
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+      {% when 'custom' %}
+        box-shadow: 0 8px 24px {{ settings.preorder_shadow_color | color_modify: 'alpha', 0.2 }};
       {% else %}
-        background: linear-gradient(
-          {{ custom_gradient_angle }}deg,
-          {{ custom_bg_color | color_modify: 'alpha', bg_opacity }} 0%,
-          {{ custom_bg_gradient_end | color_modify: 'alpha', bg_opacity }} 100%
-        ) !important;
+        box-shadow: none;
     {% endcase %}
     
-    {% if custom_border_style != 'none' %}
-      border: {{ custom_border_width }}px {{ custom_border_style }} {{ custom_border_color }} !important;
-    {% else %}
-      border: none !important;
-    {% endif %}
+    {% unless settings.preorder_shadow_enable %}
+      box-shadow: none;
+    {% endunless %}
   }
-  
-  /* Color scheme mode - uses CSS custom properties */
-  {% if settings.preorder_color_mode == 'scheme' %}
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} {
-      {% case settings.preorder_bg_type %}
-        {% when 'solid' %}
-          background: rgba(var(--color-background-rgb), {{ bg_opacity }});
-        {% when 'gradient' %}
-          background: linear-gradient(
-            {{ settings.preorder_bg_gradient_angle }}deg,
-            rgba(var(--color-background-rgb), {{ bg_opacity }}) 0%,
-            rgba(var(--color-foreground-rgb), 0.05) 100%
-          );
-        {% when 'transparent' %}
-          background: transparent;
-      {% endcase %}
-      
-      {% if settings.preorder_border_style != 'none' %}
-        border: {{ settings.preorder_border_width }}px {{ settings.preorder_border_style }} rgba(var(--color-border-rgb), 0.3);
-      {% endif %}
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__title {
-      color: var(--color-foreground-heading);
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__message {
-      color: rgba(var(--color-foreground-rgb), 0.8);
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__note {
-      color: rgba(var(--color-foreground-rgb), 0.6);
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge {
-      background: var(--color-primary-button-background);
-      color: var(--color-primary-button-text);
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__badge--ready {
-      background: var(--color-primary);
-      color: var(--color-primary-button-text);
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__icon {
-      {% if settings.preorder_icon_circle %}
-        background: var(--color-primary-button-background);
-        box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-      {% endif %}
-      color: var(--color-primary-button-text);
-    }
-    
-    .preorder-display__container.color-{{ settings.preorder_color_scheme }} .preorder-display__countdown-live {
-      background: rgba(var(--color-border-rgb), 0.1);
-      border-color: var(--color-border);
-      color: var(--color-foreground-heading);
-    }
-  {% endif %}
-  
-  /* Text and element colors - applied for custom mode or as fallback */
-  {% if settings.preorder_color_mode != 'scheme' %}
-    .preorder-display__container .preorder-display__title {
-      color: {{ custom_title_color }} !important;
-    }
-    
-    .preorder-display__container .preorder-display__message {
-      color: {{ custom_message_color }} !important;
-    }
-    
-    .preorder-display__container .preorder-display__note {
-      color: {{ custom_note_color }} !important;
-    }
-    
-    .preorder-display__container .preorder-display__badge {
-      background: {{ custom_badge_bg }} !important;
-      color: {{ custom_badge_text }} !important;
-    }
-    
-    .preorder-display__container .preorder-display__badge--ready {
-      background: {{ custom_badge_ready_bg }} !important;
-    }
-    
-    .preorder-display__container .preorder-display__icon {
-      {% if settings.preorder_icon_circle != false %}
-        background: linear-gradient(135deg, {{ custom_icon_bg }} 0%, {{ custom_icon_bg | color_modify: 'lightness', 60 }} 100%) !important;
-        box-shadow: 0 2px 8px {{ custom_icon_bg | color_modify: 'alpha', 0.3 }} !important;
-      {% endif %}
-      color: {{ custom_icon_color }} !important;
-    }
-    
-    .preorder-display__container .preorder-display__countdown-live {
-      background: {{ custom_border_color | color_modify: 'alpha', 0.1 }} !important;
-      border-color: {{ custom_border_color }} !important;
-      color: {{ custom_title_color }} !important;
-    }
-  {% endif %}
   
   /* Common styles for both modes */
   .preorder-display__icon {
     flex-shrink: 0;
     width: 48px;
     height: 48px;
-    {% if settings.preorder_icon_circle %}
-      border-radius: 50%;
-    {% endif %}
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--preorder-icon-color);
+    {% if settings.preorder_icon_circle %}
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--preorder-icon-bg) 0%, color-mix(in srgb, var(--preorder-icon-bg) 60%, white) 100%);
+      box-shadow: 0 2px 8px color-mix(in srgb, var(--preorder-icon-bg) 30%, transparent);
+    {% endif %}
   }
   
   .preorder-display__content {
@@ -448,6 +331,12 @@
     letter-spacing: 0.5px;
     border-radius: 20px;
     margin-bottom: 8px;
+    background: var(--preorder-badge-bg);
+    color: var(--preorder-badge-text);
+  }
+  
+  .preorder-display__badge--ready {
+    background: var(--preorder-badge-ready-bg);
   }
   
   .preorder-display__title {
@@ -455,18 +344,21 @@
     font-size: clamp(1.25rem, 3vw, 1.5rem);
     font-weight: 700;
     line-height: 1.2;
+    color: var(--preorder-title-color);
   }
   
   .preorder-display__message {
     margin: 0 0 8px 0;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
     line-height: 1.4;
+    color: var(--preorder-message-color);
   }
   
   .preorder-display__note {
     margin: 0;
     font-size: clamp(0.75rem, 2vw, 0.875rem);
     font-style: italic;
+    color: var(--preorder-note-color);
   }
   
   .preorder-display__countdown {
@@ -476,10 +368,12 @@
   .preorder-display__countdown-live {
     display: inline-block;
     padding: 8px 16px;
-    border: 1px solid;
+    border: 1px solid var(--preorder-border-color);
     border-radius: 8px;
     font-weight: 600;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
+    background: color-mix(in srgb, var(--preorder-border-color) 10%, transparent);
+    color: var(--preorder-title-color);
     {% if settings.preorder_animation_style != 'none' %}
       animation: pulse 2s ease-in-out infinite;
     {% endif %}
