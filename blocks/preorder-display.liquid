@@ -2,6 +2,9 @@
    show_when_available: block.settings.show_when_available, 
    block: block %}
 
+{% comment %} Include Klaviyo BIS integration {% endcomment %}
+{% render 'klaviyo-bis-integration' %}
+
 {% schema %}
 {
   "name": "Preorder Display",
