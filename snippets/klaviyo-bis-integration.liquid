@@ -311,10 +311,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .klaviyo-bis-button-container {
   margin: 16px 0;
+  width: 100%;
+  display: block;
 }
 
 .klaviyo-bis-button {
   width: 100%;
+  box-sizing: border-box;
+  display: block;
   padding: 16px 24px;
   background: {{ settings.preorder_button_background | default: '#dc6565' }};
   color: {{ settings.preorder_button_text_color | default: '#ffffff' }};
