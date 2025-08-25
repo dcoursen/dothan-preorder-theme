@@ -1,0 +1,230 @@
+/* Preorder Display Component */
+.preorder-display {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md, 16px);
+  padding: var(--spacing-lg, 24px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  border-radius: var(--preorder-border-radius);
+}
+
+/* Shadow styles */
+.preorder-display--shadow-subtle {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.preorder-display--shadow-medium {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.preorder-display--shadow-strong {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom color mode styles - only apply when NO color scheme class is present */
+.preorder-display:not([class*="color-"]) {
+  border: var(--preorder-border-width) var(--preorder-border-style) var(--preorder-border-color);
+}
+
+/* Background types for custom mode */
+.preorder-display:not([class*="color-"]).preorder-display--bg-solid {
+  background: color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent);
+}
+
+.preorder-display:not([class*="color-"]).preorder-display--bg-transparent {
+  background: transparent;
+}
+
+.preorder-display:not([class*="color-"]).preorder-display--bg-gradient {
+  background: linear-gradient(
+    var(--preorder-bg-gradient-angle),
+    color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent) 0%,
+    color-mix(in srgb, var(--preorder-bg-gradient-end) var(--preorder-bg-opacity), transparent) 100%
+  );
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__badge {
+  background: var(--preorder-badge-bg);
+  color: var(--preorder-badge-text);
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__badge--ready {
+  background: var(--preorder-badge-ready-bg) !important;
+  color: var(--preorder-badge-text) !important;
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__title {
+  color: var(--preorder-title-color);
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__message {
+  color: var(--preorder-message-color);
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__note {
+  color: var(--preorder-note-color);
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__icon {
+  color: var(--preorder-icon-color);
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__icon.preorder-display__icon--circle {
+  background: linear-gradient(135deg, var(--preorder-icon-bg) 0%, color-mix(in srgb, var(--preorder-icon-bg) 60%, white) 100%);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--preorder-icon-bg) 30%, transparent);
+}
+
+.preorder-display:not([class*="color-"]) .preorder-display__countdown-live {
+  border-color: var(--preorder-border-color);
+  background: color-mix(in srgb, var(--preorder-border-color) 10%, transparent);
+  color: var(--preorder-title-color);
+}
+
+/* Color scheme mode styles - apply when ANY color scheme class is present */
+.preorder-display[class*="color-"] {
+  border: 2px solid var(--color-border);
+}
+
+.preorder-display[class*="color-"].preorder-display--bg-transparent {
+  background: transparent;
+}
+
+.preorder-display[class*="color-"]:not(.preorder-display--bg-transparent) {
+  background: var(--color-background);
+}
+
+.preorder-display[class*="color-"] .preorder-display__badge {
+  background: var(--color-primary-button-background);
+  color: var(--color-primary-button-text);
+}
+
+.preorder-display[class*="color-"] .preorder-display__badge--ready {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-button-text) !important;
+}
+
+.preorder-display[class*="color-"] .preorder-display__title {
+  color: var(--color-foreground-heading);
+}
+
+.preorder-display[class*="color-"] .preorder-display__message {
+  color: var(--color-foreground);
+}
+
+.preorder-display[class*="color-"] .preorder-display__note {
+  color: rgba(var(--color-foreground-rgb), 0.8);
+}
+
+.preorder-display[class*="color-"] .preorder-display__icon {
+  color: var(--color-primary-button-text);
+}
+
+.preorder-display[class*="color-"] .preorder-display__icon.preorder-display__icon--circle {
+  background: var(--color-primary-button-background);
+  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.preorder-display[class*="color-"] .preorder-display__countdown-live {
+  border-color: var(--color-border);
+  background: rgba(var(--color-background-rgb), 0.1);
+  color: var(--color-foreground-heading);
+}
+
+/* Icon styles */
+.preorder-display__icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preorder-display__icon--circle {
+  border-radius: 50%;
+}
+
+/* Content styles */
+.preorder-display__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.preorder-display__badge {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.preorder-display__title {
+  margin: 0 0 8px 0;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.preorder-display__message {
+  margin: 0 0 8px 0;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  line-height: 1.4;
+}
+
+.preorder-display__note {
+  margin: 0;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  font-style: italic;
+}
+
+.preorder-display__countdown {
+  margin-top: 12px;
+}
+
+.preorder-display__countdown-live {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.preorder-display__countdown-live--animated {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Mobile optimizations */
+@media screen and (max-width: 640px) {
+  .preorder-display {
+    padding: var(--spacing-md, 16px);
+    gap: var(--spacing-sm, 12px);
+  }
+  
+  .preorder-display__icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .preorder-display__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

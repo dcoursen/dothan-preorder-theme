@@ -108,47 +108,63 @@
   endif
   
   comment
-    Apply color scheme class if using scheme mode
+    Build CSS classes based on settings
   endcomment
   
-  if settings.preorder_color_mode == 'scheme'
-    assign preorder_css_class = 'color-' | append: settings.preorder_color_scheme
-  else
-    assign preorder_css_class = ''
-  endif
+  capture preorder_classes
+    echo 'preorder-display spacing-style'
+    
+    if settings.preorder_color_mode == 'scheme'
+      echo ' color-' | append: settings.preorder_color_scheme
+    endif
+    
+    case settings.preorder_bg_type
+      when 'solid'
+        echo ' preorder-display--bg-solid'
+      when 'transparent'
+        echo ' preorder-display--bg-transparent'
+      else
+        echo ' preorder-display--bg-gradient'
+    endcase
+    
+    case settings.preorder_shadow_style
+      when 'subtle'
+        echo ' preorder-display--shadow-subtle'
+      when 'medium'
+        echo ' preorder-display--shadow-medium'
+      when 'strong'
+        echo ' preorder-display--shadow-strong'
+    endcase
+  endcapture
 %}
 
 {%- if show_display -%}
-  <div class="preorder-display spacing-style {{ preorder_css_class }}" 
+  <div class="{{ preorder_classes }}" 
        {% if block %}{{ block.shopify_attributes }}{% endif %}
-       data-color-class="{{ preorder_css_class }}"
        data-preorder="{{ is_coming_soon }}"
        data-pickup="{{ show_pickup }}"
        data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
-       data-color-mode="{{ settings.preorder_color_mode | default: 'custom' }}"
-       data-bg-type="{{ settings.preorder_bg_type | default: 'gradient' }}"
-       data-bg-color="{{ settings.preorder_bg_color | default: '#f0f7f0' }}"
        style="
          {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
-           --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
-           --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
-           --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
-           --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
-           --preorder-border-width: {{ settings.preorder_border_width | default: 2 }}px;
-           --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
-           --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
-           --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
-           --preorder-title-color: {{ settings.preorder_title_color | default: '#2d5a2d' }};
-           --preorder-message-color: {{ settings.preorder_message_color | default: '#4c7c4c' }};
-           --preorder-note-color: {{ settings.preorder_note_color | default: '#6ba46b' }};
-           --preorder-badge-bg: {{ settings.preorder_badge_bg_color | default: '#4c7c4c' }};
-           --preorder-badge-text: {{ settings.preorder_badge_text_color | default: '#ffffff' }};
-           --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
-           --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
-           --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
-         ">
+         --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
+         --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
+         --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
+         --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
+         --preorder-border-width: {{ settings.preorder_border_width | default: 2 }}px;
+         --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
+         --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
+         --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
+         --preorder-title-color: {{ settings.preorder_title_color | default: '#2d5a2d' }};
+         --preorder-message-color: {{ settings.preorder_message_color | default: '#4c7c4c' }};
+         --preorder-note-color: {{ settings.preorder_note_color | default: '#6ba46b' }};
+         --preorder-badge-bg: {{ settings.preorder_badge_bg_color | default: '#4c7c4c' }};
+         --preorder-badge-text: {{ settings.preorder_badge_text_color | default: '#ffffff' }};
+         --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
+         --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
+         --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
+       ">
       
-      <div class="preorder-display__icon">
+      <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
         {%- case settings.preorder_icon_type -%}
           {%- when 'clock' -%}
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -229,7 +245,8 @@
             countdownText = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
           }
           
-          countdownEl.innerHTML = `<span class="preorder-display__countdown-live">Available in ${countdownText}</span>`;
+          const animationClass = '{{ settings.preorder_animation_style }}' !== 'none' ? ' preorder-display__countdown-live--animated' : '';
+          countdownEl.innerHTML = `<span class="preorder-display__countdown-live${animationClass}">Available in ${countdownText}</span>`;
         }
         
         updateCountdown();
@@ -239,216 +256,4 @@
   {%- endif -%}
 {%- endif -%}
 
-{% stylesheet %}
-  .preorder-display {
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-md, 16px);
-    padding: var(--spacing-lg, 24px);
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-    border-radius: var(--preorder-border-radius);
-    
-    /* Shadow */
-    {% case settings.preorder_shadow_style %}
-      {% when 'subtle' %}
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      {% when 'medium' %}
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      {% when 'strong' %}
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
-      {% when 'custom' %}
-        box-shadow: 0 8px 24px {{ settings.preorder_shadow_color | color_modify: 'alpha', 0.2 }};
-      {% else %}
-        box-shadow: none;
-    {% endcase %}
-    
-    {% unless settings.preorder_shadow_enable %}
-      box-shadow: none;
-    {% endunless %}
-  }
-  
-  /* Custom color mode styles - only apply when NO color scheme class is present */
-  .preorder-display:not([class*="color-"]) {
-    border: var(--preorder-border-width) var(--preorder-border-style) var(--preorder-border-color);
-    
-    /* Background based on type */
-    {% if settings.preorder_bg_type == 'solid' %}
-      background: color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent);
-    {% elsif settings.preorder_bg_type == 'transparent' %}
-      background: transparent;
-    {% else %}
-      background: linear-gradient(
-        var(--preorder-bg-gradient-angle),
-        color-mix(in srgb, var(--preorder-bg-color) var(--preorder-bg-opacity), transparent) 0%,
-        color-mix(in srgb, var(--preorder-bg-gradient-end) var(--preorder-bg-opacity), transparent) 100%
-      );
-    {% endif %}
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__badge {
-    background: var(--preorder-badge-bg);
-    color: var(--preorder-badge-text);
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__badge--ready {
-    background: var(--preorder-badge-ready-bg) !important;
-    color: var(--preorder-badge-text) !important;
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__title {
-    color: var(--preorder-title-color);
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__message {
-    color: var(--preorder-message-color);
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__note {
-    color: var(--preorder-note-color);
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__icon {
-    color: var(--preorder-icon-color);
-    {% if settings.preorder_icon_circle %}
-      background: linear-gradient(135deg, var(--preorder-icon-bg) 0%, color-mix(in srgb, var(--preorder-icon-bg) 60%, white) 100%);
-      box-shadow: 0 2px 8px color-mix(in srgb, var(--preorder-icon-bg) 30%, transparent);
-    {% endif %}
-  }
-  
-  .preorder-display:not([class*="color-"]) .preorder-display__countdown-live {
-    border-color: var(--preorder-border-color);
-    background: color-mix(in srgb, var(--preorder-border-color) 10%, transparent);
-    color: var(--preorder-title-color);
-  }
-  
-  /* Color scheme mode styles - apply when ANY color scheme class is present */
-  .preorder-display[class*="color-"] {
-    border: 2px solid var(--color-border);
-    {% if settings.preorder_bg_type == 'transparent' %}
-      background: transparent;
-    {% else %}
-      background: var(--color-background);
-    {% endif %}
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__badge {
-    background: var(--color-primary-button-background);
-    color: var(--color-primary-button-text);
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__badge--ready {
-    background: var(--color-primary) !important;
-    color: var(--color-primary-button-text) !important;
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__title {
-    color: var(--color-foreground-heading);
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__message {
-    color: var(--color-foreground);
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__note {
-    color: rgba(var(--color-foreground-rgb), 0.8);
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__icon {
-    color: var(--color-primary-button-text);
-    {% if settings.preorder_icon_circle %}
-      background: var(--color-primary-button-background);
-      box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-    {% endif %}
-  }
-  
-  .preorder-display[class*="color-"] .preorder-display__countdown-live {
-    border-color: var(--color-border);
-    background: rgba(var(--color-background-rgb), 0.1);
-    color: var(--color-foreground-heading);
-  }
-  
-  .preorder-display__icon {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    {% if settings.preorder_icon_circle %}
-      border-radius: 50%;
-    {% endif %}
-  }
-  
-  .preorder-display__content {
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .preorder-display__badge {
-    display: inline-block;
-    padding: 4px 12px;
-    font-size: clamp(0.75rem, 2vw, 0.875rem);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: 20px;
-    margin-bottom: 8px;
-  }
-  
-  .preorder-display__title {
-    margin: 0 0 8px 0;
-    font-size: clamp(1.25rem, 3vw, 1.5rem);
-    font-weight: 700;
-    line-height: 1.2;
-  }
-  
-  .preorder-display__message {
-    margin: 0 0 8px 0;
-    font-size: clamp(0.875rem, 2.5vw, 1rem);
-    line-height: 1.4;
-  }
-  
-  .preorder-display__note {
-    margin: 0;
-    font-size: clamp(0.75rem, 2vw, 0.875rem);
-    font-style: italic;
-  }
-  
-  .preorder-display__countdown {
-    margin-top: 12px;
-  }
-  
-  .preorder-display__countdown-live {
-    display: inline-block;
-    padding: 8px 16px;
-    border: 1px solid;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: clamp(0.875rem, 2.5vw, 1rem);
-    {% if settings.preorder_animation_style != 'none' %}
-      animation: pulse 2s ease-in-out infinite;
-    {% endif %}
-  }
-  
-  /* Mobile optimizations */
-  @media screen and (max-width: 640px) {
-    .preorder-display {
-      padding: var(--spacing-md, 16px);
-      gap: var(--spacing-sm, 12px);
-    }
-    
-    .preorder-display__icon {
-      width: 40px;
-      height: 40px;
-    }
-    
-    .preorder-display__icon svg {
-      width: 20px;
-      height: 20px;
-    }
-  }
-{% endstylesheet %}
+{{ 'preorder-display.css' | asset_url | stylesheet_tag }}
