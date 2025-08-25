@@ -46,10 +46,10 @@
           when '6'
             assign day_name = 'Saturday'
         endcase
-        assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
+        assign time_with_tz = drop_date_field | date: '%l:%M%p'
         assign preorder_text = 'Available this ' | append: day_name | append: ' @ ' | append: time_with_tz
       else
-        assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p EST'
+        assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p'
         assign preorder_text = 'Available ' | append: formatted_date
       endif
     endif

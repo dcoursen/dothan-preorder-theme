@@ -32,7 +32,7 @@
             when '6'
               assign day_name = 'Saturday'
           endcase
-          assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
+          assign time_with_tz = drop_date_field | date: '%l:%M%p'
           assign availability_text = settings.preorder_availability_text | default: 'Available'
           assign preorder_text = availability_text | append: ' this ' | append: day_name | append: ' @ ' | append: time_with_tz
         else
