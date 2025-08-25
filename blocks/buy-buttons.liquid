@@ -70,7 +70,16 @@
           class="product-form-buttons spacing-style{% if block_settings.stacking %} product-form-buttons--stacked{% endif %}"
           style="{% render 'spacing-style', settings: block_settings %}"
         >
-          {% content_for 'block', type: 'quantity', id: 'quantity' %}
+{%- liquid
+  assign bis_enabled = settings.enable_back_in_stock | default: true
+  assign show_bis = false
+  if bis_enabled and inventory_quantity <= 0 and can_add_to_cart == false
+    assign show_bis = true
+  endif
+-%}
+          {%- unless show_bis -%}
+            {% content_for 'block', type: 'quantity', id: 'quantity' %}
+          {%- endunless -%}
 
           {% content_for 'block',
             type: 'add-to-cart',
