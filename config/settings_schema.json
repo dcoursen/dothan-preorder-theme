@@ -3075,7 +3075,7 @@
         "type": "text",
         "id": "preorder_predrop_badge",
         "label": "Badge Text",
-        "default": "PREORDER"
+        "default": "Preorder"
       },
       {
         "type": "color",
@@ -3139,7 +3139,7 @@
         "type": "text",
         "id": "preorder_live_badge",
         "label": "Badge Text",
-        "default": "PREORDER"
+        "default": "Preorder"
       },
       {
         "type": "color",
@@ -3203,7 +3203,7 @@
         "type": "text",
         "id": "preorder_soldout_badge",
         "label": "Badge Text",
-        "default": "SOLD OUT"
+        "default": "Preorder"
       },
       {
         "type": "color",
@@ -3267,7 +3267,7 @@
         "type": "text",
         "id": "preorder_closed_badge",
         "label": "Badge Text",
-        "default": "CLOSED"
+        "default": "Preorder"
       },
       {
         "type": "color",

@@ -182,14 +182,35 @@
          --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
          --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
          --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
-         --preorder-title-color: {{ settings.preorder_title_color | default: '#2d5a2d' }};
-         --preorder-message-color: {{ settings.preorder_message_color | default: '#4c7c4c' }};
-         --preorder-note-color: {{ settings.preorder_note_color | default: '#6ba46b' }};
-         --preorder-badge-bg: {{ settings.preorder_badge_bg_color | default: '#4c7c4c' }};
-         --preorder-badge-text: {{ settings.preorder_badge_text_color | default: '#ffffff' }};
-         --preorder-badge-ready-bg: {{ settings.preorder_badge_ready_bg_color | default: '#2d5a2d' }};
          --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
          --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
+         {% comment %} Stage-specific colors {% endcomment %}
+         {% case preorder_status %}
+           {% when 'predrop' %}
+             --preorder-badge-bg: {{ settings.preorder_predrop_badge_bg | default: '#4c7c4c' }};
+             --preorder-badge-text: {{ settings.preorder_predrop_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_predrop_title_color | default: '#2d5a2d' }};
+             --preorder-message-color: {{ settings.preorder_predrop_message_color | default: '#4c7c4c' }};
+             --preorder-note-color: {{ settings.preorder_predrop_note_color | default: '#6ba46b' }};
+           {% when 'live' %}
+             --preorder-badge-bg: {{ settings.preorder_live_badge_bg | default: '#2d5a2d' }};
+             --preorder-badge-text: {{ settings.preorder_live_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_live_title_color | default: '#2d5a2d' }};
+             --preorder-message-color: {{ settings.preorder_live_message_color | default: '#4c7c4c' }};
+             --preorder-note-color: {{ settings.preorder_live_note_color | default: '#6ba46b' }};
+           {% when 'soldout' %}
+             --preorder-badge-bg: {{ settings.preorder_soldout_badge_bg | default: '#dc6565' }};
+             --preorder-badge-text: {{ settings.preorder_soldout_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_soldout_title_color | default: '#dc6565' }};
+             --preorder-message-color: {{ settings.preorder_soldout_message_color | default: '#dc6565' }};
+             --preorder-note-color: {{ settings.preorder_soldout_note_color | default: '#c85454' }};
+           {% when 'closed' %}
+             --preorder-badge-bg: {{ settings.preorder_closed_badge_bg | default: '#666666' }};
+             --preorder-badge-text: {{ settings.preorder_closed_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_closed_title_color | default: '#666666' }};
+             --preorder-message-color: {{ settings.preorder_closed_message_color | default: '#666666' }};
+             --preorder-note-color: {{ settings.preorder_closed_note_color | default: '#999999' }};
+         {% endcase %}
        ">
       
       <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
