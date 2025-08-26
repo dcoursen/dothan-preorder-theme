@@ -21,6 +21,17 @@ echo "📦 Creating production backup..."
 shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=142915502242 --only=config/settings_data.json --path=./backups/production-backup-$(date +%Y%m%d-%H%M%S)/ 2>/dev/null || echo "⚠️  Backup skipped (not critical)"
 
 echo ""
+echo "💾 Backing up theme configuration..."
+
+# Backup theme settings before push
+if [ -f "scripts/backup-theme-config.js" ]; then
+    node scripts/backup-theme-config.js
+    echo "✅ Theme configuration backed up"
+else
+    echo "⚠️  Warning: backup script not found, continuing without backup"
+fi
+
+echo ""
 echo "📤 Pushing to PRODUCTION theme..."
 
 # Push to production theme

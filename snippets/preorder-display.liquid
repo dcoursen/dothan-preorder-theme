@@ -34,12 +34,12 @@
     
     # Determine preorder status
     if now < drop_timestamp
-      # State 1: Coming Soon (Before Drop Date)
-      assign preorder_status = 'coming_soon'
-      assign badge_text = settings.preorder_coming_badge | default: 'Preorder'
-      assign title_text = settings.preorder_coming_title | default: 'Available Soon'
-      assign message_text = settings.preorder_coming_message | default: 'Product will be live for preorders {date}'
-      assign note_text = settings.preorder_coming_note | default: 'Pickup your preorders in store beginning: {pickup_date}'
+      # PRE DROP STAGE - Before Preorders Open
+      assign preorder_status = 'predrop'
+      assign badge_text = settings.preorder_predrop_badge | default: 'Preorder'
+      assign title_text = settings.preorder_predrop_title | default: 'Available Soon'
+      assign message_text = settings.preorder_predrop_message | default: 'Product will be live for preorders {date}'
+      assign note_text = settings.preorder_predrop_note | default: 'Pickup your preorders in store beginning: {pickup_date}'
       assign show_display = true
       
     elsif preorder_close_date != blank
@@ -48,16 +48,16 @@
       if now >= drop_timestamp and now <= close_timestamp
         # Preorder window is open
         if stock > 0 and is_available
-          # State 2: Preorder Open (In Stock)
-          assign preorder_status = 'preorder_open'
-          assign badge_text = settings.preorder_open_badge | default: 'Preorder'
-          assign title_text = settings.preorder_open_title | default: 'Order Now'
-          assign message_text = settings.preorder_open_message | default: 'Pickup your preorders in store beginning: {pickup_date} through {pickup_end}'
-          assign note_text = settings.preorder_open_note | default: 'Visit our garden center during business hours'
+          # LIVE STAGE - Preorders Open (In Stock)
+          assign preorder_status = 'live'
+          assign badge_text = settings.preorder_live_badge | default: 'Preorder'
+          assign title_text = settings.preorder_live_title | default: 'Order Now'
+          assign message_text = settings.preorder_live_message | default: 'Pickup your preorders in store beginning: {pickup_date} through {pickup_end}'
+          assign note_text = settings.preorder_live_note | default: 'Visit our garden center during business hours'
           assign show_display = true
         else
-          # State 3: Preorder Sold Out (No Stock)
-          assign preorder_status = 'preorder_soldout'
+          # SOLD OUT STAGE - Preorders Open (No Stock)
+          assign preorder_status = 'soldout'
           assign badge_text = settings.preorder_soldout_badge | default: 'Preorder'
           assign title_text = settings.preorder_soldout_title | default: 'Sold Out'
           assign message_text = settings.preorder_soldout_message | default: 'This product is currently sold out'
@@ -65,8 +65,8 @@
           assign show_display = true
         endif
       elsif now > close_timestamp
-        # State 4: Preorder Closed (After Close Date)
-        assign preorder_status = 'preorder_closed'
+        # CLOSED STAGE - After Preorder Window Closes
+        assign preorder_status = 'closed'
         assign badge_text = settings.preorder_closed_badge | default: 'Preorder'
         assign title_text = settings.preorder_closed_title | default: 'Ordering Closed'
         assign message_text = settings.preorder_closed_message | default: 'Ordering for this product closed {close_date}'
@@ -263,14 +263,14 @@
           <p class="preorder-display__note">{{ note_text }}</p>
         {%- endif -%}
         
-        {%- if settings.preorder_show_countdown and preorder_status == 'coming_soon' -%}
+        {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
           <div class="preorder-display__countdown" data-target="{{ preorder_drop_date | date: '%s' }}"></div>
         {%- endif -%}
       </div>
     </div>
   </div>
 
-  {%- if settings.preorder_show_countdown and preorder_status == 'coming_soon' -%}
+  {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const countdownEl = document.querySelector('.preorder-display__countdown[data-target]');

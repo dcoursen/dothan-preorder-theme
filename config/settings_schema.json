@@ -3050,117 +3050,117 @@
       },
       {
         "type": "header",
-        "content": "State-Specific Settings - Coming Soon (Before Drop Date)"
+        "content": "🕐 PRE DROP STAGE - Before Preorders Open"
       },
       {
         "type": "text",
-        "id": "preorder_coming_badge",
-        "label": "Coming Soon Badge Text",
+        "id": "preorder_predrop_badge",
+        "label": "Badge",
         "default": "Preorder"
       },
       {
         "type": "text",
-        "id": "preorder_coming_title",
-        "label": "Coming Soon Title",
+        "id": "preorder_predrop_title",
+        "label": "Title",
         "default": "Available Soon"
       },
       {
         "type": "textarea",
-        "id": "preorder_coming_message",
-        "label": "Coming Soon Message",
+        "id": "preorder_predrop_message",
+        "label": "Main Message",
         "default": "Product will be live for preorders {date}",
-        "info": "Use {date} for drop date, {pickup_date} for pickup start"
+        "info": "Available placeholders: {date}, {pickup_date}"
       },
       {
         "type": "textarea",
-        "id": "preorder_coming_note",
-        "label": "Coming Soon Custom Note",
+        "id": "preorder_predrop_note",
+        "label": "Custom Note",
         "default": "Pickup your preorders in store beginning: {pickup_date}"
       },
       {
         "type": "header",
-        "content": "State-Specific Settings - Preorder Open (In Stock)"
+        "content": "✅ LIVE STAGE - Preorders Open (In Stock)"
       },
       {
         "type": "text",
-        "id": "preorder_open_badge",
-        "label": "Open Badge Text",
+        "id": "preorder_live_badge",
+        "label": "Badge",
         "default": "Preorder"
       },
       {
         "type": "text",
-        "id": "preorder_open_title",
-        "label": "Open Title",
+        "id": "preorder_live_title",
+        "label": "Title",
         "default": "Order Now"
       },
       {
         "type": "textarea",
-        "id": "preorder_open_message",
-        "label": "Open Message",
+        "id": "preorder_live_message",
+        "label": "Main Message",
         "default": "Pickup your preorders in store beginning: {pickup_date} through {pickup_end}",
-        "info": "Use {pickup_date}, {pickup_end}, {close_date} as placeholders"
+        "info": "Available placeholders: {pickup_date}, {pickup_end}, {close_date}"
       },
       {
         "type": "textarea",
-        "id": "preorder_open_note",
-        "label": "Open Custom Note",
+        "id": "preorder_live_note",
+        "label": "Custom Note",
         "default": "Visit our garden center during business hours"
       },
       {
         "type": "header",
-        "content": "State-Specific Settings - Preorder Sold Out (No Stock)"
+        "content": "❌ SOLD OUT STAGE - Preorders Open (No Stock)"
       },
       {
         "type": "text",
         "id": "preorder_soldout_badge",
-        "label": "Sold Out Badge Text",
+        "label": "Badge",
         "default": "Preorder"
       },
       {
         "type": "text",
         "id": "preorder_soldout_title",
-        "label": "Sold Out Title",
+        "label": "Title",
         "default": "Sold Out"
       },
       {
         "type": "textarea",
         "id": "preorder_soldout_message",
-        "label": "Sold Out Message",
+        "label": "Main Message",
         "default": "This product is currently sold out"
       },
       {
         "type": "textarea",
         "id": "preorder_soldout_note",
-        "label": "Sold Out Custom Note",
+        "label": "Custom Note",
         "default": "Check back later or contact us for availability"
       },
       {
         "type": "header",
-        "content": "State-Specific Settings - Preorder Closed (After Close Date)"
+        "content": "🔒 CLOSED STAGE - After Preorder Window Closes"
       },
       {
         "type": "text",
         "id": "preorder_closed_badge",
-        "label": "Closed Badge Text",
+        "label": "Badge",
         "default": "Preorder"
       },
       {
         "type": "text",
         "id": "preorder_closed_title",
-        "label": "Closed Title",
+        "label": "Title",
         "default": "Ordering Closed"
       },
       {
         "type": "textarea",
         "id": "preorder_closed_message",
-        "label": "Closed Message",
+        "label": "Main Message",
         "default": "Ordering for this product closed {close_date}",
-        "info": "Use {close_date} for the close date"
+        "info": "Available placeholders: {close_date}"
       },
       {
         "type": "textarea",
         "id": "preorder_closed_note",
-        "label": "Closed Custom Note",
+        "label": "Custom Note",
         "default": "Contact us for future availability"
       }
     ]

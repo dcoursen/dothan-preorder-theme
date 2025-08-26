@@ -30,6 +30,17 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo ""
+echo "💾 Backing up theme settings..."
+
+# Backup theme settings before push
+if [ -f "scripts/backup-theme-config.js" ]; then
+    node scripts/backup-theme-config.js
+    echo "✅ Theme settings backed up"
+else
+    echo "⚠️  Warning: backup script not found, continuing without backup"
+fi
+
+echo ""
 echo "📤 Pushing to staging theme..."
 
 # Push to staging theme
