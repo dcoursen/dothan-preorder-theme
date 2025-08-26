@@ -2832,6 +2832,46 @@
           {
             "value": "truck",
             "label": "Truck"
+          },
+          {
+            "value": "leaf",
+            "label": "Leaf (Garden)"
+          },
+          {
+            "value": "flower",
+            "label": "Flower (Garden)"
+          },
+          {
+            "value": "seedling",
+            "label": "Seedling (Garden)"
+          },
+          {
+            "value": "shopping-bag",
+            "label": "Shopping Bag"
+          },
+          {
+            "value": "gift",
+            "label": "Gift Box"
+          },
+          {
+            "value": "heart",
+            "label": "Heart"
+          },
+          {
+            "value": "lightning",
+            "label": "Lightning Bolt"
+          },
+          {
+            "value": "bell",
+            "label": "Bell"
+          },
+          {
+            "value": "tag",
+            "label": "Tag"
+          },
+          {
+            "value": "timer",
+            "label": "Timer"
           }
         ],
         "default": "calendar"
@@ -3007,6 +3047,121 @@
           }
         ],
         "default": "subtle"
+      },
+      {
+        "type": "header",
+        "content": "State-Specific Settings - Coming Soon (Before Drop Date)"
+      },
+      {
+        "type": "text",
+        "id": "preorder_coming_badge",
+        "label": "Coming Soon Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "text",
+        "id": "preorder_coming_title",
+        "label": "Coming Soon Title",
+        "default": "Available Soon"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_coming_message",
+        "label": "Coming Soon Message",
+        "default": "Product will be live for preorders {date}",
+        "info": "Use {date} for drop date, {pickup_date} for pickup start"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_coming_note",
+        "label": "Coming Soon Custom Note",
+        "default": "Pickup your preorders in store beginning: {pickup_date}"
+      },
+      {
+        "type": "header",
+        "content": "State-Specific Settings - Preorder Open (In Stock)"
+      },
+      {
+        "type": "text",
+        "id": "preorder_open_badge",
+        "label": "Open Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "text",
+        "id": "preorder_open_title",
+        "label": "Open Title",
+        "default": "Order Now"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_open_message",
+        "label": "Open Message",
+        "default": "Pickup your preorders in store beginning: {pickup_date} through {pickup_end}",
+        "info": "Use {pickup_date}, {pickup_end}, {close_date} as placeholders"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_open_note",
+        "label": "Open Custom Note",
+        "default": "Visit our garden center during business hours"
+      },
+      {
+        "type": "header",
+        "content": "State-Specific Settings - Preorder Sold Out (No Stock)"
+      },
+      {
+        "type": "text",
+        "id": "preorder_soldout_badge",
+        "label": "Sold Out Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "text",
+        "id": "preorder_soldout_title",
+        "label": "Sold Out Title",
+        "default": "Sold Out"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_soldout_message",
+        "label": "Sold Out Message",
+        "default": "This product is currently sold out"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_soldout_note",
+        "label": "Sold Out Custom Note",
+        "default": "Check back later or contact us for availability"
+      },
+      {
+        "type": "header",
+        "content": "State-Specific Settings - Preorder Closed (After Close Date)"
+      },
+      {
+        "type": "text",
+        "id": "preorder_closed_badge",
+        "label": "Closed Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "text",
+        "id": "preorder_closed_title",
+        "label": "Closed Title",
+        "default": "Ordering Closed"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_closed_message",
+        "label": "Closed Message",
+        "default": "Ordering for this product closed {close_date}",
+        "info": "Use {close_date} for the close date"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_closed_note",
+        "label": "Closed Custom Note",
+        "default": "Contact us for future availability"
       }
     ]
   }
