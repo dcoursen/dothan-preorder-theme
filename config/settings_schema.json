@@ -2975,26 +2975,41 @@
         "options": [
           {
             "value": "month_day",
-            "label": "September 15"
+            "label": "September 2 (single digit days)"
           },
           {
             "value": "mm_dd",
-            "label": "09/15"
+            "label": "9/2 (single digit format)"
           },
           {
             "value": "dd_mm",
-            "label": "15/09"
+            "label": "2/9 (single digit format)"
           },
           {
             "value": "relative",
-            "label": "Relative (e.g., Tomorrow, Next Friday)"
+            "label": "Smart Relative (Today, Next Tuesday, etc.)"
           },
           {
             "value": "full",
-            "label": "September 15 at 2:00PM EST"
+            "label": "September 2 at 2:00PM EST"
           }
         ],
-        "default": "month_day"
+        "default": "relative",
+        "info": "Smart relative format uses proper This/Next logic and single digit formatting"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_use_single_digits",
+        "label": "Use Single Digit Days (1-9 not 01-09)",
+        "default": true,
+        "info": "Show '2' instead of '02' for single digit days"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_smart_relative_dates",
+        "label": "Smart This/Next Week Logic",
+        "default": true,
+        "info": "Uses proper logic: if today is Tuesday and event is next Tuesday, shows 'Next Tuesday' not 'This Tuesday'"
       },
       {
         "type": "checkbox",
@@ -3053,115 +3068,256 @@
         "content": "🕐 PRE DROP STAGE - Before Preorders Open"
       },
       {
+        "type": "paragraph",
+        "content": "Settings for products before preorder window opens"
+      },
+      {
         "type": "text",
         "id": "preorder_predrop_badge",
-        "label": "Badge",
-        "default": "Preorder"
+        "label": "Badge Text",
+        "default": "PREORDER"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
       },
       {
         "type": "text",
         "id": "preorder_predrop_title",
-        "label": "Title",
+        "label": "Title Text",
         "default": "Available Soon"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_title_color",
+        "label": "Title Color",
+        "default": "#2d5a2d"
       },
       {
         "type": "textarea",
         "id": "preorder_predrop_message",
-        "label": "Main Message",
+        "label": "Main Message Template",
         "default": "Product will be live for preorders {date}",
-        "info": "Available placeholders: {date}, {pickup_date}"
+        "info": "Available placeholders: {date}, {pickup_date}, {pickup_end}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_message_color",
+        "label": "Message Color",
+        "default": "#4c7c4c"
       },
       {
         "type": "textarea",
         "id": "preorder_predrop_note",
-        "label": "Custom Note",
-        "default": "Pickup your preorders in store beginning: {pickup_date}"
+        "label": "Pickup Information",
+        "default": "Pickup your preorders in store beginning: {pickup_date}",
+        "info": "Shows pickup date information below main message"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_note_color",
+        "label": "Pickup Info Color",
+        "default": "#6ba46b"
       },
       {
         "type": "header",
         "content": "✅ LIVE STAGE - Preorders Open (In Stock)"
       },
       {
+        "type": "paragraph",
+        "content": "Settings for products during preorder window when items are available"
+      },
+      {
         "type": "text",
         "id": "preorder_live_badge",
-        "label": "Badge",
-        "default": "Preorder"
+        "label": "Badge Text",
+        "default": "PREORDER"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
       },
       {
         "type": "text",
         "id": "preorder_live_title",
-        "label": "Title",
+        "label": "Title Text",
         "default": "Order Now"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_title_color",
+        "label": "Title Color",
+        "default": "#2d5a2d"
       },
       {
         "type": "textarea",
         "id": "preorder_live_message",
-        "label": "Main Message",
+        "label": "Main Message Template",
         "default": "Pickup your preorders in store beginning: {pickup_date} through {pickup_end}",
         "info": "Available placeholders: {pickup_date}, {pickup_end}, {close_date}"
       },
       {
+        "type": "color",
+        "id": "preorder_live_message_color",
+        "label": "Message Color",
+        "default": "#4c7c4c"
+      },
+      {
         "type": "textarea",
         "id": "preorder_live_note",
-        "label": "Custom Note",
-        "default": "Visit our garden center during business hours"
+        "label": "Additional Information",
+        "default": "Visit our garden center during business hours",
+        "info": "Additional note shown below pickup information"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_note_color",
+        "label": "Additional Info Color",
+        "default": "#6ba46b"
       },
       {
         "type": "header",
         "content": "❌ SOLD OUT STAGE - Preorders Open (No Stock)"
       },
       {
+        "type": "paragraph",
+        "content": "Settings for products during preorder window when items are sold out"
+      },
+      {
         "type": "text",
         "id": "preorder_soldout_badge",
-        "label": "Badge",
-        "default": "Preorder"
+        "label": "Badge Text",
+        "default": "SOLD OUT"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#dc6565"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
       },
       {
         "type": "text",
         "id": "preorder_soldout_title",
-        "label": "Title",
+        "label": "Title Text",
         "default": "Sold Out"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_title_color",
+        "label": "Title Color",
+        "default": "#dc6565"
       },
       {
         "type": "textarea",
         "id": "preorder_soldout_message",
-        "label": "Main Message",
-        "default": "This product is currently sold out"
+        "label": "Main Message Template",
+        "default": "This product is currently sold out",
+        "info": "Available placeholders: {pickup_date}, {pickup_end}, {close_date}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_message_color",
+        "label": "Message Color",
+        "default": "#dc6565"
       },
       {
         "type": "textarea",
         "id": "preorder_soldout_note",
-        "label": "Custom Note",
-        "default": "Check back later or contact us for availability"
+        "label": "Additional Information",
+        "default": "Check back later or contact us for availability",
+        "info": "Additional note shown below main message"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_note_color",
+        "label": "Additional Info Color",
+        "default": "#c85454"
       },
       {
         "type": "header",
         "content": "🔒 CLOSED STAGE - After Preorder Window Closes"
       },
       {
+        "type": "paragraph",
+        "content": "Settings for products after the preorder window has closed"
+      },
+      {
         "type": "text",
         "id": "preorder_closed_badge",
-        "label": "Badge",
-        "default": "Preorder"
+        "label": "Badge Text",
+        "default": "CLOSED"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#666666"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
       },
       {
         "type": "text",
         "id": "preorder_closed_title",
-        "label": "Title",
+        "label": "Title Text",
         "default": "Ordering Closed"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_title_color",
+        "label": "Title Color",
+        "default": "#666666"
       },
       {
         "type": "textarea",
         "id": "preorder_closed_message",
-        "label": "Main Message",
+        "label": "Main Message Template",
         "default": "Ordering for this product closed {close_date}",
-        "info": "Available placeholders: {close_date}"
+        "info": "Available placeholders: {close_date}, {pickup_date}, {pickup_end}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_message_color",
+        "label": "Message Color",
+        "default": "#666666"
       },
       {
         "type": "textarea",
         "id": "preorder_closed_note",
-        "label": "Custom Note",
-        "default": "Contact us for future availability"
+        "label": "Additional Information",
+        "default": "Contact us for future availability",
+        "info": "Additional note shown below main message"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_note_color",
+        "label": "Additional Info Color",
+        "default": "#999999"
       }
     ]
   }

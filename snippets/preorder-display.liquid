@@ -19,6 +19,7 @@
   assign badge_text = ''
   assign title_text = ''
   assign message_text = ''
+  assign pickup_info_text = ''
   assign note_text = ''
   
   # Check if preorder feature is enabled
@@ -32,7 +33,7 @@
     assign stock = variant.inventory_quantity | default: 0
     assign is_available = product.available
     
-    # Determine preorder status
+    # Determine preorder status and get stage-specific settings
     if now < drop_timestamp
       # PRE DROP STAGE - Before Preorders Open
       assign preorder_status = 'predrop'
@@ -76,102 +77,43 @@
     endif
   endif
   
-  # Format dates for display
+  # Format dates using smart formatter
   if show_display
     # Format drop date
     assign drop_date_formatted = ''
     if preorder_drop_date != blank
-      case settings.preorder_date_format
-        when 'month_day'
-          assign drop_date_formatted = preorder_drop_date | date: '%B %d'
-        when 'mm_dd'
-          assign drop_date_formatted = preorder_drop_date | date: '%m/%d'
-        when 'dd_mm'
-          assign drop_date_formatted = preorder_drop_date | date: '%d/%m'
-        when 'relative'
-          assign days_until_drop = drop_timestamp | minus: now | divided_by: 86400
-          if days_until_drop == 0
-            assign drop_date_formatted = 'Today'
-          elsif days_until_drop == 1
-            assign drop_date_formatted = 'Tomorrow'
-          elsif days_until_drop > 0 and days_until_drop <= 7
-            assign drop_date_formatted = preorder_drop_date | date: 'This %A'
-          else
-            assign drop_date_formatted = preorder_drop_date | date: '%B %d'
-          endif
-        when 'full'
-          assign drop_date_formatted = preorder_drop_date | date: '%B %d at %l:%M%p %Z'
-        else
-          assign drop_date_formatted = preorder_drop_date | date: '%B %d'
-      endcase
+      assign drop_date_formatted = ''
+      capture drop_date_formatted
+        render 'smart-date-formatter', date: preorder_drop_date, format_type: settings.preorder_date_format, context: 'drop'
+      endcapture
+      assign drop_date_formatted = drop_date_formatted | strip
     endif
     
-    # Format pickup dates
+    # Format pickup dates  
     assign pickup_date_formatted = ''
     assign pickup_end_formatted = ''
     if preorder_pickup_start != blank
       assign pickup_start_timestamp = preorder_pickup_start | date: '%s'
       assign pickup_end_timestamp = pickup_start_timestamp | plus: pickup_duration_days | times: 86400
       
-      case settings.preorder_date_format
-        when 'month_day'
-          assign pickup_date_formatted = preorder_pickup_start | date: '%B %d'
-          assign pickup_end_formatted = pickup_end_timestamp | date: '%B %d'
-        when 'mm_dd'
-          assign pickup_date_formatted = preorder_pickup_start | date: '%m/%d'
-          assign pickup_end_formatted = pickup_end_timestamp | date: '%m/%d'
-        when 'dd_mm'
-          assign pickup_date_formatted = preorder_pickup_start | date: '%d/%m'
-          assign pickup_end_formatted = pickup_end_timestamp | date: '%d/%m'
-        when 'relative'
-          assign days_until_pickup = pickup_start_timestamp | minus: now | divided_by: 86400
-          if days_until_pickup <= 0
-            assign pickup_date_formatted = 'Now'
-          elsif days_until_pickup == 1
-            assign pickup_date_formatted = 'Tomorrow'
-          elsif days_until_pickup <= 7
-            assign pickup_date_formatted = preorder_pickup_start | date: 'This %A'
-          else
-            assign pickup_date_formatted = preorder_pickup_start | date: '%B %d'
-          endif
-          assign pickup_end_formatted = pickup_end_timestamp | date: '%B %d'
-        when 'full'
-          assign pickup_date_formatted = preorder_pickup_start | date: '%B %d at %l:%M%p %Z'
-          assign pickup_end_formatted = pickup_end_timestamp | date: '%B %d at %l:%M%p %Z'
-        else
-          assign pickup_date_formatted = preorder_pickup_start | date: '%B %d'
-          assign pickup_end_formatted = pickup_end_timestamp | date: '%B %d'
-      endcase
+      capture pickup_date_formatted
+        render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup'
+      endcapture
+      assign pickup_date_formatted = pickup_date_formatted | strip
+      
+      capture pickup_end_formatted
+        render 'smart-date-formatter', date: pickup_end_timestamp, format_type: settings.preorder_date_format
+      endcapture
+      assign pickup_end_formatted = pickup_end_formatted | strip
     endif
     
     # Format close date
     assign close_date_formatted = ''
     if preorder_close_date != blank
-      case settings.preorder_date_format
-        when 'month_day'
-          assign close_date_formatted = preorder_close_date | date: '%B %d'
-        when 'mm_dd'
-          assign close_date_formatted = preorder_close_date | date: '%m/%d'
-        when 'dd_mm'
-          assign close_date_formatted = preorder_close_date | date: '%d/%m'
-        when 'relative'
-          assign days_until_close = close_timestamp | minus: now | divided_by: 86400
-          if days_until_close == 0
-            assign close_date_formatted = 'Today'
-          elsif days_until_close == 1
-            assign close_date_formatted = 'Tomorrow'
-          elsif days_until_close > 0 and days_until_close <= 7
-            assign close_date_formatted = preorder_close_date | date: 'This %A'
-          elsif days_until_close < 0
-            assign close_date_formatted = preorder_close_date | date: '%B %d'
-          else
-            assign close_date_formatted = preorder_close_date | date: '%B %d'
-          endif
-        when 'full'
-          assign close_date_formatted = preorder_close_date | date: '%B %d at %l:%M%p %Z'
-        else
-          assign close_date_formatted = preorder_close_date | date: '%B %d'
-      endcase
+      capture close_date_formatted
+        render 'smart-date-formatter', date: preorder_close_date, format_type: settings.preorder_date_format, context: 'close'
+      endcapture
+      assign close_date_formatted = close_date_formatted | strip
     endif
     
     # Replace placeholders in messages
@@ -184,6 +126,16 @@
     assign note_text = note_text | replace: '{pickup_date}', pickup_date_formatted
     assign note_text = note_text | replace: '{pickup_end}', pickup_end_formatted
     assign note_text = note_text | replace: '{close_date}', close_date_formatted
+    
+    # Create pickup info section
+    assign pickup_info_text = ''
+    if preorder_pickup_start != blank
+      if pickup_duration_days > 1
+        assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted | append: ' through ' | append: pickup_end_formatted
+      else
+        assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted
+      endif
+    endif
   endif
   
   # Build CSS classes
@@ -245,18 +197,28 @@
       </div>
       
       <div class="preorder-display__content">
-        {%- if badge_text != blank -%}
-          <div class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
-            {{ badge_text }}
-          </div>
-        {%- endif -%}
-        
-        {%- if title_text != blank -%}
-          <h3 class="preorder-display__title">{{ title_text }}</h3>
-        {%- endif -%}
+        {%- comment -%} Badge and Title together in header section {%- endcomment -%}
+        <div class="preorder-display__header">
+          {%- if badge_text != blank -%}
+            <span class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
+              {{ badge_text }}
+            </span>
+          {%- endif -%}
+          
+          {%- if title_text != blank -%}
+            <h3 class="preorder-display__title">{{ title_text }}</h3>
+          {%- endif -%}
+        </div>
         
         {%- if message_text != blank -%}
           <p class="preorder-display__message">{{ message_text }}</p>
+        {%- endif -%}
+        
+        {%- comment -%} Pickup Information Section {%- endcomment -%}
+        {%- if pickup_info_text != blank -%}
+          <div class="preorder-display__pickup-info">
+            <strong>{{ pickup_info_text }}</strong>
+          </div>
         {%- endif -%}
         
         {%- if note_text != blank -%}

@@ -154,6 +154,38 @@
   min-width: 0;
 }
 
+/* Header with badge and title together */
+.preorder-display__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* Content sections */
+.preorder-display__message-section {
+  margin-bottom: 8px;
+}
+
+.preorder-display__pickup-info {
+  margin-bottom: 8px;
+}
+
+.preorder-display__pickup-dates {
+  margin: 0;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  line-height: 1.4;
+}
+
+.preorder-display__additional-info {
+  margin-bottom: 8px;
+}
+
+.preorder-display__countdown-section {
+  margin-top: 12px;
+}
+
 .preorder-display__badge {
   display: inline-block;
   padding: 4px 12px;
@@ -162,14 +194,16 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-radius: 20px;
-  margin-bottom: 8px;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .preorder-display__title {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: clamp(1.25rem, 3vw, 1.5rem);
   font-weight: 700;
   line-height: 1.2;
+  flex: 1;
 }
 
 .preorder-display__message {

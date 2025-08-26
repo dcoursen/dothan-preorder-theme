@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preorder Date Formatting Test</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .expected { color: #28a745; }
+        .old { color: #dc3545; text-decoration: line-through; }
+    </style>
+</head>
+<body>
+    <h1>Preorder Date Formatting Improvements</h1>
+    
+    <h2>Single Digit Formatting</h2>
+    <div class="test-case">
+        <strong>Test Case:</strong> September 2nd (not 02)<br>
+        <span class="old">OLD: September 02</span><br>
+        <span class="expected">NEW: September 2</span>
+    </div>
+    
+    <h2>Smart This/Next Week Logic</h2>
+    <div class="test-case">
+        <strong>Test Case:</strong> Today is Tuesday, event is next Tuesday<br>
+        <span class="old">OLD: This Tuesday</span><br>
+        <span class="expected">NEW: Next Tuesday</span>
+    </div>
+    
+    <div class="test-case">
+        <strong>Test Case:</strong> Today is Monday, event is this Tuesday<br>
+        <span class="expected">CORRECT: This Tuesday</span>
+    </div>
+    
+    <h2>Today Handling</h2>
+    <div class="test-case">
+        <strong>Test Case:</strong> Event is today at 11:00AM<br>
+        <span class="old">OLD: Today</span><br>
+        <span class="expected">NEW: Today at 11:00AM</span>
+    </div>
+    
+    <h2>New Theme Settings Structure</h2>
+    <div class="test-case">
+        <h3>Each stage now has complete control:</h3>
+        <ul>
+            <li><strong>Pre Drop Stage:</strong> Badge text, colors, title, message template</li>
+            <li><strong>Live Stage:</strong> Badge text, colors, title, message template</li>
+            <li><strong>Sold Out Stage:</strong> Badge text, colors, title, message template</li>
+            <li><strong>Closed Stage:</strong> Badge text, colors, title, message template</li>
+        </ul>
+    </div>
+    
+    <h2>UI Layout Improvements</h2>
+    <div class="test-case">
+        <h3>New Structure:</h3>
+        <ul>
+            <li>Badge and Title together in header section</li>
+            <li>Main message with dynamic dates</li>
+            <li>Pickup dates section (bold and prominent)</li>
+            <li>Additional information section</li>
+            <li>Countdown timer (for pre-drop stage)</li>
+        </ul>
+    </div>
+    
+    <h2>Conflicting Displays Removed</h2>
+    <div class="test-case">
+        <strong>Removed:</strong> "Available this Tuesday @ 11:00PM" from legacy preorder-logic.liquid<br>
+        <strong>Now handled by:</strong> preorder-display.liquid with proper date formatting
+    </div>
+</body>
+</html>
