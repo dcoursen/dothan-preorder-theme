@@ -184,6 +184,16 @@
               },
               "blocks": {}
             },
+            "bulk_pricing_display": {
+              "type": "bulk-pricing",
+              "settings": {
+                "title": "Volume Discounts",
+                "description": "Order more and save! The more you buy, the more you save.",
+                "show_savings_example": true,
+                "padding-block-start": 12,
+                "padding-block-end": 12
+              }
+            },
             "preorder_display_modern": {
               "type": "preorder-display",
               "settings": {
@@ -468,6 +478,7 @@
             "group_icgrde",
             "divider_VJhene",
             "variant_picker_R3rGDr",
+            "bulk_pricing_display",
             "preorder_display_modern",
             "buy_buttons_eYQEYi",
             "group_JbmQwr",

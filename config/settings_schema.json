@@ -3366,5 +3366,101 @@
         "default": "#999999"
       }
     ]
+  },
+  {
+    "name": "Bulk Pricing",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Configure bulk pricing tiers to offer discounts for larger quantity purchases. These settings serve as defaults and can be overridden per-product using metafields."
+      },
+      {
+        "type": "checkbox",
+        "id": "bulk_pricing_enabled",
+        "label": "Enable Bulk Pricing",
+        "default": true,
+        "info": "Show bulk pricing on product pages when tiers are configured"
+      },
+      {
+        "type": "header",
+        "content": "Default Pricing Tiers"
+      },
+      {
+        "type": "number",
+        "id": "bulk_tier1_qty",
+        "label": "Tier 1 - Minimum Quantity",
+        "default": 3,
+        "info": "First discount tier quantity"
+      },
+      {
+        "type": "number",
+        "id": "bulk_tier1_discount",
+        "label": "Tier 1 - Discount Percentage",
+        "default": 10,
+        "info": "Discount percentage for tier 1"
+      },
+      {
+        "type": "number",
+        "id": "bulk_tier2_qty",
+        "label": "Tier 2 - Minimum Quantity",
+        "default": 5,
+        "info": "Second discount tier quantity"
+      },
+      {
+        "type": "number",
+        "id": "bulk_tier2_discount",
+        "label": "Tier 2 - Discount Percentage",
+        "default": 15,
+        "info": "Discount percentage for tier 2"
+      },
+      {
+        "type": "number",
+        "id": "bulk_tier3_qty",
+        "label": "Tier 3 - Minimum Quantity",
+        "default": 10,
+        "info": "Third discount tier quantity"
+      },
+      {
+        "type": "number",
+        "id": "bulk_tier3_discount",
+        "label": "Tier 3 - Discount Percentage",
+        "default": 20,
+        "info": "Discount percentage for tier 3"
+      },
+      {
+        "type": "header",
+        "content": "Appearance"
+      },
+      {
+        "type": "color",
+        "id": "bulk_pricing_bg_color",
+        "label": "Background Color",
+        "default": "#f8f9fa"
+      },
+      {
+        "type": "color",
+        "id": "bulk_pricing_border_color",
+        "label": "Border Color",
+        "default": "#e9ecef"
+      },
+      {
+        "type": "color",
+        "id": "bulk_pricing_text_color",
+        "label": "Text Color",
+        "default": "#495057"
+      },
+      {
+        "type": "color",
+        "id": "bulk_pricing_header_color",
+        "label": "Header Color",
+        "default": "#212529"
+      },
+      {
+        "type": "color",
+        "id": "bulk_pricing_discount_color",
+        "label": "Discount Color",
+        "default": "#28a745"
+      }
+    ]
   }
 ]
