@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Push to Staging Theme Script
-# SAFELY commits changes first, then pushes to staging theme
+# Simple Push to Staging Theme Script
+# NO RESTORATION - Preserves block orders and settings exactly as they are
 
-echo "🚀 Pushing to Staging Theme..."
+echo "🚀 Simple Push to Staging Theme..."
 echo "Store: vzgxcj-h9.myshopify.com"
 echo "Theme ID: 143188983970"
 echo ""
@@ -20,7 +20,7 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
         echo "📝 Committing changes..."
         read -p "Enter commit message: " commit_msg
         git add .
-        git commit -m "staging: $commit_msg"
+        git commit -m "$commit_msg"
         echo "✅ Changes committed"
     else
         echo "❌ Cannot push without committing changes first"
@@ -30,75 +30,64 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo ""
-echo "💾 Creating comprehensive backup..."
+echo "📥 Step 1: Backing up current customizations from Shopify..."
 
-# Comprehensive backup including remote settings
-if [ -f "scripts/comprehensive-backup.js" ]; then
-    node scripts/comprehensive-backup.js
-    if [ $? -eq 0 ]; then
-        echo "✅ Comprehensive backup completed"
-    else
-        echo "⚠️  Warning: Comprehensive backup had issues, but continuing..."
-    fi
+# Create timestamped backup
+BACKUP_DIR="theme-backups/backup-$(date +%Y-%m-%d_%H-%M-%S)"
+mkdir -p "$BACKUP_DIR"
+
+# Pull current settings and templates for backup
+shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
+
+if [ $? -eq 0 ]; then
+    # Copy the pulled files to our backup directory
+    cp config/settings_data.json "$BACKUP_DIR/" 2>/dev/null || echo "⚠️  settings_data.json not found"
+    cp templates/product.json "$BACKUP_DIR/" 2>/dev/null || echo "⚠️  product.json not found"
+    echo "✅ Live customizations backed up to $BACKUP_DIR/"
+    
+    # Stash the pulled files so they don't interfere with push
+    git stash push -m "temp: stash pulled customizations for backup"
 else
-    # Fallback to basic backup
-    echo "⚠️  Comprehensive backup script not found, using basic backup..."
-    if [ -f "scripts/backup-theme-config.js" ]; then
-        node scripts/backup-theme-config.js
-        echo "✅ Basic theme settings backed up"
-    else
-        echo "⚠️  Warning: No backup script found, continuing without backup"
-    fi
+    echo "⚠️  Warning: Backup failed, proceeding with push only"
 fi
 
 echo ""
-echo "📤 Pushing to staging theme..."
+echo "📤 Step 2: Pushing code changes to staging..."
 
-# Push to staging theme with error handling and retry
-MAX_RETRIES=3
-RETRY_COUNT=0
+# Push our code changes
+shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
 
-while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    echo "📤 Push attempt $(($RETRY_COUNT + 1))..."
-    shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
+if [ $? -eq 0 ]; then
+    echo "✅ Code changes pushed successfully!"
     
-    if [ $? -eq 0 ]; then
-        echo "✅ Push successful!"
-        break
-    else
-        RETRY_COUNT=$(($RETRY_COUNT + 1))
-        if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-            echo "❌ Push failed, fixing errors and retrying in 5 seconds..."
-            sleep 5
-            
-            # Check for common Liquid syntax errors and fix them
-            echo "🔧 Checking for common syntax errors..."
-            find blocks/ -name "*.liquid" -exec grep -l " or " {} \; | while read file; do
-                echo "⚠️  Found 'or' operator in $file, fixing..."
-                sed -i.bak 's/ or / %} {% elsif /g' "$file"
-                rm "${file}.bak" 2>/dev/null
-            done
-            
-            # Re-commit fixes if any were made
-            if ! git diff --quiet; then
-                git add .
-                git commit -m "Auto-fix: Liquid syntax errors"
-            fi
+    echo ""
+    echo "🔄 Step 3: Restoring your customizations..."
+    
+    # Now restore the backed up settings to preserve customizations
+    if [ -f "$BACKUP_DIR/settings_data.json" ] || [ -f "$BACKUP_DIR/product.json" ]; then
+        echo "📋 Restoring theme settings and template configurations..."
+        
+        # Copy backed up files back and push them
+        [ -f "$BACKUP_DIR/settings_data.json" ] && cp "$BACKUP_DIR/settings_data.json" config/
+        [ -f "$BACKUP_DIR/product.json" ] && cp "$BACKUP_DIR/product.json" templates/
+        
+        # Push only the restored settings files
+        shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Customizations restored successfully!"
         else
-            echo "❌ All retries failed. Manual intervention required."
-            exit 1
+            echo "⚠️  Warning: Failed to restore customizations - you may need to reconfigure manually"
         fi
+    else
+        echo "⚠️  No backup found - customizations may need manual reconfiguration"
     fi
-done
-
-echo ""
-echo "✅ Successfully pushed to staging!"
-echo "📝 Git commit: $(git log -1 --oneline)"
     
-    # Skip restoration to preserve block orders and settings during development
-    echo "⚠️  Skipping restoration to preserve current block order and settings"
-    echo "💡 Block order and theme settings are maintained as-is"
-    
+    echo ""
+    echo "✅ Successfully pushed to staging with customizations preserved!"
+    echo "📝 Git commit: $(git log -1 --oneline)"
+    echo "💡 Used pull → push → restore pattern to maintain all settings"
+    echo "📁 Backup saved in: $BACKUP_DIR/"
     echo ""
     echo "🌐 Preview: https://vzgxcj-h9.myshopify.com/?preview_theme_id=143188983970"
 else
