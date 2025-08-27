@@ -54,13 +54,46 @@ fi
 echo ""
 echo "📤 Pushing to staging theme..."
 
-# Push to staging theme
-shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
+# Push to staging theme with error handling and retry
+MAX_RETRIES=3
+RETRY_COUNT=0
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "✅ Successfully pushed to staging!"
-    echo "📝 Git commit: $(git log -1 --oneline)"
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    echo "📤 Push attempt $(($RETRY_COUNT + 1))..."
+    shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Push successful!"
+        break
+    else
+        RETRY_COUNT=$(($RETRY_COUNT + 1))
+        if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+            echo "❌ Push failed, fixing errors and retrying in 5 seconds..."
+            sleep 5
+            
+            # Check for common Liquid syntax errors and fix them
+            echo "🔧 Checking for common syntax errors..."
+            find blocks/ -name "*.liquid" -exec grep -l " or " {} \; | while read file; do
+                echo "⚠️  Found 'or' operator in $file, fixing..."
+                sed -i.bak 's/ or / %} {% elsif /g' "$file"
+                rm "${file}.bak" 2>/dev/null
+            done
+            
+            # Re-commit fixes if any were made
+            if ! git diff --quiet; then
+                git add .
+                git commit -m "Auto-fix: Liquid syntax errors"
+            fi
+        else
+            echo "❌ All retries failed. Manual intervention required."
+            exit 1
+        fi
+    fi
+done
+
+echo ""
+echo "✅ Successfully pushed to staging!"
+echo "📝 Git commit: $(git log -1 --oneline)"
     
     # Allow theme to settle before restoration
     echo "⏳ Waiting for theme to settle..."
