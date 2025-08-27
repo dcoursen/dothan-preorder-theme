@@ -226,23 +226,21 @@
       
       <div class="preorder-display__content">
         {%- comment -%} Icon and Badge on same line {%- endcomment -%}
-        <div class="preorder-display__header">
-          <div class="preorder-display__icon-badge">
-            <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
-              {%- render 'preorder-icon', icon_type: settings.preorder_icon_type -%}
-            </div>
-            {%- if badge_text != blank -%}
-              <span class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
-                {{ badge_text }}
-              </span>
-            {%- endif -%}
+        <div class="preorder-display__icon-badge-row">
+          <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
+            {%- render 'preorder-icon', icon_type: settings.preorder_icon_type -%}
           </div>
-          
-          {%- comment -%} Title on separate line below {%- endcomment -%}
-          {%- if title_text != blank -%}
-            <h3 class="preorder-display__title">{{ title_text }}</h3>
+          {%- if badge_text != blank -%}
+            <span class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
+              {{ badge_text }}
+            </span>
           {%- endif -%}
         </div>
+        
+        {%- comment -%} Title on separate line below {%- endcomment -%}
+        {%- if title_text != blank -%}
+          <h3 class="preorder-display__title">{{ title_text }}</h3>
+        {%- endif -%}
         
         {%- if message_text != blank -%}
           <p class="preorder-display__message">{{ message_text }}</p>

@@ -1,10 +1,9 @@
 /* Preorder Display Component */
 .preorder-display {
   width: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md, 16px);
+  display: block;
   padding: var(--spacing-lg, 24px);
+  margin-bottom: var(--spacing-lg, 24px);
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -154,12 +153,11 @@
   min-width: 0;
 }
 
-/* Header with badge and title together */
-.preorder-display__header {
+/* Icon and Badge Row */
+.preorder-display__icon-badge-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
@@ -199,11 +197,10 @@
 }
 
 .preorder-display__title {
-  margin: 0;
+  margin: 0 0 12px 0;
   font-size: clamp(1.25rem, 3vw, 1.5rem);
   font-weight: 700;
   line-height: 1.2;
-  flex: 1;
 }
 
 .preorder-display__message {
