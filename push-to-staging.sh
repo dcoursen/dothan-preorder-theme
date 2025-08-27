@@ -41,9 +41,20 @@ echo "💾 Backing up current local files..."
 [ -f "config/settings_data.json" ] && cp "config/settings_data.json" "config/settings_data.local.backup"
 [ -f "templates/product.json" ] && cp "templates/product.json" "templates/product.local.backup"
 
-# Pull current live settings (this will overwrite local files)
-echo "🔄 Pulling current live settings from Shopify..."
-shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
+# Add delay to ensure Shopify has processed any recent changes
+echo "⏳ Waiting 5 seconds to ensure Shopify has processed recent changes..."
+sleep 5
+
+# Force fresh pull by clearing any cache and pulling current live settings
+echo "🔄 Pulling current live settings from Shopify (with cache bypass)..."
+# Remove local files to force fresh download
+rm -f config/settings_data.json templates/product.json
+shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json --force
+
+# Verify we got fresh data by checking file timestamps
+echo "🔍 Verifying pulled files are fresh:"
+echo "   settings_data.json: $(stat -f '%Sm' config/settings_data.json)"
+echo "   product.json: $(stat -f '%Sm' templates/product.json)"
 
 if [ $? -eq 0 ]; then
     # Copy the pulled files to our backup directory
@@ -104,6 +115,19 @@ if [ $? -eq 0 ]; then
         
         if [ $? -eq 0 ]; then
             echo "✅ Customizations restored successfully!"
+            
+            # Verify what was actually restored by comparing backup to what we just pushed
+            echo "🔍 Verification - comparing backup to restored files:"
+            if [ -f "$BACKUP_DIR/settings_data.json" ]; then
+                BACKUP_SIZE=$(stat -f%z "$BACKUP_DIR/settings_data.json")
+                CURRENT_SIZE=$(stat -f%z "config/settings_data.json")
+                echo "   settings_data.json: backup=${BACKUP_SIZE}bytes, restored=${CURRENT_SIZE}bytes"
+            fi
+            if [ -f "$BACKUP_DIR/product.json" ]; then
+                BACKUP_SIZE=$(stat -f%z "$BACKUP_DIR/product.json")
+                CURRENT_SIZE=$(stat -f%z "templates/product.json")
+                echo "   product.json: backup=${BACKUP_SIZE}bytes, restored=${CURRENT_SIZE}bytes"
+            fi
         else
             echo "⚠️  Warning: Failed to restore customizations - you may need to reconfigure manually"
         fi
