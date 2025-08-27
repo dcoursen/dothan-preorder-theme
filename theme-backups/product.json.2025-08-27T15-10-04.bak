@@ -159,10 +159,6 @@
                 "price_tVjtKg"
               ]
             },
-            "savings_display": {
-              "type": "savings-display",
-              "settings": {}
-            },
             "divider_VJhene": {
               "type": "_divider",
               "name": "t:names.divider",
@@ -470,7 +466,6 @@
           },
           "block_order": [
             "group_icgrde",
-            "savings_display",
             "divider_VJhene",
             "variant_picker_R3rGDr",
             "preorder_display_modern",
