@@ -47,7 +47,11 @@
       # After drop date - check if we have a close date
       if preorder_close_date != blank
         assign close_timestamp = preorder_close_date | date: '%s'
-        assign is_closed = now > close_timestamp
+        if now > close_timestamp
+          assign is_closed = true
+        else
+          assign is_closed = false
+        endif
       else
         # No close date means preorder stays open indefinitely
         assign is_closed = false
