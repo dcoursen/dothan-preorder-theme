@@ -110,8 +110,13 @@
     return "{{ v.id }}";
   }
 
-  // Update display
-  function updateDisplay(variantId) {
+  // Update renderer
+  var lastRenderedId = null;
+  function renderFor(variantId) {
+    if (!variantId || variantId === lastRenderedId) return;
+    lastRenderedId = variantId;
+    
+    // Check variant-specific text first, then fall back to product text
     var text = variantText[String(variantId)] || productText;
     
     if (text && text.trim()) {
@@ -122,20 +127,36 @@
     }
   }
 
-  // Listen for variant changes
+  // Try to hook any theme events if they exist
   document.addEventListener('variant:change', function(e){
     var id = e?.detail?.variant?.id;
-    if (id) updateDisplay(id);
+    if (id) renderFor(id);
+  });
+  document.addEventListener('product:variant-change', function(e){
+    var id = e?.detail?.variant?.id || e?.detail?.variantId;
+    if (id) renderFor(id);
   });
 
+  // Also listen to obvious form changes
   document.addEventListener('change', function(e){
-    if (e.target && e.target.name === 'id') {
-      updateDisplay(getCurrentVariantId());
+    if (!e.target) return;
+    if (e.target.name === 'id' || e.target.closest('[name="id"]')) {
+      renderFor(getCurrentVariantId());
     }
   });
 
-  // Initial display
-  updateDisplay(getCurrentVariantId());
+  // Safety net: poll the current variant id (catches JS-updated hidden inputs)
+  var lastId = null;
+  setInterval(function(){
+    var id = getCurrentVariantId();
+    if (id && id !== lastId) {
+      lastId = id;
+      renderFor(id);
+    }
+  }, 150); // light-weight; OK on product page
+
+  // Initial render sync (in case server-rendered != initial JS state)
+  renderFor(getCurrentVariantId());
 })();
 </script>
 
