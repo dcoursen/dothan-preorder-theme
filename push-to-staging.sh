@@ -45,12 +45,28 @@ echo "🔄 Using temporary directory: $TEMP_BACKUP_DIR"
 
 # Pull current live settings into temp directory (completely clean)
 cd "$TEMP_BACKUP_DIR"
+echo "🔍 Debug: Pulling files in temp directory..."
 shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
+
+echo "🔍 Debug: Contents of temp directory after pull:"
+find . -name "*.json" | head -10
 
 if [ $? -eq 0 ]; then
     # Copy the CLEAN pulled files to our permanent backup directory
-    [ -f "config/settings_data.json" ] && cp "config/settings_data.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
-    [ -f "templates/product.json" ] && cp "templates/product.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
+    echo "🔍 Debug: Copying files to backup..."
+    if [ -f "config/settings_data.json" ]; then
+        cp "config/settings_data.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
+        echo "   ✅ Copied settings_data.json"
+    else
+        echo "   ❌ settings_data.json not found"
+    fi
+    
+    if [ -f "templates/product.json" ]; then
+        cp "templates/product.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
+        echo "   ✅ Copied product.json"
+    else
+        echo "   ❌ product.json not found"
+    fi
     
     cd "$ORIGINAL_DIR"
     echo "✅ Live customizations backed up to $BACKUP_DIR/"
