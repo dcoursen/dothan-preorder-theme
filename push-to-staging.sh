@@ -30,14 +30,25 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo ""
-echo "💾 Backing up theme settings..."
+echo "💾 Creating comprehensive backup..."
 
-# Backup theme settings before push
-if [ -f "scripts/backup-theme-config.js" ]; then
-    node scripts/backup-theme-config.js
-    echo "✅ Theme settings backed up"
+# Comprehensive backup including remote settings
+if [ -f "scripts/comprehensive-backup.js" ]; then
+    node scripts/comprehensive-backup.js
+    if [ $? -eq 0 ]; then
+        echo "✅ Comprehensive backup completed"
+    else
+        echo "⚠️  Warning: Comprehensive backup had issues, but continuing..."
+    fi
 else
-    echo "⚠️  Warning: backup script not found, continuing without backup"
+    # Fallback to basic backup
+    echo "⚠️  Comprehensive backup script not found, using basic backup..."
+    if [ -f "scripts/backup-theme-config.js" ]; then
+        node scripts/backup-theme-config.js
+        echo "✅ Basic theme settings backed up"
+    else
+        echo "⚠️  Warning: No backup script found, continuing without backup"
+    fi
 fi
 
 echo ""
@@ -49,8 +60,51 @@ shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
 if [ $? -eq 0 ]; then
     echo ""
     echo "✅ Successfully pushed to staging!"
-    echo "🌐 Preview: https://vzgxcj-h9.myshopify.com/?preview_theme_id=143188983970"
     echo "📝 Git commit: $(git log -1 --oneline)"
+    
+    # Allow theme to settle before restoration
+    echo "⏳ Waiting for theme to settle..."
+    sleep 3
+    
+    # Comprehensive restoration of theme settings and configuration
+    echo "🔧 Restoring theme configuration..."
+    
+    if [ -f "scripts/comprehensive-restore.js" ]; then
+        node scripts/comprehensive-restore.js --include-settings --sync
+        if [ $? -eq 0 ]; then
+            echo "✅ Theme configuration restored and synchronized"
+        else
+            echo "⚠️  Warning: Comprehensive restoration had issues, trying fallback..."
+            
+            # Fallback to basic restoration
+            if [ -f "scripts/check-and-restore-template.js" ]; then
+                node scripts/check-and-restore-template.js --include-settings
+                if [ $? -eq 0 ]; then
+                    echo "✅ Basic restoration completed"
+                    
+                    # Try to sync settings
+                    echo "📤 Syncing settings..."
+                    shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json
+                    if [ $? -eq 0 ]; then
+                        echo "✅ Settings synchronized"
+                    fi
+                fi
+            fi
+        fi
+    else
+        echo "⚠️  Warning: Comprehensive restore script not found, using fallback..."
+        
+        # Fallback to basic restoration
+        if [ -f "scripts/check-and-restore-template.js" ]; then
+            node scripts/check-and-restore-template.js --include-settings
+            echo "✅ Basic restoration completed"
+        else
+            echo "⚠️  Warning: No restore script found"
+        fi
+    fi
+    
+    echo ""
+    echo "🌐 Preview: https://vzgxcj-h9.myshopify.com/?preview_theme_id=143188983970"
 else
     echo ""
     echo "❌ Push failed. Check the error above."

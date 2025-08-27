@@ -160,7 +160,8 @@ function checkAndRestore(options = {}) {
 
 // Run if called directly
 if (require.main === module) {
-  checkAndRestore();
+  const includeSettings = process.argv.includes('--include-settings');
+  checkAndRestore({ includeSettings });
 }
 
 module.exports = { checkAndRestore, hasPickupDateBlock };

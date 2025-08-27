@@ -263,42 +263,73 @@ When making changes, test:
 
 ## Theme Configuration Management
 
-### Automatic Backup System
+### Advanced Backup & Restore System
 
-**Pre-Push Hook**: Every time you push code, backups are automatically updated with:
+**Comprehensive Push-to-Staging Workflow**:
+The `./push-to-staging.sh` script now includes full backup and restore functionality:
+
+1. **Pre-Push Comprehensive Backup**:
+   ```bash
+   node scripts/comprehensive-backup.js
+   ```
+   - Downloads current remote theme settings from Shopify
+   - Backs up all local template files
+   - Creates timestamped backups of everything
+   - Stores in `theme-backups/` directory
+
+2. **Push to Staging**:
+   - Commits any uncommitted changes (with user confirmation)
+   - Pushes all files to Shopify staging theme
+
+3. **Post-Push Restoration**:
+   ```bash
+   node scripts/comprehensive-restore.js --include-settings --sync
+   ```
+   - Restores theme settings from backup
+   - Verifies template integrity (bulk pricing, preorder blocks)
+   - Syncs restored settings back to Shopify
+
+### Manual Backup/Restore Commands:
+
+**Comprehensive Backup (includes remote settings)**:
 ```bash
-node scripts/backup-theme-config.js --pre-push
+node scripts/comprehensive-backup.js
 ```
 
-### Backup Files Created:
-- **Product Template**: `templates/product.backup.json` - With pickup-date block configured
-- **Theme Settings**: `theme-backups/settings_data.backup.json` - All theme customizer settings
-- **Settings Schema**: `theme-backups/settings_schema.backup.json` - Settings structure
-- **Timestamped Archives**: `theme-backups/*.bak` - Historical backups
-
-### Automatic Restoration
-
-When the theme configuration gets reset, I will restore everything:
+**Comprehensive Restore**:
 ```bash
-# Restore template only
-node scripts/check-and-restore-template.js
+# Restore templates and settings, sync to Shopify
+node scripts/comprehensive-restore.js --include-settings --sync
 
-# Restore template + theme settings
+# Restore templates only
+node scripts/comprehensive-restore.js
+
+# Basic restore (legacy)
 node scripts/check-and-restore-template.js --include-settings
 ```
 
-### Manual Backup/Restore:
+**Basic Backup (local files only)**:
 ```bash
-# Update all backups manually
 node scripts/backup-theme-config.js
-
-# Restore from backup
-node scripts/check-and-restore-template.js
 ```
 
-**Note to Claude**: 
-1. Always run backup script before major changes
-2. Run `node scripts/check-and-restore-template.js` when user mentions template/settings were reset
-3. Use `--include-settings` flag if theme settings were also reset
+### Backup Files Created:
+- **Remote Settings**: Downloaded from live Shopify theme before each push
+- **Product Template**: `templates/product.backup.json` - With all custom blocks
+- **Theme Settings**: `theme-backups/settings_data.backup.json` - All customizer settings
+- **Settings Schema**: `theme-backups/settings_schema.backup.json` - Settings structure
+- **Timestamped Archives**: `theme-backups/*.bak` - Historical backups with timestamps
 
-Last updated: 2025-08-08
+### Key Features:
+- **Automatic**: Runs on every staging push
+- **Comprehensive**: Backs up remote settings, not just local files
+- **Resilient**: Multiple fallback systems for restoration
+- **Verifying**: Checks for missing blocks (bulk pricing, preorder display)
+- **Syncing**: Automatically syncs restored settings back to Shopify
+
+**Note to Claude**: 
+1. Use `./push-to-staging.sh` for all staging deployments (includes full backup/restore)
+2. Run `node scripts/comprehensive-restore.js --include-settings --sync` if user mentions theme reset
+3. Check `theme-backups/` directory for timestamped backups if restoration fails
+
+Last updated: 2025-08-27
