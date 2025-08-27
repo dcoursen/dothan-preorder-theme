@@ -30,25 +30,34 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo ""
-echo "📥 Step 1: Backing up current customizations from Shopify..."
+echo "📥 Step 1: Backing up current LIVE customizations from Shopify..."
 
 # Create timestamped backup
 BACKUP_DIR="theme-backups/backup-$(date +%Y-%m-%d_%H-%M-%S)"
 mkdir -p "$BACKUP_DIR"
 
-# Pull current settings and templates for backup
+# Create a temporary directory for clean backup
+TEMP_BACKUP_DIR=$(mktemp -d)
+echo "🔄 Using temporary directory: $TEMP_BACKUP_DIR"
+
+# Pull current live settings into temp directory (completely clean)
+cd "$TEMP_BACKUP_DIR"
 shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
 
 if [ $? -eq 0 ]; then
-    # Copy the pulled files to our backup directory
-    cp config/settings_data.json "$BACKUP_DIR/" 2>/dev/null || echo "⚠️  settings_data.json not found"
-    cp templates/product.json "$BACKUP_DIR/" 2>/dev/null || echo "⚠️  product.json not found"
+    # Copy the CLEAN pulled files to our permanent backup directory
+    [ -f "config/settings_data.json" ] && cp "config/settings_data.json" "$OLDPWD/$BACKUP_DIR/"
+    [ -f "templates/product.json" ] && cp "templates/product.json" "$OLDPWD/$BACKUP_DIR/"
+    
+    cd "$OLDPWD"
     echo "✅ Live customizations backed up to $BACKUP_DIR/"
     
-    # Stash the pulled files so they don't interfere with push
-    git stash push -m "temp: stash pulled customizations for backup"
+    # Clean up temp directory
+    rm -rf "$TEMP_BACKUP_DIR"
 else
+    cd "$OLDPWD"
     echo "⚠️  Warning: Backup failed, proceeding with push only"
+    rm -rf "$TEMP_BACKUP_DIR"
 fi
 
 echo ""
