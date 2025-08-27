@@ -257,15 +257,15 @@
         
         {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
           {%- liquid
-            assign show_countdown = true
+            assign show_countdown_timer = true
             if settings.preorder_countdown_24h_only
               assign hours_until_drop = drop_timestamp | minus: now | divided_by: 3600
               if hours_until_drop > 24
-                assign show_countdown = false
+                assign show_countdown_timer = false
               endif
             endif
           -%}
-          {%- if show_countdown -%}
+          {%- if show_countdown_timer -%}
             <div class="preorder-display__countdown" 
                  data-target="{{ preorder_drop_date | date: '%s' }}"
                  style="font-size: {{ settings.preorder_countdown_font_size | default: 14 }}px; font-weight: {{ settings.preorder_countdown_font_weight | default: 'normal' }};">
@@ -276,7 +276,7 @@
     </div>
   </div>
 
-  {%- if settings.preorder_show_countdown and preorder_status == 'predrop' and show_countdown -%}
+  {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const countdownEl = document.querySelector('.preorder-display__countdown[data-target]');
