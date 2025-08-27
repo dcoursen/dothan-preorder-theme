@@ -1,309 +1,405 @@
 {% comment %}
-  Advanced Dothan Footer - Fixed version with proper column management
-  Features: Flexible columns (1-4), column positioning, all block types working
+  Dothan Footer - Now with flexible block system
+  Maintains existing design but uses configurable blocks
 {% endcomment %}
 
-<footer class="dothan-footer color-{{ section.settings.color_scheme }}"
-        style="background-color: {{ section.settings.background_color | default: '#f8f9fa' }};">
+<footer class="dothan-footer color-{{ section.settings.color_scheme }}">
   <div class="dothan-footer-container">
     <div class="dothan-footer-content" 
-         data-columns="{{ section.settings.columns | default: 3 }}">
+         data-columns="{{ section.settings.columns | default: 3 }}"
+         style="grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: {{ section.settings.column_gap | default: 60 }}px;">
       
-      {% comment %} Group blocks by column position {% endcomment %}
-      {% assign column_1_blocks = section.blocks | where: 'settings.column_position', '1' %}
-      {% assign column_2_blocks = section.blocks | where: 'settings.column_position', '2' %}
-      {% assign column_3_blocks = section.blocks | where: 'settings.column_position', '3' %}
-      {% assign column_4_blocks = section.blocks | where: 'settings.column_position', '4' %}
-      {% assign auto_blocks = section.blocks | where: 'settings.column_position', blank %}
-      
-      {% comment %} Render each column as a separate flexbox container {% endcomment %}
-      
-      {% comment %} Column 1 {% endcomment %}
-      {% if column_1_blocks.size > 0 %}
-        <div class="dothan-footer-column" data-column="1">
-          {% for block in column_1_blocks %}
-            {% render 'footer-block-renderer', block: block %}
-          {% endfor %}
+      {% for block in section.blocks %}
+        <div class="dothan-footer-section" 
+             id="block-{{ block.id }}"
+             {{ block.shopify_attributes }}>
+          
+          {% case block.type %}
+            
+            {% when 'business_info' %}
+              <div class="details-section">
+                {% if block.settings.show_logo %}
+                  <div class="dothan-logo">
+                    <div class="logo-box">
+                      <span class="logo-text-main">{{ block.settings.logo_text | default: 'DN' }}</span>
+                    </div>
+                    <div class="logo-text-sub">
+                      {{ block.settings.business_name | default: 'DOTHAN<br>NURSERIES' }}
+                    </div>
+                  </div>
+                {% endif %}
+                
+                <div class="dothan-details">
+                  {% if block.settings.heading != blank %}
+                    <h3>{{ block.settings.heading }}</h3>
+                  {% endif %}
+                  
+                  {% if block.settings.address != blank %}
+                    <div class="detail-item">
+                      <a href="{{ block.settings.maps_url | default: 'https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7' }}" target="_blank" class="address-link">
+                        {{ block.settings.address | newline_to_br }}
+                      </a>
+                    </div>
+                  {% endif %}
+                  
+                  {% if block.settings.phone != blank %}
+                    <div class="detail-item">
+                      <a href="tel:{{ block.settings.phone | replace: '.', '' | replace: ' ', '' }}" class="phone-link">{{ block.settings.phone }}</a>
+                      {% if block.settings.phone_2 != blank %}
+                        <br><a href="tel:{{ block.settings.phone_2 | replace: '.', '' | replace: ' ', '' }}" class="phone-link">{{ block.settings.phone_2 }}</a>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                  
+                  {% if block.settings.email != blank %}
+                    <div class="detail-item">
+                      <a href="mailto:{{ block.settings.email }}" class="email-link">
+                        {{ block.settings.email }}
+                      </a>
+                    </div>
+                  {% endif %}
+                  
+                  <!-- Social Media Icons -->
+                  <div class="social-icons">
+                    {% if block.settings.instagram_url != blank %}
+                      <a href="{{ block.settings.instagram_url }}" target="_blank" aria-label="Instagram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="currentColor"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    {% if block.settings.facebook_url != blank %}
+                      <a href="{{ block.settings.facebook_url }}" target="_blank" aria-label="Facebook">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="currentColor"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    {% if block.settings.youtube_url != blank %}
+                      <a href="{{ block.settings.youtube_url }}" target="_blank" aria-label="YouTube">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="currentColor"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    {% if block.settings.tiktok_url != blank %}
+                      <a href="{{ block.settings.tiktok_url }}" target="_blank" aria-label="TikTok">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" fill="currentColor"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+            {% when 'store_hours' %}
+              <div class="hours-section">
+                {% if block.settings.heading != blank %}
+                  <h3>{{ block.settings.heading }}</h3>
+                {% endif %}
+                <div class="hours-list">
+                  {% if block.settings.combine_weekdays %}
+                    <div class="hours-item">
+                      <span class="days">{{ block.settings.weekdays_label | default: 'Tuesday - Friday' }}:</span>
+                      <span class="times">{{ block.settings.tuesday | default: '9AM - 5PM' }}</span>
+                    </div>
+                  {% else %}
+                    {% if block.settings.monday != blank %}
+                      <div class="hours-item {% if block.settings.monday contains 'Closed' %}closed{% endif %}">
+                        <span class="days">Monday:</span>
+                        <span class="times">{{ block.settings.monday }}</span>
+                      </div>
+                    {% endif %}
+                    {% if block.settings.tuesday != blank %}
+                      <div class="hours-item {% if block.settings.tuesday contains 'Closed' %}closed{% endif %}">
+                        <span class="days">Tuesday:</span>
+                        <span class="times">{{ block.settings.tuesday }}</span>
+                      </div>
+                    {% endif %}
+                    {% if block.settings.wednesday != blank %}
+                      <div class="hours-item {% if block.settings.wednesday contains 'Closed' %}closed{% endif %}">
+                        <span class="days">Wednesday:</span>
+                        <span class="times">{{ block.settings.wednesday }}</span>
+                      </div>
+                    {% endif %}
+                    {% if block.settings.thursday != blank %}
+                      <div class="hours-item {% if block.settings.thursday contains 'Closed' %}closed{% endif %}">
+                        <span class="days">Thursday:</span>
+                        <span class="times">{{ block.settings.thursday }}</span>
+                      </div>
+                    {% endif %}
+                    {% if block.settings.friday != blank %}
+                      <div class="hours-item {% if block.settings.friday contains 'Closed' %}closed{% endif %}">
+                        <span class="days">Friday:</span>
+                        <span class="times">{{ block.settings.friday }}</span>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                  {% if block.settings.saturday != blank %}
+                    <div class="hours-item {% if block.settings.saturday contains 'Closed' %}closed{% endif %}">
+                      <span class="days">Saturday:</span>
+                      <span class="times">{{ block.settings.saturday }}</span>
+                    </div>
+                  {% endif %}
+                  {% if block.settings.sunday != blank and block.settings.monday != blank and block.settings.sunday contains 'Closed' and block.settings.monday contains 'Closed' %}
+                    <div class="hours-item closed">
+                      <span class="days">Sunday & Monday:</span>
+                      <span class="times">Closed</span>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+            {% when 'policy_links' %}
+              <div class="policy-section">
+                {% if block.settings.heading != blank %}
+                  <h3>{{ block.settings.heading }}</h3>
+                {% endif %}
+                <div class="policy-links">
+                  {% if block.settings.warranty_url != blank %}
+                    <a href="{{ block.settings.warranty_url }}" target="_blank">{{ block.settings.warranty_text | default: 'Warranty' }}</a>
+                  {% endif %}
+                  {% if block.settings.shipping_url != blank %}
+                    <a href="{{ block.settings.shipping_url }}" target="_blank">{{ block.settings.shipping_text | default: 'Shipping' }}</a>
+                  {% endif %}
+                  {% if block.settings.returns_url != blank %}
+                    <a href="{{ block.settings.returns_url }}" target="_blank">{{ block.settings.returns_text | default: 'Returns' }}</a>
+                  {% endif %}
+                </div>
+              </div>
+            
+            {% when 'google_reviews' %}
+              <div class="review-section">
+                {% if block.settings.heading != blank %}
+                  <h4>{{ block.settings.heading }}</h4>
+                {% endif %}
+                <div class="review-icons">
+                  {% if block.settings.google_reviews_url != blank %}
+                    <a href="{{ block.settings.google_reviews_url }}" target="_blank" aria-label="Google Reviews">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                      </svg>
+                    </a>
+                  {% endif %}
+                  {% if block.settings.yelp_url != blank %}
+                    <a href="{{ block.settings.yelp_url }}" target="_blank" aria-label="Yelp Reviews">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12.017 0C6.396 0 1.807 4.589 1.807 10.21 1.807 15.831 6.396 20.42 12.017 20.42c5.621 0 10.21-4.589 10.21-10.21C22.227 4.589 17.638.001 12.017.001zm0 18.655c-4.666 0-8.445-3.779-8.445-8.445s3.779-8.444 8.445-8.444 8.445 3.778 8.445 8.444-3.779 8.445-8.445 8.445z" fill="#D32323"/>
+                        <path d="M15.108 8.717l-2.29.924-1.516-1.516.924-2.29c.152-.376.076-.808-.19-1.074l-.951-.951c-.342-.342-.895-.342-1.237 0l-.951.951c-.266.266-.342.698-.19 1.074l.924 2.29-1.516 1.516-2.29-.924c-.376-.152-.808-.076-1.074.19l-.951.951c-.342.342-.342.895 0 1.237l.951.951c.266.266.698.342 1.074.19l2.29-.924 1.516 1.516-.924 2.29c-.152.376-.076.808.19 1.074l.951.951c.342.342.895.342 1.237 0l.951-.951c.266-.266.342-.698.19-1.074l-.924-2.29 1.516-1.516 2.29.924c.376.152.808.076 1.074-.19l.951-.951c.342-.342.342-.895 0-1.237l-.951-.951c-.266-.266-.698-.342-1.074-.19z" fill="#D32323"/>
+                      </svg>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+              
+          {% endcase %}
         </div>
-      {% endif %}
-      
-      {% comment %} Column 2 {% endcomment %}
-      {% if column_2_blocks.size > 0 %}
-        <div class="dothan-footer-column" data-column="2">
-          {% for block in column_2_blocks %}
-            {% render 'footer-block-renderer', block: block %}
-          {% endfor %}
-        </div>
-      {% endif %}
-      
-      {% comment %} Column 3 {% endcomment %}
-      {% if column_3_blocks.size > 0 %}
-        <div class="dothan-footer-column" data-column="3">
-          {% for block in column_3_blocks %}
-            {% render 'footer-block-renderer', block: block %}
-          {% endfor %}
-        </div>
-      {% endif %}
-      
-      {% comment %} Column 4 {% endcomment %}
-      {% if column_4_blocks.size > 0 %}
-        <div class="dothan-footer-column" data-column="4">
-          {% for block in column_4_blocks %}
-            {% render 'footer-block-renderer', block: block %}
-          {% endfor %}
-        </div>
-      {% endif %}
-      
-      {% comment %} Auto-positioned blocks {% endcomment %}
-      {% if auto_blocks.size > 0 %}
-        <div class="dothan-footer-column" data-column="auto">
-          {% for block in auto_blocks %}
-            {% render 'footer-block-renderer', block: block %}
-          {% endfor %}
-        </div>
-      {% endif %}
+      {% endfor %}
+    </div>
 
     {% if section.settings.show_copyright %}
+      <!-- Copyright Section -->
       <div class="dothan-footer-bottom">
-        <p>{{ section.settings.copyright_text | default: '© ' | append: 'now' | date: '%Y' | append: ' ' | append: shop.name | append: '. All rights reserved.' }}{% if section.settings.main_website_url %} | <a href="{{ section.settings.main_website_url }}" target="_blank">{{ section.settings.main_website_text | default: 'Visit our main website' }}</a>{% endif %}</p>
+        <p>{{ section.settings.copyright_text | default: '&copy; ' | append: 'now' | date: '%Y' | append: ' ' | append: shop.name | append: '. All rights reserved.' }}{% if section.settings.main_website_url %} | <a href="{{ section.settings.main_website_url }}" target="_blank">{{ section.settings.main_website_text | default: 'Visit our main website' }}</a>{% endif %}</p>
       </div>
     {% endif %}
+    </div>
   </div>
 </footer>
 
 <style>
   .dothan-footer {
-    background-color: #f8f9fa;
-    border-top: 1px solid #e9ecef;
-    padding: 48px 0 24px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #495057;
-    font-size: 14px;
+    background-color: {{ section.settings.background_color | default: '#f8f9fa' }};
+    border-top: {{ section.settings.border_width | default: 1 }}px solid {{ section.settings.border_color | default: '#e9ecef' }};
+    padding: {{ section.settings.padding_top | default: 60 }}px 0 {{ section.settings.padding_bottom | default: 30 }}px;
+    margin-top: auto;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: {{ section.settings.text_color | default: '#495057' }};
   }
 
   .dothan-footer-container {
-    max-width: 1200px;
+    max-width: {{ section.settings.container_width | default: 1200 }}px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
   }
 
   .dothan-footer-content {
-    display: flex;
-    gap: {{ section.settings.column_gap | default: 50 }}px;
-    margin-bottom: 32px;
-    align-items: flex-start;
-    justify-content: space-between;
+    display: grid;
+    margin-bottom: 40px;
   }
 
-  /* Individual column containers */
-  .dothan-footer-column {
-    flex: 1;
+  /* Logo Section */
+  .details-section {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 30px;
   }
 
-  /* Stack blocks in same column vertically */
-  .dothan-footer-section {
-    margin-bottom: 0; /* Remove margin since we use gap on parent */
-  }
-
-  .dothan-footer-section h3 {
-    color: #6c757d;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 16px 0;
-  }
-
-  /* Contact Us Section */
   .dothan-logo {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 15px;
+    margin-bottom: 20px;
   }
 
   .logo-box {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
     background-color: #333;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 24px;
     border-radius: 4px;
   }
 
   .logo-text-sub {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: bold;
     line-height: 1.2;
     color: #333;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
   }
 
-  .contact-item {
-    margin-bottom: 8px;
-    color: #495057;
-    line-height: 1.4;
+  /* Details Section */
+  .dothan-details h3 {
+    color: #6c757d;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
-  .contact-item a {
+  .detail-item {
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+
+  .detail-item a {
     color: #495057;
     text-decoration: none;
+    transition: color 0.3s ease;
   }
 
-  .contact-item a:hover {
+  .detail-item a:hover {
+    color: #28a745;
     text-decoration: underline;
   }
 
-  /* Store Hours */
-  .hours-list {
+  .address-link {
+    display: block;
+  }
+
+  .social-icons {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .social-icons a {
+    color: #6c757d;
+    transition: color 0.3s ease;
+  }
+
+  .social-icons a:hover {
+    color: #28a745;
+  }
+
+  /* Store Hours Section */
+  .hours-section h3 {
+    color: #6c757d;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   .hours-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    margin-bottom: 12px;
+    color: #495057;
   }
 
-  .hours-item .day {
+  .hours-item.closed {
+    color: #6c757d;
+  }
+
+  .days {
     font-weight: 500;
   }
 
-  .hours-item .time {
+  .times {
     color: #6c757d;
   }
 
-  .hours-item.closed .time {
+  /* Store Policy Section */
+  .policy-section h3 {
     color: #6c757d;
-    font-style: italic;
-  }
-
-  /* Reviews Section */
-  .reviews-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .review-platform {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 16px;
-    background: white;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-  }
-
-  .review-platform:hover {
-    background: #f8f9fa;
-    border-color: #dee2e6;
-  }
-
-  .review-header {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .review-platform-info {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .review-platform-logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .platform-name {
-    font-weight: 600;
-    color: #333;
-  }
-
-  .review-rating {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .stars {
-    color: #ffc107;
-    font-size: 14px;
-  }
-
-  .rating-text {
-    font-size: 13px;
-    color: #6c757d;
-    font-weight: 500;
-  }
-
-  .review-link {
-    display: inline-block;
-    color: #007bff;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 4px 0;
-  }
-
-  .review-link:hover {
-    color: #0056b3;
-    text-decoration: none;
-  }
-
-  /* Social Media */
-  .social-icons {
-    display: flex;
-    gap: 16px;
-  }
-
-  .social-icon {
-    color: #6c757d;
-    transition: color 0.2s;
-  }
-
-  .social-icon:hover {
-    color: #333;
-  }
-
-  /* Policies */
-  .policy-links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   .policy-links a {
     color: #495057;
     text-decoration: none;
+    transition: color 0.3s ease;
   }
 
   .policy-links a:hover {
+    color: #28a745;
     text-decoration: underline;
   }
 
-  /* Copyright */
+  .review-section {
+    margin-top: 30px;
+  }
+
+  .review-section h4 {
+    color: #6c757d;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .review-icons {
+    display: flex;
+    gap: 15px;
+  }
+
+  .review-icons a {
+    color: #6c757d;
+    transition: color 0.3s ease;
+  }
+
+  .review-icons a:hover {
+    color: #28a745;
+  }
+
+  /* Copyright Section */
   .dothan-footer-bottom {
     border-top: 1px solid #e9ecef;
-    padding-top: 24px;
+    padding-top: 20px;
     text-align: center;
   }
 
   .dothan-footer-bottom p {
     margin: 0;
     color: #6c757d;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .dothan-footer-bottom a {
@@ -312,49 +408,71 @@
   }
 
   .dothan-footer-bottom a:hover {
+    color: #28a745;
     text-decoration: underline;
   }
 
   /* Responsive Design */
   @media (max-width: 968px) {
     .dothan-footer-content {
-      flex-wrap: wrap;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
     }
-    
-    .dothan-footer-column {
-      flex-basis: calc(50% - 24px);
-      min-width: 250px;
+
+    .policy-section {
+      grid-column: span 2;
+      text-align: center;
     }
   }
 
   @media (max-width: 640px) {
     .dothan-footer {
-      padding: 32px 0 16px;
+      padding: 40px 0 20px;
     }
-    
+
     .dothan-footer-content {
-      flex-direction: column;
-      gap: 32px;
+      grid-template-columns: 1fr;
+      gap: 40px;
     }
-    
-    .dothan-footer-column {
-      flex-basis: auto;
-      min-width: auto;
+
+    .policy-section {
+      grid-column: span 1;
     }
-    
-    .review-header {
+
+    .dothan-logo {
+      justify-content: center;
+    }
+
+    .hours-section,
+    .policy-section {
       text-align: center;
     }
-    
-    .social-icons {
+
+    .social-icons,
+    .review-icons {
       justify-content: center;
+    }
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 968px) {
+    .dothan-footer-content {
+      grid-template-columns: repeat({{ section.settings.columns_tablet | default: 2 }}, 1fr) !important;
+      gap: 40px !important;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .dothan-footer-content {
+      grid-template-columns: 1fr !important;
+      gap: 40px !important;
     }
   }
 </style>
 
 {% schema %}
 {
-  "name": "Advanced Dothan Footer",
+  "name": "Dothan Footer",
   "tag": "footer",
   "class": "section-dothan-footer",
   "settings": [
@@ -363,28 +481,22 @@
       "content": "Layout Settings"
     },
     {
-      "type": "select",
+      "type": "range",
       "id": "columns",
-      "label": "Number of Columns",
-      "options": [
-        {
-          "value": "1",
-          "label": "1 Column"
-        },
-        {
-          "value": "2",
-          "label": "2 Columns"
-        },
-        {
-          "value": "3",
-          "label": "3 Columns"
-        },
-        {
-          "value": "4",
-          "label": "4 Columns"
-        }
-      ],
-      "default": "3"
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Desktop Columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Tablet Columns",
+      "default": 2
     },
     {
       "type": "range",
@@ -394,7 +506,17 @@
       "step": 10,
       "unit": "px",
       "label": "Column Gap",
-      "default": 50
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 1000,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Container Width",
+      "default": 1200
     },
     {
       "type": "header",
@@ -413,6 +535,54 @@
       "default": "#f8f9fa"
     },
     {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#495057"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#6c757d"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Top Border Width",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#e9ecef"
+    },
+    {
       "type": "header",
       "content": "Copyright Settings"
     },
@@ -425,7 +595,8 @@
     {
       "type": "text",
       "id": "copyright_text",
-      "label": "Copyright Text"
+      "label": "Copyright Text",
+      "default": "© 2024 Dothan Nurseries. All rights reserved."
     },
     {
       "type": "url",
@@ -435,25 +606,25 @@
     {
       "type": "text",
       "id": "main_website_text",
-      "label": "Main Website Text",
+      "label": "Main Website Link Text",
       "default": "Visit our main website"
     }
   ],
   "blocks": [
     {
-      "type": "contact_us",
-      "name": "Contact Us",
+      "type": "business_info",
+      "name": "Business Info",
       "settings": [
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "CONTACT US"
+          "default": "VISIT US"
         },
         {
           "type": "checkbox",
           "id": "show_logo",
-          "label": "Show Logo",
+          "label": "Show Logo/Brand",
           "default": true
         },
         {
@@ -463,345 +634,39 @@
           "default": "DN"
         },
         {
-          "type": "textarea",
+          "type": "text",
           "id": "business_name",
           "label": "Business Name",
-          "default": "DOTHAN\nNURSERIES"
+          "default": "DOTHAN<br>NURSERIES"
         },
         {
           "type": "textarea",
           "id": "address",
           "label": "Address",
-          "default": "1300 Montgomery Hwy\nDothan, AL 36303"
+          "default": "1300 Montgomery Hwy<br>Dothan, AL 36303"
+        },
+        {
+          "type": "url",
+          "id": "maps_url",
+          "label": "Google Maps URL"
+        },
+        {
+          "type": "text",
+          "id": "phone",
+          "label": "Primary Phone",
+          "default": "334.793.6244"
+        },
+        {
+          "type": "text",
+          "id": "phone_2",
+          "label": "Secondary Phone",
+          "default": "334.794.3480"
         },
         {
           "type": "text",
           "id": "email",
-          "label": "Email",
-          "default": "office@dothannursery.com"
-        },
-        {
-          "type": "header",
-          "content": "Block Position"
-        },
-        {
-          "type": "select",
-          "id": "column_position",
-          "label": "Column Position",
-          "options": [
-            {
-              "value": "",
-              "label": "Auto"
-            },
-            {
-              "value": "1",
-              "label": "Column 1"
-            },
-            {
-              "value": "2",
-              "label": "Column 2"
-            },
-            {
-              "value": "3",
-              "label": "Column 3"
-            },
-            {
-              "value": "4",
-              "label": "Column 4"
-            }
-          ],
-          "default": ""
-        }
-      ]
-    },
-    {
-      "type": "store_hours",
-      "name": "Store Hours",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "STORE HOURS"
-        },
-        {
-          "type": "header",
-          "content": "Individual Days (Enable days you want to show)"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_monday",
-          "label": "Show Monday",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "monday_hours",
-          "label": "Monday Hours",
-          "default": "Closed"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_tuesday",
-          "label": "Show Tuesday",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "tuesday_hours",
-          "label": "Tuesday Hours",
-          "default": "9AM - 5PM"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_wednesday",
-          "label": "Show Wednesday",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "wednesday_hours",
-          "label": "Wednesday Hours",
-          "default": "9AM - 5PM"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_thursday",
-          "label": "Show Thursday",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "thursday_hours",
-          "label": "Thursday Hours",
-          "default": "9AM - 5PM"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_friday",
-          "label": "Show Friday",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "friday_hours",
-          "label": "Friday Hours",
-          "default": "9AM - 5PM"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_saturday",
-          "label": "Show Saturday",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "saturday_hours",
-          "label": "Saturday Hours",
-          "default": "9AM - 4PM"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_sunday",
-          "label": "Show Sunday",
-          "default": false
-        },
-        {
-          "type": "text",
-          "id": "sunday_hours",
-          "label": "Sunday Hours",
-          "default": "Closed"
-        },
-        {
-          "type": "header",
-          "content": "Combined Hours (Alternative to individual days)"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_weekday_combined",
-          "label": "Show Combined Weekdays",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "weekday_range",
-          "label": "Weekday Range Label",
-          "default": "Tuesday - Friday"
-        },
-        {
-          "type": "text",
-          "id": "weekday_hours",
-          "label": "Weekday Hours",
-          "default": "9AM - 5PM"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_closed_combined",
-          "label": "Show Combined Closed Days",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "closed_days",
-          "label": "Closed Days Label",
-          "default": "Sunday & Monday"
-        },
-        {
-          "type": "header",
-          "content": "Block Position"
-        },
-        {
-          "type": "select",
-          "id": "column_position",
-          "label": "Column Position",
-          "options": [
-            {
-              "value": "",
-              "label": "Auto"
-            },
-            {
-              "value": "1",
-              "label": "Column 1"
-            },
-            {
-              "value": "2",
-              "label": "Column 2"
-            },
-            {
-              "value": "3",
-              "label": "Column 3"
-            },
-            {
-              "value": "4",
-              "label": "Column 4"
-            }
-          ],
-          "default": ""
-        }
-      ]
-    },
-    {
-      "type": "reviews",
-      "name": "Reviews",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "REVIEWS"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_google_reviews",
-          "label": "Show Google Reviews",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "google_rating",
-          "label": "Google Rating",
-          "default": "4.9"
-        },
-        {
-          "type": "text",
-          "id": "google_count",
-          "label": "Google Review Count",
-          "default": "568"
-        },
-        {
-          "type": "url",
-          "id": "google_review_url",
-          "label": "Google Review URL"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_yelp_reviews",
-          "label": "Show Yelp Reviews",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "yelp_rating",
-          "label": "Yelp Rating",
-          "default": "4.9"
-        },
-        {
-          "type": "text",
-          "id": "yelp_count",
-          "label": "Yelp Review Count",
-          "default": "9"
-        },
-        {
-          "type": "url",
-          "id": "yelp_review_url",
-          "label": "Yelp Review URL"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_facebook_reviews",
-          "label": "Show Facebook Reviews",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "facebook_rating",
-          "label": "Facebook Rating",
-          "default": "4.9"
-        },
-        {
-          "type": "text",
-          "id": "facebook_count",
-          "label": "Facebook Review Count",
-          "default": "311"
-        },
-        {
-          "type": "url",
-          "id": "facebook_review_url",
-          "label": "Facebook Review URL"
-        },
-        {
-          "type": "header",
-          "content": "Block Position"
-        },
-        {
-          "type": "select",
-          "id": "column_position",
-          "label": "Column Position",
-          "options": [
-            {
-              "value": "",
-              "label": "Auto"
-            },
-            {
-              "value": "1",
-              "label": "Column 1"
-            },
-            {
-              "value": "2",
-              "label": "Column 2"
-            },
-            {
-              "value": "3",
-              "label": "Column 3"
-            },
-            {
-              "value": "4",
-              "label": "Column 4"
-            }
-          ],
-          "default": ""
-        }
-      ]
-    },
-    {
-      "type": "social_media",
-      "name": "Follow Us",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "FOLLOW US"
+          "label": "Email Address",
+          "default": "orders@dothannursery.com"
         },
         {
           "type": "url",
@@ -822,50 +687,84 @@
           "type": "url",
           "id": "tiktok_url",
           "label": "TikTok URL"
-        },
-        {
-          "type": "header",
-          "content": "Block Position"
-        },
-        {
-          "type": "select",
-          "id": "column_position",
-          "label": "Column Position",
-          "options": [
-            {
-              "value": "",
-              "label": "Auto"
-            },
-            {
-              "value": "1",
-              "label": "Column 1"
-            },
-            {
-              "value": "2",
-              "label": "Column 2"
-            },
-            {
-              "value": "3",
-              "label": "Column 3"
-            },
-            {
-              "value": "4",
-              "label": "Column 4"
-            }
-          ],
-          "default": ""
         }
       ]
     },
     {
-      "type": "policies",
-      "name": "Policies",
+      "type": "store_hours",
+      "name": "Store Hours",
       "settings": [
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "POLICIES"
+          "default": "HOURS"
+        },
+        {
+          "type": "text",
+          "id": "monday",
+          "label": "Monday",
+          "default": "Closed"
+        },
+        {
+          "type": "text",
+          "id": "tuesday",
+          "label": "Tuesday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "wednesday",
+          "label": "Wednesday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "thursday",
+          "label": "Thursday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "friday",
+          "label": "Friday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "saturday",
+          "label": "Saturday",
+          "default": "9AM - 4PM"
+        },
+        {
+          "type": "text",
+          "id": "sunday",
+          "label": "Sunday",
+          "default": "Closed"
+        },
+        {
+          "type": "checkbox",
+          "id": "combine_weekdays",
+          "label": "Combine Weekdays (Tues-Fri)",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "weekdays_label",
+          "label": "Weekdays Label",
+          "default": "Tuesday - Friday"
+        }
+      ]
+    },
+    {
+      "type": "policy_links",
+      "name": "Policy Links",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "STORE POLICY"
         },
         {
           "type": "url",
@@ -875,110 +774,98 @@
         {
           "type": "text",
           "id": "warranty_text",
-          "label": "Warranty Text",
+          "label": "Warranty Link Text",
           "default": "Warranty"
         },
         {
           "type": "url",
-          "id": "privacy_url",
-          "label": "Privacy URL"
+          "id": "shipping_url",
+          "label": "Shipping URL"
         },
         {
           "type": "text",
-          "id": "privacy_text",
-          "label": "Privacy Text",
-          "default": "Privacy"
+          "id": "shipping_text",
+          "label": "Shipping Link Text",
+          "default": "Shipping"
         },
         {
           "type": "url",
-          "id": "terms_url",
-          "label": "Terms URL"
+          "id": "returns_url",
+          "label": "Returns URL"
         },
         {
           "type": "text",
-          "id": "terms_text",
-          "label": "Terms Text",
-          "default": "Terms of Service"
+          "id": "returns_text",
+          "label": "Returns Link Text",
+          "default": "Returns"
+        }
+      ]
+    },
+    {
+      "type": "google_reviews",
+      "name": "Google Reviews",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "LEAVE US A REVIEW"
         },
         {
-          "type": "header",
-          "content": "Block Position"
+          "type": "url",
+          "id": "google_reviews_url",
+          "label": "Google Reviews URL"
         },
         {
-          "type": "select",
-          "id": "column_position",
-          "label": "Column Position",
-          "options": [
-            {
-              "value": "",
-              "label": "Auto"
-            },
-            {
-              "value": "1",
-              "label": "Column 1"
-            },
-            {
-              "value": "2",
-              "label": "Column 2"
-            },
-            {
-              "value": "3",
-              "label": "Column 3"
-            },
-            {
-              "value": "4",
-              "label": "Column 4"
-            }
-          ],
-          "default": ""
+          "type": "url",
+          "id": "yelp_url",
+          "label": "Yelp Reviews URL"
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "Advanced Dothan Footer",
+      "name": "Dothan Footer",
       "blocks": [
         {
-          "type": "contact_us",
+          "type": "business_info",
           "settings": {
-            "heading": "CONTACT US",
+            "heading": "VISIT US",
             "show_logo": true,
             "logo_text": "DN",
-            "business_name": "DOTHAN\nNURSERIES",
-            "address": "1300 Montgomery Hwy\nDothan, AL 36303",
-            "email": "office@dothannursery.com",
-            "column_position": "1"
+            "business_name": "DOTHAN<br>NURSERIES",
+            "address": "1300 Montgomery Hwy<br>Dothan, AL 36303",
+            "phone": "334.793.6244",
+            "phone_2": "334.794.3480",
+            "email": "orders@dothannursery.com"
           }
         },
         {
           "type": "store_hours",
           "settings": {
-            "heading": "STORE HOURS",
-            "show_weekday_combined": true,
-            "weekday_range": "Tuesday - Friday",
-            "weekday_hours": "9AM - 5PM",
-            "show_saturday": true,
-            "saturday_hours": "9AM - 4PM",
-            "show_closed_combined": true,
-            "closed_days": "Sunday & Monday",
-            "column_position": "2"
+            "heading": "HOURS",
+            "monday": "Closed",
+            "tuesday": "9AM - 5PM",
+            "wednesday": "9AM - 5PM",
+            "thursday": "9AM - 5PM",
+            "friday": "9AM - 5PM",
+            "saturday": "9AM - 4PM",
+            "sunday": "Closed",
+            "combine_weekdays": true,
+            "weekdays_label": "Tuesday - Friday"
           }
         },
         {
-          "type": "reviews",
+          "type": "policy_links",
           "settings": {
-            "heading": "REVIEWS",
-            "show_google_reviews": true,
-            "google_rating": "4.9",
-            "google_count": "568",
-            "show_yelp_reviews": true,
-            "yelp_rating": "4.9",
-            "yelp_count": "9",
-            "show_facebook_reviews": true,
-            "facebook_rating": "4.9",
-            "facebook_count": "311",
-            "column_position": "3"
+            "heading": "STORE POLICY"
+          }
+        },
+        {
+          "type": "google_reviews",
+          "settings": {
+            "heading": "LEAVE US A REVIEW"
           }
         }
       ]
