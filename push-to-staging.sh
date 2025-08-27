@@ -95,46 +95,9 @@ echo ""
 echo "✅ Successfully pushed to staging!"
 echo "📝 Git commit: $(git log -1 --oneline)"
     
-    # Allow theme to settle before restoration
-    echo "⏳ Waiting for theme to settle..."
-    sleep 3
-    
-    # Comprehensive restoration of theme settings and configuration
-    echo "🔧 Restoring theme configuration..."
-    
-    if [ -f "scripts/comprehensive-restore.js" ]; then
-        node scripts/comprehensive-restore.js --include-settings --sync
-        if [ $? -eq 0 ]; then
-            echo "✅ Theme configuration restored and synchronized"
-        else
-            echo "⚠️  Warning: Comprehensive restoration had issues, trying fallback..."
-            
-            # Fallback to basic restoration
-            if [ -f "scripts/check-and-restore-template.js" ]; then
-                node scripts/check-and-restore-template.js --include-settings
-                if [ $? -eq 0 ]; then
-                    echo "✅ Basic restoration completed"
-                    
-                    # Try to sync settings
-                    echo "📤 Syncing settings..."
-                    shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json
-                    if [ $? -eq 0 ]; then
-                        echo "✅ Settings synchronized"
-                    fi
-                fi
-            fi
-        fi
-    else
-        echo "⚠️  Warning: Comprehensive restore script not found, using fallback..."
-        
-        # Fallback to basic restoration
-        if [ -f "scripts/check-and-restore-template.js" ]; then
-            node scripts/check-and-restore-template.js --include-settings
-            echo "✅ Basic restoration completed"
-        else
-            echo "⚠️  Warning: No restore script found"
-        fi
-    fi
+    # Skip restoration to preserve block orders and settings during development
+    echo "⚠️  Skipping restoration to preserve current block order and settings"
+    echo "💡 Block order and theme settings are maintained as-is"
     
     echo ""
     echo "🌐 Preview: https://vzgxcj-h9.myshopify.com/?preview_theme_id=143188983970"
