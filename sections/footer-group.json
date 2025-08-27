@@ -54,20 +54,12 @@
             "warranty_url": "https://www.dothannurseries.com/happiness-gurantee",
             "warranty_text": "Warranty"
           }
-        },
-        "google_reviews_block": {
-          "type": "google_reviews",
-          "settings": {
-            "heading": "LEAVE US A REVIEW",
-            "google_reviews_url": "https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7"
-          }
         }
       },
       "block_order": [
         "business_info_block",
         "store_hours_block",
-        "policy_links_block",
-        "google_reviews_block"
+        "policy_links_block"
       ],
       "settings": {
         "columns": 3,
