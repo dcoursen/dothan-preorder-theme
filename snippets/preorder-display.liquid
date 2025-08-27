@@ -43,11 +43,26 @@
       assign note_text = settings.preorder_predrop_note | default: 'Pickup your preorders in store beginning: {pickup_date}'
       assign show_display = true
       
-    elsif preorder_close_date != blank
-      assign close_timestamp = preorder_close_date | date: '%s'
+    elsif now >= drop_timestamp
+      # After drop date - check if we have a close date
+      if preorder_close_date != blank
+        assign close_timestamp = preorder_close_date | date: '%s'
+        assign is_closed = now > close_timestamp
+      else
+        # No close date means preorder stays open indefinitely
+        assign is_closed = false
+      endif
       
-      if now >= drop_timestamp and now <= close_timestamp
-        # Preorder window is open
+      if is_closed
+        # CLOSED STAGE - After Preorder Window Closes
+        assign preorder_status = 'closed'
+        assign badge_text = settings.preorder_closed_badge | default: 'Preorder'
+        assign title_text = settings.preorder_closed_title | default: 'Ordering Closed'
+        assign message_text = settings.preorder_closed_message | default: 'Ordering for this product closed {close_date}'
+        assign note_text = settings.preorder_closed_note | default: 'Contact us for future availability'
+        assign show_display = true
+      else
+        # Preorder window is open - check stock
         if stock > 0 and is_available
           # LIVE STAGE - Preorders Open (In Stock)
           assign preorder_status = 'live'
@@ -65,14 +80,6 @@
           assign note_text = settings.preorder_soldout_note | default: 'Check back later or contact us for availability'
           assign show_display = true
         endif
-      elsif now > close_timestamp
-        # CLOSED STAGE - After Preorder Window Closes
-        assign preorder_status = 'closed'
-        assign badge_text = settings.preorder_closed_badge | default: 'Preorder'
-        assign title_text = settings.preorder_closed_title | default: 'Ordering Closed'
-        assign message_text = settings.preorder_closed_message | default: 'Ordering for this product closed {close_date}'
-        assign note_text = settings.preorder_closed_note | default: 'Contact us for future availability'
-        assign show_display = true
       endif
     endif
   endif
