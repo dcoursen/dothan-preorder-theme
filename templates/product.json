@@ -152,10 +152,15 @@
                     "padding-inline-end": 0
                   },
                   "blocks": {}
+                },
+                "pickup_date_block": {
+                  "type": "pickup-date",
+                  "settings": {}
                 }
               },
               "block_order": [
                 "text_xrnftG",
+                "pickup_date_block",
                 "price_tVjtKg"
               ]
             },
