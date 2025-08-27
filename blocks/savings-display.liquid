@@ -22,49 +22,51 @@
     margin: 8px 0;
   ">
     
-    <!-- Tag Icon (diamond shaped like sample) -->
+    <!-- Green Square Tag Icon -->
     <div style="
       background: {{ block.settings.icon_background_color | default: '#28a745' }};
       border-radius: 3px;
-      padding: 6px;
+      padding: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 24px;
-      min-height: 24px;
-      transform: rotate(45deg);
+      min-width: 20px;
+      min-height: 20px;
+      flex-shrink: 0;
     ">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="white" style="transform: rotate(-45deg);">
-        <path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L15,1H5C3.89,1 3,1.89 3,3V21C3,22.11 3.89,23 5,23H19C20.11,23 21,22.11 21,21V9M19,9H14V4H19V9Z"/>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+        <path d="M5.5 7A1.5 1.5 0 0 1 4 5.5A1.5 1.5 0 0 1 5.5 4A1.5 1.5 0 0 1 7 5.5A1.5 1.5 0 0 1 5.5 7M21.41 11.58L12.41 2.58C12.05 2.22 11.55 2 11 2H4C2.9 2 2 2.9 2 4V11C2 11.55 2.22 12.05 2.59 12.42L11.58 21.41C11.95 21.78 12.45 22 13 22S14.05 21.78 14.41 21.41L21.41 14.41C21.78 14.05 22 13.55 22 13S21.78 11.95 21.41 11.58Z"/>
       </svg>
     </div>
 
-    <!-- Single Line Text Content -->
-    <span style="
-      color: {{ block.settings.text_color | default: '#333' }};
-      font-weight: {{ block.settings.label_font_weight | default: '600' }};
-      {% case block.settings.text_transform %}
-        {% when 'uppercase' %}text-transform: uppercase;
-        {% when 'lowercase' %}text-transform: lowercase;
-        {% when 'capitalize' %}text-transform: capitalize;
-      {% endcase %}
-    ">
-      {{ block.settings.label_text | default: 'Bulk Savings' }}
-    </span>
-    
-    <span id="discount-text-{{ section.id }}" 
-          data-product-text="{{ product_text }}" 
-          style="
-            color: {{ block.settings.discount_text_color | default: '#666' }};
-            font-weight: {{ block.settings.discount_font_weight | default: '400' }};
-            margin-left: 4px;
-          ">
-      {% if v and v.metafields.custom.variant_only_discount_text != blank %}
-        {{ v.metafields.custom.variant_only_discount_text }}
-      {% elsif product_text != blank %}
-        {{ product_text }}
-      {% endif %}
-    </span>
+    <!-- Single Line Text - Label and Discount together -->
+    <div style="display: flex; align-items: center; white-space: nowrap;">
+      <span style="
+        color: {{ block.settings.text_color | default: '#333' }};
+        font-weight: {{ block.settings.label_font_weight | default: '600' }};
+        margin-right: 8px;
+        {% case block.settings.text_transform %}
+          {% when 'uppercase' %}text-transform: uppercase;
+          {% when 'lowercase' %}text-transform: lowercase;
+          {% when 'capitalize' %}text-transform: capitalize;
+        {% endcase %}
+      ">
+        {{ block.settings.label_text | default: 'Bulk Savings' }}
+      </span>
+      
+      <span id="discount-text-{{ section.id }}" 
+            data-product-text="{{ product_text }}" 
+            style="
+              color: {{ block.settings.discount_text_color | default: '#666' }};
+              font-weight: {{ block.settings.discount_font_weight | default: '400' }};
+            ">
+        {% if v and v.metafields.custom.variant_only_discount_text != blank %}
+          {{ v.metafields.custom.variant_only_discount_text }}
+        {% elsif product_text != blank %}
+          {{ product_text }}
+        {% endif %}
+      </span>
+    </div>
   </div>
 </div>
 
