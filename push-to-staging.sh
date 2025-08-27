@@ -36,51 +36,47 @@ echo "📥 Step 1: Backing up current LIVE customizations from Shopify..."
 BACKUP_DIR="theme-backups/backup-$(date +%Y-%m-%d_%H-%M-%S)"
 mkdir -p "$BACKUP_DIR"
 
-# Store the current directory
-ORIGINAL_DIR=$(pwd)
+# Backup current local files first (in case pull overwrites them)
+echo "💾 Backing up current local files..."
+[ -f "config/settings_data.json" ] && cp "config/settings_data.json" "config/settings_data.local.backup"
+[ -f "templates/product.json" ] && cp "templates/product.json" "templates/product.local.backup"
 
-# Create a temporary directory for clean backup
-TEMP_BACKUP_DIR=$(mktemp -d)
-echo "🔄 Using temporary directory: $TEMP_BACKUP_DIR"
-
-# Pull current live settings into temp directory (completely clean)
-cd "$TEMP_BACKUP_DIR"
-echo "🔍 Debug: Pulling files in temp directory..."
+# Pull current live settings (this will overwrite local files)
+echo "🔄 Pulling current live settings from Shopify..."
 shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
 
-echo "🔍 Debug: Contents of temp directory after pull:"
-find . -name "*.json" | head -10
-
 if [ $? -eq 0 ]; then
-    # Copy the CLEAN pulled files to our permanent backup directory
-    echo "🔍 Debug: Copying files to backup..."
+    # Copy the pulled files to our backup directory
+    echo "🔍 Copying pulled files to permanent backup..."
     if [ -f "config/settings_data.json" ]; then
-        cp "config/settings_data.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
-        echo "   ✅ Copied settings_data.json"
+        cp "config/settings_data.json" "$BACKUP_DIR/"
+        echo "   ✅ Backed up settings_data.json"
     else
-        echo "   ❌ settings_data.json not found"
+        echo "   ❌ settings_data.json not found after pull"
     fi
     
     if [ -f "templates/product.json" ]; then
-        cp "templates/product.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
-        echo "   ✅ Copied product.json"
+        cp "templates/product.json" "$BACKUP_DIR/"
+        echo "   ✅ Backed up product.json"
     else
-        echo "   ❌ product.json not found"
+        echo "   ❌ product.json not found after pull"
     fi
     
-    cd "$ORIGINAL_DIR"
+    # Restore local files for the code push
+    echo "🔄 Restoring local files for code push..."
+    [ -f "config/settings_data.local.backup" ] && mv "config/settings_data.local.backup" "config/settings_data.json"
+    [ -f "templates/product.local.backup" ] && mv "templates/product.local.backup" "templates/product.json"
+    
     echo "✅ Live customizations backed up to $BACKUP_DIR/"
     
     # List what we actually backed up
     echo "📋 Backed up files:"
     ls -la "$BACKUP_DIR/" 2>/dev/null || echo "   No files found"
-    
-    # Clean up temp directory
-    rm -rf "$TEMP_BACKUP_DIR"
 else
-    cd "$ORIGINAL_DIR"
     echo "⚠️  Warning: Backup failed, proceeding with push only"
-    rm -rf "$TEMP_BACKUP_DIR"
+    # Restore local backups if pull failed
+    [ -f "config/settings_data.local.backup" ] && mv "config/settings_data.local.backup" "config/settings_data.json"
+    [ -f "templates/product.local.backup" ] && mv "templates/product.local.backup" "templates/product.json"
 fi
 
 echo ""
