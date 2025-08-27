@@ -86,7 +86,7 @@
         "policies_block"
       ],
       "settings": {
-        "columns": 3,
+        "columns": "3",
         "columns_tablet": 2,
         "column_gap": 60,
         "container_width": 1200,
