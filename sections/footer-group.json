@@ -14,7 +14,80 @@
     "footer": {
       "type": "dothan-footer",
       "name": "Dothan Nurseries Footer",
-      "settings": {}
+      "blocks": {
+        "business_info_block": {
+          "type": "business_info",
+          "settings": {
+            "heading": "Details",
+            "show_logo": true,
+            "logo_text": "DN",
+            "business_name": "DOTHAN<br>NURSERIES",
+            "address": "1300 Montgomery Hwy<br>Dothan, AL 36303",
+            "maps_url": "https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7",
+            "phone": "334.794.6774",
+            "phone_2": "334.648.1451",
+            "email": "office@dothannurseries.com",
+            "instagram_url": "https://www.instagram.com/dothan.nurseries/",
+            "facebook_url": "https://www.facebook.com/dothannurseries/",
+            "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
+            "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en"
+          }
+        },
+        "store_hours_block": {
+          "type": "store_hours",
+          "settings": {
+            "heading": "Store Hours",
+            "monday": "Closed",
+            "tuesday": "9AM - 5PM",
+            "wednesday": "9AM - 5PM",
+            "thursday": "9AM - 5PM",
+            "friday": "9AM - 5PM",
+            "saturday": "9AM - 4PM",
+            "sunday": "Closed",
+            "combine_weekdays": true,
+            "weekdays_label": "Tuesday - Friday"
+          }
+        },
+        "policy_block": {
+          "type": "policy_links",
+          "settings": {
+            "heading": "Store Policy",
+            "warranty_url": "https://www.dothannurseries.com/happiness-gurantee",
+            "warranty_text": "Warranty"
+          }
+        },
+        "reviews_block": {
+          "type": "google_reviews",
+          "settings": {
+            "heading": "Leave us a review",
+            "google_reviews_url": "https://www.google.com/maps/search/Dothan+Nurseries+Dothan+AL/",
+            "yelp_url": "https://www.yelp.com/biz/dothan-nurseries-dothan"
+          }
+        }
+      },
+      "block_order": [
+        "business_info_block",
+        "store_hours_block",
+        "policy_block",
+        "reviews_block"
+      ],
+      "settings": {
+        "columns": 3,
+        "columns_tablet": 2,
+        "column_gap": 60,
+        "container_width": 1200,
+        "background_color": "#f8f9fa",
+        "text_color": "#495057",
+        "heading_color": "#6c757d",
+        "padding_top": 60,
+        "padding_bottom": 30,
+        "border_width": 1,
+        "border_color": "#e9ecef",
+        "show_copyright": true,
+        "copyright_text": "© 2024 Dothan Nurseries. All rights reserved.",
+        "main_website_url": "https://www.dothannurseries.com/",
+        "main_website_text": "Visit our main website"
+      }
     }
   },
   "order": [
