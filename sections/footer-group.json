@@ -15,61 +15,73 @@
       "type": "dothan-footer",
       "name": "Dothan Nurseries Footer",
       "blocks": {
-        "business_info_block": {
-          "type": "business_info",
+        "contact_us_block": {
+          "type": "contact_us",
           "settings": {
-            "heading": "Details",
+            "heading": "CONTACT US",
             "show_logo": true,
             "logo_text": "DN",
-            "business_name": "DOTHAN<br>NURSERIES",
-            "address": "1300 Montgomery Hwy<br>Dothan, AL 36303",
-            "maps_url": "https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7",
-            "phone": "334.794.6774",
-            "phone_2": "334.648.1451",
-            "email": "office@dothannurseries.com",
+            "business_name": "DOTHAN\nNURSERIES",
+            "address": "1300 Montgomery Hwy\nDothan, AL 36303",
+            "email": "office@dothannursery.com"
+          }
+        },
+        "store_hours_block": {
+          "type": "store_hours",
+          "settings": {
+            "heading": "STORE HOURS",
+            "show_individual_days": true,
+            "tuesday_friday_combined": true,
+            "weekday_hours": "9AM - 5PM",
+            "saturday_hours": "9AM - 4PM",
+            "sunday_hours": "Closed",
+            "show_combined_closed_days": true
+          }
+        },
+        "reviews_block": {
+          "type": "reviews",
+          "settings": {
+            "heading": "REVIEWS",
+            "show_google_reviews": true,
+            "google_rating": "4.9",
+            "google_count": "568",
+            "show_yelp_reviews": true,
+            "yelp_rating": "4.9",
+            "yelp_count": "9",
+            "show_facebook_reviews": true,
+            "facebook_rating": "4.9",
+            "facebook_count": "311"
+          }
+        },
+        "social_media_block": {
+          "type": "social_media",
+          "settings": {
+            "heading": "FOLLOW US",
             "instagram_url": "https://www.instagram.com/dothan.nurseries/",
             "facebook_url": "https://www.facebook.com/dothannurseries/",
             "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
             "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en"
           }
         },
-        "store_hours_block": {
-          "type": "store_hours",
+        "policies_block": {
+          "type": "policies",
           "settings": {
-            "heading": "Store Hours",
-            "monday": "Closed",
-            "tuesday": "9AM - 5PM",
-            "wednesday": "9AM - 5PM",
-            "thursday": "9AM - 5PM",
-            "friday": "9AM - 5PM",
-            "saturday": "9AM - 4PM",
-            "sunday": "Closed",
-            "combine_weekdays": true,
-            "weekdays_label": "Tuesday - Friday"
-          }
-        },
-        "policy_block": {
-          "type": "policy_links",
-          "settings": {
-            "heading": "Store Policy",
+            "heading": "POLICIES",
             "warranty_url": "https://www.dothannurseries.com/happiness-gurantee",
-            "warranty_text": "Warranty"
-          }
-        },
-        "reviews_block": {
-          "type": "google_reviews",
-          "settings": {
-            "heading": "Leave us a review",
-            "google_reviews_url": "https://www.google.com/maps/search/Dothan+Nurseries+Dothan+AL/",
-            "yelp_url": "https://www.yelp.com/biz/dothan-nurseries-dothan"
+            "warranty_text": "Warranty",
+            "privacy_url": "",
+            "privacy_text": "Privacy",
+            "terms_url": "",
+            "terms_text": "Terms of Service"
           }
         }
       },
       "block_order": [
-        "business_info_block",
+        "contact_us_block",
         "store_hours_block",
-        "policy_block",
-        "reviews_block"
+        "reviews_block",
+        "social_media_block",
+        "policies_block"
       ],
       "settings": {
         "columns": 3,
