@@ -213,19 +213,21 @@
          {% endcase %}
        ">
       
-      <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
-        {%- render 'preorder-icon', icon_type: settings.preorder_icon_type -%}
-      </div>
-      
       <div class="preorder-display__content">
-        {%- comment -%} Badge and Title together in header section {%- endcomment -%}
+        {%- comment -%} Icon and Badge on same line {%- endcomment -%}
         <div class="preorder-display__header">
-          {%- if badge_text != blank -%}
-            <span class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
-              {{ badge_text }}
-            </span>
-          {%- endif -%}
+          <div class="preorder-display__icon-badge">
+            <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
+              {%- render 'preorder-icon', icon_type: settings.preorder_icon_type -%}
+            </div>
+            {%- if badge_text != blank -%}
+              <span class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
+                {{ badge_text }}
+              </span>
+            {%- endif -%}
+          </div>
           
+          {%- comment -%} Title on separate line below {%- endcomment -%}
           {%- if title_text != blank -%}
             <h3 class="preorder-display__title">{{ title_text }}</h3>
           {%- endif -%}
@@ -247,13 +249,27 @@
         {%- endif -%}
         
         {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
-          <div class="preorder-display__countdown" data-target="{{ preorder_drop_date | date: '%s' }}"></div>
+          {%- liquid
+            assign show_countdown = true
+            if settings.preorder_countdown_24h_only
+              assign hours_until_drop = drop_timestamp | minus: now | divided_by: 3600
+              if hours_until_drop > 24
+                assign show_countdown = false
+              endif
+            endif
+          -%}
+          {%- if show_countdown -%}
+            <div class="preorder-display__countdown" 
+                 data-target="{{ preorder_drop_date | date: '%s' }}"
+                 style="font-size: {{ settings.preorder_countdown_font_size | default: 14 }}px; font-weight: {{ settings.preorder_countdown_font_weight | default: 'normal' }};">
+            </div>
+          {%- endif -%}
         {%- endif -%}
       </div>
     </div>
   </div>
 
-  {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
+  {%- if settings.preorder_show_countdown and preorder_status == 'predrop' and show_countdown -%}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const countdownEl = document.querySelector('.preorder-display__countdown[data-target]');
@@ -261,9 +277,19 @@
         
         const targetTime = parseInt(countdownEl.dataset.target) * 1000;
         
+        const only24Hours = {{ settings.preorder_countdown_24h_only | json }};
+        
         function updateCountdown() {
           const now = new Date().getTime();
           const distance = targetTime - now;
+          
+          // If countdown should only show < 24 hours, hide if > 24 hours
+          if (only24Hours && distance > (24 * 60 * 60 * 1000)) {
+            countdownEl.style.display = 'none';
+            return;
+          } else {
+            countdownEl.style.display = 'block';
+          }
           
           if (distance < 0) {
             countdownEl.innerHTML = '<span class="preorder-display__countdown-live">Preorders now open!</span>';
@@ -273,22 +299,32 @@
           const days = Math.floor(distance / (1000 * 60 * 60 * 24));
           const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           
           let countdownText = '';
           if (days > 0) {
-            countdownText = `${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+            countdownText = `Opening in ${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
           } else if (hours > 0) {
-            countdownText = `${hours} hour${hours !== 1 ? 's' : ''}, ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            countdownText = `Opening in ${hours} hour${hours !== 1 ? 's' : ''}, ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+          } else if (minutes > 0) {
+            countdownText = `Opening in ${minutes} minute${minutes !== 1 ? 's' : ''}, ${seconds} second${seconds !== 1 ? 's' : ''}`;
           } else {
-            countdownText = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            countdownText = `Opening in ${seconds} second${seconds !== 1 ? 's' : ''}`;
           }
           
           const animationClass = '{{ settings.preorder_animation_style }}' !== 'none' ? ' preorder-display__countdown-live--animated' : '';
-          countdownEl.innerHTML = `<span class="preorder-display__countdown-live${animationClass}">Opening in ${countdownText}</span>`;
+          countdownEl.innerHTML = `<span class="preorder-display__countdown-live${animationClass}">${countdownText}</span>`;
         }
         
         updateCountdown();
-        setInterval(updateCountdown, 60000);
+        
+        // Update every second when < 1 hour, every minute otherwise
+        const updateInterval = () => {
+          const distance = targetTime - new Date().getTime();
+          return distance < (60 * 60 * 1000) ? 1000 : 60000; // 1 second if < 1 hour, 1 minute otherwise
+        };
+        
+        setInterval(updateCountdown, updateInterval());
       });
     </script>
   {%- endif -%}

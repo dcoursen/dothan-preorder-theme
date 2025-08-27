@@ -3012,10 +3012,56 @@
         "info": "Uses proper logic: if today is Tuesday and event is next Tuesday, shows 'Next Tuesday' not 'This Tuesday'"
       },
       {
+        "type": "header",
+        "content": "Countdown Timer Settings"
+      },
+      {
         "type": "checkbox",
         "id": "preorder_show_countdown",
-        "label": "Show Countdown Timer",
-        "default": true
+        "label": "Enable Countdown Timer",
+        "default": true,
+        "info": "Shows live countdown for pre-drop stage"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_countdown_24h_only",
+        "label": "Only Show Countdown < 24 Hours",
+        "default": false,
+        "info": "Only displays countdown when less than 24 hours remain"
+      },
+      {
+        "type": "range",
+        "id": "preorder_countdown_font_size",
+        "label": "Countdown Font Size",
+        "min": 12,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 14
+      },
+      {
+        "type": "select",
+        "id": "preorder_countdown_font_weight",
+        "label": "Countdown Font Weight",
+        "options": [
+          {
+            "value": "normal",
+            "label": "Normal"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semi-bold"
+          },
+          {
+            "value": "bold",
+            "label": "Bold"
+          }
+        ],
+        "default": "normal"
       },
       {
         "type": "header",
