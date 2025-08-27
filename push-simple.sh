@@ -30,9 +30,27 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 echo ""
-echo "📤 Pushing to staging theme (NO RESTORATION)..."
+echo "📥 Pulling latest customizations from Shopify..."
+# Pull settings and templates to preserve your customizations
+shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
 
-# Direct push without any restoration
+if [ $? -eq 0 ]; then
+    echo "✅ Latest customizations pulled and preserved"
+    
+    # Commit the pulled customizations to avoid conflicts
+    if ! git diff --quiet config/settings_data.json templates/product.json; then
+        echo "💾 Saving pulled customizations..."
+        git add config/settings_data.json templates/product.json
+        git commit -m "preserve: Save latest theme customizations from Shopify"
+    fi
+else
+    echo "⚠️  Warning: Pull failed, using existing local files"
+fi
+
+echo ""
+echo "📤 Now pushing code changes to staging (PRESERVING CUSTOMIZATIONS)..."
+
+# Push all files - settings and templates are now current from Shopify
 shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
 
 if [ $? -eq 0 ]; then
