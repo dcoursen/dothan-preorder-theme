@@ -45,16 +45,65 @@ echo "💾 Backing up current local files..."
 echo "⏳ Waiting 5 seconds to ensure Shopify has processed recent changes..."
 sleep 5
 
-# Force fresh pull by clearing any cache and pulling current live settings
-echo "🔄 Pulling current live settings from Shopify (with cache bypass)..."
-# Remove local files to force fresh download
-rm -f config/settings_data.json templates/product.json
-shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json --force
+# Attempt to pull current live settings with multiple retries
+echo "🔄 Pulling current live settings from Shopify (with retries)..."
 
-# Verify we got fresh data by checking file timestamps
-echo "🔍 Verifying pulled files are fresh:"
-echo "   settings_data.json: $(stat -f '%Sm' config/settings_data.json)"
-echo "   product.json: $(stat -f '%Sm' templates/product.json)"
+# Function to attempt pull with retries
+attempt_pull() {
+    local attempt=1
+    local max_attempts=3
+    
+    while [ $attempt -le $max_attempts ]; do
+        echo "   Attempt $attempt/$max_attempts..."
+        
+        # Remove local files to force fresh download
+        rm -f config/settings_data.json templates/product.json
+        
+        # Try the pull
+        if shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json --force; then
+            # Check if files were actually created
+            if [ -f "config/settings_data.json" ] && [ -f "templates/product.json" ]; then
+                echo "   ✅ Pull successful on attempt $attempt"
+                return 0
+            else
+                echo "   ❌ Pull reported success but files not found"
+            fi
+        else
+            echo "   ❌ Pull failed on attempt $attempt"
+        fi
+        
+        if [ $attempt -lt $max_attempts ]; then
+            echo "   ⏳ Waiting 3 seconds before retry..."
+            sleep 3
+        fi
+        
+        attempt=$((attempt + 1))
+    done
+    
+    echo "   ❌ All pull attempts failed"
+    return 1
+}
+
+# Attempt the pull
+if attempt_pull; then
+    # Verify we got fresh data by checking file timestamps
+    echo "🔍 Verifying pulled files are fresh:"
+    echo "   settings_data.json: $(stat -f '%Sm' config/settings_data.json 2>/dev/null || echo 'NOT FOUND')"
+    echo "   product.json: $(stat -f '%Sm' templates/product.json 2>/dev/null || echo 'NOT FOUND')"
+    PULL_SUCCESS=true
+else
+    echo "⚠️  CRITICAL: Unable to backup live settings after multiple attempts!"
+    echo "   This deployment will NOT preserve your recent changes."
+    echo "   Your settings changes may be lost."
+    echo ""
+    read -p "   Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "❌ Deployment cancelled to protect your settings."
+        exit 1
+    fi
+    PULL_SUCCESS=false
+fi
 
 if [ $? -eq 0 ]; then
     # Copy the pulled files to our backup directory
@@ -91,55 +140,20 @@ else
 fi
 
 echo ""
-echo "📤 Step 2: Pushing code changes to staging..."
+echo "📤 Step 2: Pushing code changes (excluding config files that might overwrite customizations)..."
 
-# Push our code changes
-shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970
+# Push our code changes but exclude the configuration files that contain customizations
+# This way we don't overwrite the user's live theme customizations
+shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970 --ignore=config/settings_data.json,templates/product.json
 
 if [ $? -eq 0 ]; then
-    echo "✅ Code changes pushed successfully!"
+    echo "✅ Code changes pushed successfully (without overriding customizations)!"
     
     echo ""
-    echo "🔄 Step 3: Restoring your customizations..."
-    
-    # Now restore the backed up settings to preserve customizations
-    if [ -f "$BACKUP_DIR/settings_data.json" ] || [ -f "$BACKUP_DIR/product.json" ]; then
-        echo "📋 Restoring theme settings and template configurations..."
-        
-        # Copy backed up files back and push them
-        [ -f "$BACKUP_DIR/settings_data.json" ] && cp "$BACKUP_DIR/settings_data.json" config/
-        [ -f "$BACKUP_DIR/product.json" ] && cp "$BACKUP_DIR/product.json" templates/
-        
-        # Push only the restored settings files
-        shopify theme push --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=config/settings_data.json,templates/product.json
-        
-        if [ $? -eq 0 ]; then
-            echo "✅ Customizations restored successfully!"
-            
-            # Verify what was actually restored by comparing backup to what we just pushed
-            echo "🔍 Verification - comparing backup to restored files:"
-            if [ -f "$BACKUP_DIR/settings_data.json" ]; then
-                BACKUP_SIZE=$(stat -f%z "$BACKUP_DIR/settings_data.json")
-                CURRENT_SIZE=$(stat -f%z "config/settings_data.json")
-                echo "   settings_data.json: backup=${BACKUP_SIZE}bytes, restored=${CURRENT_SIZE}bytes"
-            fi
-            if [ -f "$BACKUP_DIR/product.json" ]; then
-                BACKUP_SIZE=$(stat -f%z "$BACKUP_DIR/product.json")
-                CURRENT_SIZE=$(stat -f%z "templates/product.json")
-                echo "   product.json: backup=${BACKUP_SIZE}bytes, restored=${CURRENT_SIZE}bytes"
-            fi
-        else
-            echo "⚠️  Warning: Failed to restore customizations - you may need to reconfigure manually"
-        fi
-    else
-        echo "⚠️  No backup found - customizations may need manual reconfiguration"
-    fi
-    
-    echo ""
-    echo "✅ Successfully pushed to staging with customizations preserved!"
+    echo "✅ Successfully pushed to staging with ALL customizations preserved!"
     echo "📝 Git commit: $(git log -1 --oneline)"
-    echo "💡 Used pull → push → restore pattern to maintain all settings"
-    echo "📁 Backup saved in: $BACKUP_DIR/"
+    echo "💡 Used selective push strategy - only code files pushed, customizations left intact"
+    echo "📁 Live settings backup saved in: $BACKUP_DIR/ (for emergencies)"
     echo ""
     echo "🌐 Preview: https://vzgxcj-h9.myshopify.com/?preview_theme_id=143188983970"
 else
