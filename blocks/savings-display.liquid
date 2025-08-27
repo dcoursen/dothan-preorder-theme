@@ -8,7 +8,7 @@
 
 <div id="savings-display-{{ section.id }}" class="savings-display-block" 
      data-section-id="{{ section.id }}"
-     style="{% if product_text != blank or (v and v.metafields.custom.variant_only_discount_text != blank) %}display: block;{% else %}display: none;{% endif %}">
+     style="{% if product_text != blank %}display: block;{% elsif v and v.metafields.custom.variant_only_discount_text != blank %}display: block;{% else %}display: none;{% endif %}">
   
   <div class="savings-display-content" style="
     display: flex;
