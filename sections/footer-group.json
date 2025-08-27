@@ -24,12 +24,7 @@
             "business_name": "DOTHAN\nNURSERIES",
             "address": "1300 Montgomery Hwy\nDothan, AL 36303",
             "email": "office@dothannursery.com",
-            "show_social_media": true,
-            "social_heading": "FOLLOW US",
-            "instagram_url": "https://www.instagram.com/dothan.nurseries/",
-            "facebook_url": "https://www.facebook.com/dothannurseries/",
-            "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
-            "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en"
+            "column_position": "1"
           }
         },
         "store_hours_block": {
@@ -43,10 +38,7 @@
             "saturday_hours": "9AM - 4PM",
             "show_closed_combined": true,
             "closed_days": "Sunday & Monday",
-            "show_policies": true,
-            "policies_heading": "POLICIES",
-            "warranty_url": "https://www.dothannurseries.com/happiness-gurantee",
-            "warranty_text": "Warranty"
+            "column_position": "2"
           }
         },
         "reviews_block": {
@@ -61,14 +53,37 @@
             "yelp_count": "9",
             "show_facebook_reviews": true,
             "facebook_rating": "4.9",
-            "facebook_count": "311"
+            "facebook_count": "311",
+            "column_position": "3"
+          }
+        },
+        "social_media_block": {
+          "type": "social_media",
+          "settings": {
+            "heading": "FOLLOW US",
+            "instagram_url": "https://www.instagram.com/dothan.nurseries/",
+            "facebook_url": "https://www.facebook.com/dothannurseries/",
+            "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
+            "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en",
+            "column_position": "1"
+          }
+        },
+        "policies_block": {
+          "type": "policies",
+          "settings": {
+            "heading": "POLICIES",
+            "warranty_url": "https://www.dothannurseries.com/happiness-gurantee",
+            "warranty_text": "Warranty",
+            "column_position": "2"
           }
         }
       },
       "block_order": [
         "contact_us_block",
         "store_hours_block",
-        "reviews_block"
+        "reviews_block",
+        "social_media_block",
+        "policies_block"
       ],
       "settings": {
         "columns": 3,
