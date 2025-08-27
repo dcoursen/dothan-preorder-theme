@@ -283,8 +283,9 @@
         if (!countdownEl) return;
         
         const targetTime = parseInt(countdownEl.dataset.target) * 1000;
+        if (isNaN(targetTime)) return;
         
-        const only24Hours = {{ settings.preorder_countdown_24h_only | json }};
+        const only24Hours = {{ settings.preorder_countdown_24h_only | default: false | json }};
         
         function updateCountdown() {
           const now = new Date().getTime();
