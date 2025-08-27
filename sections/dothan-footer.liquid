@@ -40,65 +40,131 @@
                   <a href="mailto:{{ block.settings.email }}">{{ block.settings.email }}</a>
                 </div>
               {% endif %}
+              
+              {% comment %} Social Media Icons integrated into Contact Us {% endcomment %}
+              {% if block.settings.show_social_media %}
+                <div class="social-section">
+                  <h3>{{ block.settings.social_heading | default: 'FOLLOW US' }}</h3>
+                  <div class="social-icons">
+                    {% if block.settings.instagram_url != blank %}
+                      <a href="{{ block.settings.instagram_url }}" target="_blank" aria-label="Instagram" class="social-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    {% if block.settings.facebook_url != blank %}
+                      <a href="{{ block.settings.facebook_url }}" target="_blank" aria-label="Facebook" class="social-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    {% if block.settings.youtube_url != blank %}
+                      <a href="{{ block.settings.youtube_url }}" target="_blank" aria-label="YouTube" class="social-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    {% if block.settings.tiktok_url != blank %}
+                      <a href="{{ block.settings.tiktok_url }}" target="_blank" aria-label="TikTok" class="social-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
 
             {% when 'store_hours' %}
               <h3>{{ block.settings.heading | default: 'STORE HOURS' }}</h3>
               <div class="hours-list">
-                {% if block.settings.show_individual_days %}
-                  {% if block.settings.tuesday_friday_combined %}
-                    <div class="hours-item">
-                      <span class="day">Tuesday - Friday:</span>
-                      <span class="time">{{ block.settings.weekday_hours | default: '9AM - 5PM' }}</span>
-                    </div>
-                  {% else %}
-                    {% if block.settings.tuesday_hours != blank %}
-                      <div class="hours-item">
-                        <span class="day">Tuesday:</span>
-                        <span class="time">{{ block.settings.tuesday_hours }}</span>
-                      </div>
-                    {% endif %}
-                    {% if block.settings.wednesday_hours != blank %}
-                      <div class="hours-item">
-                        <span class="day">Wednesday:</span>
-                        <span class="time">{{ block.settings.wednesday_hours }}</span>
-                      </div>
-                    {% endif %}
-                    {% if block.settings.thursday_hours != blank %}
-                      <div class="hours-item">
-                        <span class="day">Thursday:</span>
-                        <span class="time">{{ block.settings.thursday_hours }}</span>
-                      </div>
-                    {% endif %}
-                    {% if block.settings.friday_hours != blank %}
-                      <div class="hours-item">
-                        <span class="day">Friday:</span>
-                        <span class="time">{{ block.settings.friday_hours }}</span>
-                      </div>
-                    {% endif %}
-                  {% endif %}
-                  
-                  {% if block.settings.saturday_hours != blank %}
-                    <div class="hours-item">
-                      <span class="day">Saturday:</span>
-                      <span class="time">{{ block.settings.saturday_hours }}</span>
-                    </div>
-                  {% endif %}
-                  
-                  {% if block.settings.sunday_hours != blank %}
-                    <div class="hours-item {% if block.settings.sunday_hours contains 'Closed' %}closed{% endif %}">
-                      <span class="day">Sunday:</span>
-                      <span class="time">{{ block.settings.sunday_hours }}</span>
-                    </div>
-                  {% endif %}
-                  
-                  {% if block.settings.show_combined_closed_days %}
-                    <div class="hours-item closed">
-                      <span class="day">Sunday & Monday:</span>
-                      <span class="time">Closed</span>
-                    </div>
-                  {% endif %}
+                {% comment %} Flexible store hours - show each day if enabled {% endcomment %}
+                
+                {% if block.settings.show_monday and block.settings.monday_hours != blank %}
+                  <div class="hours-item {% if block.settings.monday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Monday:</span>
+                    <span class="time">{{ block.settings.monday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_tuesday and block.settings.tuesday_hours != blank %}
+                  <div class="hours-item {% if block.settings.tuesday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Tuesday:</span>
+                    <span class="time">{{ block.settings.tuesday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_wednesday and block.settings.wednesday_hours != blank %}
+                  <div class="hours-item {% if block.settings.wednesday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Wednesday:</span>
+                    <span class="time">{{ block.settings.wednesday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_thursday and block.settings.thursday_hours != blank %}
+                  <div class="hours-item {% if block.settings.thursday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Thursday:</span>
+                    <span class="time">{{ block.settings.thursday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_friday and block.settings.friday_hours != blank %}
+                  <div class="hours-item {% if block.settings.friday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Friday:</span>
+                    <span class="time">{{ block.settings.friday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_saturday and block.settings.saturday_hours != blank %}
+                  <div class="hours-item {% if block.settings.saturday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Saturday:</span>
+                    <span class="time">{{ block.settings.saturday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_sunday and block.settings.sunday_hours != blank %}
+                  <div class="hours-item {% if block.settings.sunday_hours contains 'Closed' %}closed{% endif %}">
+                    <span class="day">Sunday:</span>
+                    <span class="time">{{ block.settings.sunday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% comment %} Combined days options for common patterns {% endcomment %}
+                {% if block.settings.show_weekday_combined and block.settings.weekday_range != blank %}
+                  <div class="hours-item">
+                    <span class="day">{{ block.settings.weekday_range }}:</span>
+                    <span class="time">{{ block.settings.weekday_hours }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.show_closed_combined and block.settings.closed_days != blank %}
+                  <div class="hours-item closed">
+                    <span class="day">{{ block.settings.closed_days }}:</span>
+                    <span class="time">Closed</span>
+                  </div>
                 {% endif %}
               </div>
+              
+              {% comment %} Policies integrated into Store Hours {% endcomment %}
+              {% if block.settings.show_policies %}
+                <div class="policies-section">
+                  <h3>{{ block.settings.policies_heading | default: 'POLICIES' }}</h3>
+                  <div class="policy-links">
+                    {% if block.settings.warranty_url != blank %}
+                      <a href="{{ block.settings.warranty_url }}" target="_blank">{{ block.settings.warranty_text | default: 'Warranty' }}</a>
+                    {% endif %}
+                    {% if block.settings.privacy_url != blank %}
+                      <a href="{{ block.settings.privacy_url }}" target="_blank">{{ block.settings.privacy_text | default: 'Privacy' }}</a>
+                    {% endif %}
+                    {% if block.settings.terms_url != blank %}
+                      <a href="{{ block.settings.terms_url }}" target="_blank">{{ block.settings.terms_text | default: 'Terms of Service' }}</a>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
 
             {% when 'reviews' %}
               <h3>{{ block.settings.heading | default: 'REVIEWS' }}</h3>
@@ -127,7 +193,7 @@
                         </div>
                       </div>
                       {% if block.settings.google_review_url != blank %}
-                        <a href="{{ block.settings.google_review_url }}" target="_blank" class="review-button">
+                        <a href="{{ block.settings.google_review_url }}" target="_blank" class="review-link">
                           Leave a Google Review
                         </a>
                       {% endif %}
@@ -156,7 +222,7 @@
                         </div>
                       </div>
                       {% if block.settings.yelp_review_url != blank %}
-                        <a href="{{ block.settings.yelp_review_url }}" target="_blank" class="review-button">
+                        <a href="{{ block.settings.yelp_review_url }}" target="_blank" class="review-link">
                           Leave a Yelp Review
                         </a>
                       {% endif %}
@@ -184,7 +250,7 @@
                         </div>
                       </div>
                       {% if block.settings.facebook_review_url != blank %}
-                        <a href="{{ block.settings.facebook_review_url }}" target="_blank" class="review-button">
+                        <a href="{{ block.settings.facebook_review_url }}" target="_blank" class="review-link">
                           Leave a Facebook Review
                         </a>
                       {% endif %}
@@ -193,52 +259,6 @@
                 {% endif %}
               </div>
 
-            {% when 'social_media' %}
-              <h3>{{ block.settings.heading | default: 'FOLLOW US' }}</h3>
-              <div class="social-icons">
-                {% if block.settings.instagram_url != blank %}
-                  <a href="{{ block.settings.instagram_url }}" target="_blank" aria-label="Instagram" class="social-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-                {% if block.settings.facebook_url != blank %}
-                  <a href="{{ block.settings.facebook_url }}" target="_blank" aria-label="Facebook" class="social-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-                {% if block.settings.youtube_url != blank %}
-                  <a href="{{ block.settings.youtube_url }}" target="_blank" aria-label="YouTube" class="social-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-                {% if block.settings.tiktok_url != blank %}
-                  <a href="{{ block.settings.tiktok_url }}" target="_blank" aria-label="TikTok" class="social-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
-                    </svg>
-                  </a>
-                {% endif %}
-              </div>
-
-            {% when 'policies' %}
-              <h3>{{ block.settings.heading | default: 'POLICIES' }}</h3>
-              <div class="policy-links">
-                {% if block.settings.warranty_url != blank %}
-                  <a href="{{ block.settings.warranty_url }}" target="_blank">{{ block.settings.warranty_text | default: 'Warranty' }}</a>
-                {% endif %}
-                {% if block.settings.privacy_url != blank %}
-                  <a href="{{ block.settings.privacy_url }}" target="_blank">{{ block.settings.privacy_text | default: 'Privacy' }}</a>
-                {% endif %}
-                {% if block.settings.terms_url != blank %}
-                  <a href="{{ block.settings.terms_url }}" target="_blank">{{ block.settings.terms_text | default: 'Terms of Service' }}</a>
-                {% endif %}
-              </div>
               
           {% endcase %}
         </div>
@@ -274,6 +294,7 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 48px;
     margin-bottom: 32px;
+    align-items: start;
   }
 
   .dothan-footer-section h3 {
@@ -367,6 +388,13 @@
     border-radius: 8px;
     padding: 16px;
     background: white;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+
+  .review-platform:hover {
+    background: #f8f9fa;
+    border-color: #dee2e6;
   }
 
   .review-header {
@@ -409,25 +437,34 @@
     font-weight: 500;
   }
 
-  .review-button {
+  .review-link {
     display: inline-block;
-    background: #007bff;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
+    color: #007bff;
     text-decoration: none;
     font-size: 12px;
     font-weight: 500;
-    transition: background-color 0.2s;
+    padding: 4px 0;
   }
 
-  .review-button:hover {
-    background: #0056b3;
-    color: white;
+  .review-link:hover {
+    color: #0056b3;
     text-decoration: none;
   }
 
-  /* Social Media */
+  /* Social Media Section integrated into Contact Us */
+  .social-section {
+    margin-top: 30px;
+  }
+
+  .social-section h3 {
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+  }
+
   .social-icons {
     display: flex;
     gap: 16px;
@@ -440,6 +477,20 @@
 
   .social-icon:hover {
     color: #333;
+  }
+
+  /* Policies Section integrated into Store Hours */
+  .policies-section {
+    margin-top: 30px;
+  }
+
+  .policies-section h3 {
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
   }
 
   /* Policies */
@@ -483,7 +534,7 @@
   /* Responsive Design */
   @media (max-width: 968px) {
     .dothan-footer-content {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 32px;
     }
   }
@@ -505,8 +556,37 @@
     .social-icons {
       justify-content: center;
     }
+    
+    .social-section,
+    .policies-section {
+      text-align: center;
+    }
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Make entire review cards clickable
+    const reviewPlatforms = document.querySelectorAll('.review-platform');
+    
+    reviewPlatforms.forEach(function(platform) {
+      const reviewLink = platform.querySelector('.review-link');
+      
+      if (reviewLink) {
+        // Make entire card clickable
+        platform.addEventListener('click', function(e) {
+          // Don't interfere with direct link clicks
+          if (e.target.tagName !== 'A') {
+            reviewLink.click();
+          }
+        });
+        
+        // Add cursor pointer for entire card
+        platform.style.cursor = 'pointer';
+      }
+    });
+  });
+</script>
 
 {% schema %}
 {
