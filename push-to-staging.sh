@@ -36,6 +36,9 @@ echo "📥 Step 1: Backing up current LIVE customizations from Shopify..."
 BACKUP_DIR="theme-backups/backup-$(date +%Y-%m-%d_%H-%M-%S)"
 mkdir -p "$BACKUP_DIR"
 
+# Store the current directory
+ORIGINAL_DIR=$(pwd)
+
 # Create a temporary directory for clean backup
 TEMP_BACKUP_DIR=$(mktemp -d)
 echo "🔄 Using temporary directory: $TEMP_BACKUP_DIR"
@@ -46,16 +49,20 @@ shopify theme pull --store=vzgxcj-h9.myshopify.com --theme=143188983970 --only=c
 
 if [ $? -eq 0 ]; then
     # Copy the CLEAN pulled files to our permanent backup directory
-    [ -f "config/settings_data.json" ] && cp "config/settings_data.json" "$OLDPWD/$BACKUP_DIR/"
-    [ -f "templates/product.json" ] && cp "templates/product.json" "$OLDPWD/$BACKUP_DIR/"
+    [ -f "config/settings_data.json" ] && cp "config/settings_data.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
+    [ -f "templates/product.json" ] && cp "templates/product.json" "$ORIGINAL_DIR/$BACKUP_DIR/"
     
-    cd "$OLDPWD"
+    cd "$ORIGINAL_DIR"
     echo "✅ Live customizations backed up to $BACKUP_DIR/"
+    
+    # List what we actually backed up
+    echo "📋 Backed up files:"
+    ls -la "$BACKUP_DIR/" 2>/dev/null || echo "   No files found"
     
     # Clean up temp directory
     rm -rf "$TEMP_BACKUP_DIR"
 else
-    cd "$OLDPWD"
+    cd "$ORIGINAL_DIR"
     echo "⚠️  Warning: Backup failed, proceeding with push only"
     rm -rf "$TEMP_BACKUP_DIR"
 fi
