@@ -50,19 +50,10 @@
           }
         },
         "reviews_block": {
-          "type": "reviews",
+          "type": "google_reviews",
           "settings": {
-            "heading": "REVIEWS",
-            "show_google_reviews": true,
-            "google_rating": "4.9",
-            "google_count": "568",
+            "heading": "LEAVE US A REVIEW",
             "google_reviews_url": "https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7",
-            "show_yelp_reviews": true,
-            "yelp_rating": "4.9",
-            "yelp_count": "9",
-            "show_facebook_reviews": true,
-            "facebook_rating": "4.9",
-            "facebook_count": "311",
             "column_position": "3"
           }
         },
