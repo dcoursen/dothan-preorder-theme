@@ -64,6 +64,12 @@
           "type": "social",
           "settings": {
             "heading": "FOLLOW US",
+            "facebook_url": "",
+            "instagram_url": "",
+            "twitter_url": "",
+            "youtube_url": "",
+            "tiktok_url": "",
+            "linkedin_url": "",
             "column": 4
           }
         }
@@ -79,6 +85,7 @@
       "settings": {
         "columns": 4,
         "column_gap": 40,
+        "background_color": "#f8f9fa",
         "show_copyright": true,
         "show_policy_links": true,
         "color_scheme": "scheme-1"
