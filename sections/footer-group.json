@@ -29,7 +29,8 @@
             "instagram_url": "https://www.instagram.com/dothan.nurseries/",
             "facebook_url": "https://www.facebook.com/dothannurseries/",
             "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
-            "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en"
+            "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en",
+            "column_position": "1"
           }
         },
         "store_hours_block": {
@@ -44,7 +45,25 @@
             "saturday": "9AM - 4PM",
             "sunday": "Closed",
             "combine_weekdays": true,
-            "weekdays_label": "Tuesday - Friday"
+            "weekdays_label": "Tuesday - Friday",
+            "column_position": "2"
+          }
+        },
+        "reviews_block": {
+          "type": "reviews",
+          "settings": {
+            "heading": "REVIEWS",
+            "show_google_reviews": true,
+            "google_rating": "4.9",
+            "google_count": "568",
+            "google_reviews_url": "https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7",
+            "show_yelp_reviews": true,
+            "yelp_rating": "4.9",
+            "yelp_count": "9",
+            "show_facebook_reviews": true,
+            "facebook_rating": "4.9",
+            "facebook_count": "311",
+            "column_position": "3"
           }
         },
         "policy_links_block": {
@@ -52,13 +71,15 @@
           "settings": {
             "heading": "STORE POLICY",
             "warranty_url": "https://www.dothannurseries.com/happiness-gurantee",
-            "warranty_text": "Warranty"
+            "warranty_text": "Warranty",
+            "column_position": "2"
           }
         }
       },
       "block_order": [
         "business_info_block",
         "store_hours_block",
+        "reviews_block",
         "policy_links_block"
       ],
       "settings": {
