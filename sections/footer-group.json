@@ -26,8 +26,8 @@
           "type": "text",
           "settings": {
             "text": "<h3>VISIT US</h3><p><strong>NURSERY NAME</strong><br/>1300 Montgomery Hwy<br/>Dothan, AL 36303<br/>334.793.6244<br/>334.794.3480<br/>orders@nursery.com</p>",
-            "type_preset": "rte",
             "width": "fit-content",
+            "type_preset": "rte",
             "column": 2
           }
         },
@@ -35,8 +35,8 @@
           "type": "text",
           "settings": {
             "text": "<h3>HOURS</h3><p>Tuesday - Friday: 9AM - 5PM<br/>Saturday: 9AM - 4PM<br/>Sunday & Monday: Closed</p>",
-            "type_preset": "rte",
             "width": "fit-content",
+            "type_preset": "rte",
             "column": 2
           }
         },
@@ -54,8 +54,8 @@
           "type": "text",
           "settings": {
             "text": "<h3>LEAVE US A REVIEW</h3><p><a href='#' target='_blank'>Google Reviews</a></p>",
-            "type_preset": "rte",
             "width": "fit-content",
+            "type_preset": "rte",
             "column": 4
           }
         }
