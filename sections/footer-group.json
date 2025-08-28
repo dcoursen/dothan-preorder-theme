@@ -12,7 +12,7 @@
   "name": "Footer",
   "sections": {
     "footer": {
-      "type": "dothan-footer",
+      "type": "footer",
       "name": "Dothan Nurseries Footer",
       "blocks": {
         "business_info_block": {
