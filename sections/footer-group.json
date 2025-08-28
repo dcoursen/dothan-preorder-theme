@@ -17,58 +17,58 @@
         "logo_block": {
           "type": "logo",
           "settings": {
-            "logo_width": 120,
-            "column": 1
+            "column": 1,
+            "unit": "pixel",
+            "pixel_height": 48
           }
         },
         "text_block_1": {
           "type": "text",
           "settings": {
             "text": "<h3>VISIT US</h3><p><strong>NURSERY NAME</strong><br/>1300 Montgomery Hwy<br/>Dothan, AL 36303<br/>334.793.6244<br/>334.794.3480<br/>orders@nursery.com</p>",
-            "column": 2
+            "column": 2,
+            "type_preset": "rte",
+            "width": "fit-content"
           }
         },
         "text_block_2": {
           "type": "text",
           "settings": {
             "text": "<h3>HOURS</h3><p>Tuesday - Friday: 9AM - 5PM<br/>Saturday: 9AM - 4PM<br/>Sunday & Monday: Closed</p>",
-            "column": 2
+            "column": 2,
+            "type_preset": "rte",
+            "width": "fit-content"
           }
         },
         "menu_block": {
           "type": "menu",
           "settings": {
-            "heading": "STORE POLICY",
             "menu": "footer",
-            "column": 3
+            "heading": "STORE POLICY",
+            "column": 3,
+            "heading_preset": "h3",
+            "link_preset": "paragraph"
           }
         },
         "text_block_3": {
           "type": "text",
           "settings": {
             "text": "<h3>LEAVE US A REVIEW</h3><p><a href='#' target='_blank'>Google Reviews</a></p>",
-            "column": 4
+            "column": 4,
+            "type_preset": "rte",
+            "width": "fit-content"
           }
         }
       },
       "block_order": [
         "logo_block",
         "text_block_1",
-        "text_block_2", 
+        "text_block_2",
         "menu_block",
         "text_block_3"
       ],
       "settings": {
-        "columns": 4,
-        "column_gap": 60,
-        "background_color": "#f8f9fa",
-        "text_color": "#495057",
-        "padding_top": 60,
-        "padding_bottom": 30,
-        "show_copyright": true,
-        "copyright_text": "© 2024 Dothan Nurseries. All rights reserved.",
-        "main_website_url": "",
-        "main_website_text": "Visit our main website"
+        "columns": 4
       }
     }
   },
