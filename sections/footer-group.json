@@ -23,7 +23,15 @@
           "type": "business_hours",
           "settings": {
             "heading": "HOURS",
-            "hours_text": "<p>Tuesday - Friday: 9AM - 5PM<br/>Saturday: 9AM - 4PM<br/>Sunday & Monday: Closed</p>",
+            "monday": "Closed",
+            "tuesday": "9AM - 5PM",
+            "wednesday": "9AM - 5PM",
+            "thursday": "9AM - 5PM",
+            "friday": "9AM - 5PM",
+            "saturday": "9AM - 4PM",
+            "sunday": "Closed",
+            "combine_weekdays": true,
+            "weekdays_label": "Tuesday - Friday",
             "column": 2
           }
         },
@@ -35,10 +43,20 @@
             "column": 3
           }
         },
-        "reviews_text": {
-          "type": "text",
+        "reviews_block": {
+          "type": "reviews",
           "settings": {
-            "text": "<h3>LEAVE US A REVIEW</h3><p><a href='#' target='_blank'>Google Reviews</a></p>",
+            "heading": "LEAVE US A REVIEW",
+            "google_reviews_url": "https://www.google.com/search?q=Dothan+Nurseries&rlz=1C5CHFA_enUS966US966&oq=Dothan+Nurseries&aqs=chrome..69i57j46i175i199i512j0i512l4j69i60j69i61.2656j0j7&sourceid=chrome&ie=UTF-8#lrd=0x88910c2d4fd7b019:0x3b4ed4b7a23e7756,1,,,",
+            "google_rating": "4.9",
+            "google_count": 127,
+            "yelp_url": "",
+            "yelp_rating": "4.5",
+            "yelp_count": 89,
+            "facebook_url": "",
+            "facebook_rating": "4.8",
+            "facebook_count": 42,
+            "layout_style": "stacked",
             "column": 4
           }
         },
@@ -55,7 +73,7 @@
         "visit_us_text",
         "store_hours",
         "store_policy",
-        "reviews_text",
+        "reviews_block",
         "social_media"
       ],
       "settings": {
