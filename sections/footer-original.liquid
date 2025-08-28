@@ -18,17 +18,48 @@
   <div
     class="
       spacing-style
-      layout-panel-flex
-      layout-panel-flex--{{ section.settings.content_direction }}
+      footer-columns
+      footer-columns--{{ section.settings.columns | default: 4 }}
       section-content-wrapper
       {% if section.settings.vertical_on_mobile %} mobile-column{% endif %}
     "
     style="
       {% render 'layout-panel-style', settings: section.settings %}
       {%  render 'spacing-style', settings: section.settings %}
+      display: grid;
+      grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
+      gap: {{ section.settings.gap | default: 12 }}px;
     "
   >
-    {% content_for 'blocks' %}
+    {% for i in (1..section.settings.columns) %}
+      <div class="footer-column footer-column-{{ i }}" style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for block in section.blocks %}
+          {% assign block_column = block.settings.column | default: 1 %}
+          {% if block_column == i %}
+            <div class="footer-block" {{ block.shopify_attributes }}>
+              {% render block.type, block: block %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+    
+    <style>
+      .footer-columns {
+        display: grid;
+        gap: var(--grid-gap, 12px);
+      }
+      
+      .footer-column {
+        min-height: 50px; /* Ensure columns show even if empty */
+      }
+      
+      @media (max-width: 768px) {
+        .footer-columns.mobile-column {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    </style>
   </div>
 </div>
 
@@ -88,6 +119,15 @@
     {
       "type": "header",
       "content": "t:content.layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Number of columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
     },
     {
       "type": "select",

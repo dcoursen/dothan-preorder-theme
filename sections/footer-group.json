@@ -17,40 +17,38 @@
         "logo_block": {
           "type": "logo",
           "settings": {
-            "logo_width": 120
+            "logo_width": 120,
+            "column": 1
           }
         },
         "text_block_1": {
           "type": "text",
           "settings": {
-            "title": "VISIT US",
-            "text": "<p><strong>DOTHAN NURSERIES</strong><br/>1300 Montgomery Hwy<br/>Dothan, AL 36303<br/>334.793.6244<br/>334.794.3480<br/>orders@dothannursery.com</p>"
+            "text": "<h3>VISIT US</h3><p><strong>NURSERY NAME</strong><br/>1300 Montgomery Hwy<br/>Dothan, AL 36303<br/>334.793.6244<br/>334.794.3480<br/>orders@nursery.com</p>",
+            "column": 2
           }
         },
         "text_block_2": {
           "type": "text",
           "settings": {
-            "title": "HOURS",
-            "text": "<p>Tuesday - Friday: 9AM - 5PM<br/>Saturday: 9AM - 4PM<br/>Sunday & Monday: Closed</p>"
+            "text": "<h3>HOURS</h3><p>Tuesday - Friday: 9AM - 5PM<br/>Saturday: 9AM - 4PM<br/>Sunday & Monday: Closed</p>",
+            "column": 2
           }
         },
         "menu_block": {
           "type": "menu",
           "settings": {
-            "title": "STORE POLICY",
-            "menu": "footer"
+            "heading": "STORE POLICY",
+            "menu": "footer",
+            "column": 3
           }
         },
         "text_block_3": {
           "type": "text",
           "settings": {
-            "title": "LEAVE US A REVIEW",
-            "text": "<p><a href='https://maps.app.goo.gl/7aW9EcFbGnDua6Hr7' target='_blank'>Google Reviews</a></p>"
+            "text": "<h3>LEAVE US A REVIEW</h3><p><a href='#' target='_blank'>Google Reviews</a></p>",
+            "column": 4
           }
-        },
-        "payment_icons": {
-          "type": "payment-icons",
-          "settings": {}
         }
       },
       "block_order": [
@@ -58,24 +56,19 @@
         "text_block_1",
         "text_block_2", 
         "menu_block",
-        "text_block_3",
-        "payment_icons"
+        "text_block_3"
       ],
       "settings": {
-        "section_width": "fixed",
-        "content_direction": "row",
-        "vertical_on_mobile": true,
-        "color_scheme": "scheme-1",
+        "columns": 4,
+        "column_gap": 60,
+        "background_color": "#f8f9fa",
+        "text_color": "#495057",
         "padding_top": 60,
-        "padding_top_mobile": 40,
         "padding_bottom": 30,
-        "padding_bottom_mobile": 20,
-        "padding_horizontal": 0,
-        "padding_horizontal_mobile": 0,
-        "margin_top": 0,
-        "margin_top_mobile": 0,
-        "margin_bottom": 0,
-        "margin_bottom_mobile": 0
+        "show_copyright": true,
+        "copyright_text": "© 2024 Dothan Nurseries. All rights reserved.",
+        "main_website_url": "",
+        "main_website_text": "Visit our main website"
       }
     }
   },
