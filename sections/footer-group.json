@@ -14,61 +14,151 @@
     "footer": {
       "type": "footer",
       "blocks": {
-        "logo_block": {
+        "divider_3HLdM9": {
+          "type": "_divider",
+          "name": "t:names.divider",
+          "settings": {
+            "thickness": 5,
+            "corner_radius": "square",
+            "width_percent": 100,
+            "padding-block-start": 0,
+            "padding-block-end": 0
+          },
+          "blocks": {}
+        },
+        "logo_KgLUdt": {
           "type": "logo",
+          "name": "t:names.logo",
           "settings": {
+            "inverse": false,
+            "font": "heading",
             "unit": "pixel",
+            "percent_width": 100,
             "pixel_height": 48,
-            "column": 1
-          }
+            "custom_mobile_size": false,
+            "unit_mobile": "percent",
+            "percent_width_mobile": 100,
+            "pixel_height_mobile": 120,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
         },
-        "text_block_1": {
-          "type": "text",
+        "payment_icons_LJqyHX": {
+          "type": "payment-icons",
+          "name": "t:names.payment_icons",
           "settings": {
-            "text": "<h3>VISIT US</h3><p><strong>NURSERY NAME</strong><br/>1300 Montgomery Hwy<br/>Dothan, AL 36303<br/>334.793.6244<br/>334.794.3480<br/>orders@nursery.com</p>",
-            "width": "fit-content",
-            "type_preset": "rte",
-            "column": 2
-          }
+            "horizontal_alignment": "flex-end",
+            "gap": 10,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
         },
-        "text_block_2": {
-          "type": "text",
+        "footer_utilities_HpATtm": {
+          "type": "footer-utilities",
+          "name": "t:names.footer_utilities",
           "settings": {
-            "text": "<h3>HOURS</h3><p>Tuesday - Friday: 9AM - 5PM<br/>Saturday: 9AM - 4PM<br/>Sunday & Monday: Closed</p>",
-            "width": "fit-content",
-            "type_preset": "rte",
-            "column": 2
-          }
-        },
-        "menu_block": {
-          "type": "menu",
-          "settings": {
-            "menu": "footer",
-            "heading": "STORE POLICY",
-            "heading_preset": "h3",
-            "link_preset": "paragraph",
-            "column": 3
-          }
-        },
-        "text_block_3": {
-          "type": "text",
-          "settings": {
-            "text": "<h3>LEAVE US A REVIEW</h3><p><a href='#' target='_blank'>Google Reviews</a></p>",
-            "width": "fit-content",
-            "type_preset": "rte",
-            "column": 4
-          }
+            "divider_thickness": 1,
+            "padding-block-start": 20,
+            "padding-block-end": 20
+          },
+          "blocks": {
+            "copyright": {
+              "type": "_footer-copyright",
+              "static": true,
+              "settings": {
+                "font_size": "0.75rem",
+                "case": "none"
+              },
+              "blocks": {}
+            },
+            "policy_list": {
+              "type": "_footer-policy-list",
+              "static": true,
+              "settings": {
+                "font_size": "0.75rem",
+                "case": "none"
+              },
+              "blocks": {}
+            },
+            "social_icons": {
+              "type": "_footer-social-icons",
+              "static": true,
+              "settings": {},
+              "blocks": {
+                "social_link_xFt9mA": {
+                  "type": "_social-link",
+                  "name": "t:names.social_link",
+                  "settings": {
+                    "link": "https://www.instagram.com/dothan.nurseries/?hl=en"
+                  },
+                  "blocks": {}
+                },
+                "social_link_fnDqTf": {
+                  "type": "_social-link",
+                  "name": "t:names.social_link",
+                  "settings": {
+                    "link": "https://www.facebook.com/dothannurseries/"
+                  },
+                  "blocks": {}
+                },
+                "social_link_qpzpNX": {
+                  "type": "_social-link",
+                  "name": "t:names.social_link",
+                  "settings": {
+                    "link": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw"
+                  },
+                  "blocks": {}
+                },
+                "social_link_HwzKUC": {
+                  "type": "_social-link",
+                  "name": "t:names.social_link",
+                  "settings": {
+                    "link": "https://www.tiktok.com/@dothan.nurseries?lang=en"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "social_link_xFt9mA",
+                "social_link_fnDqTf",
+                "social_link_qpzpNX",
+                "social_link_HwzKUC"
+              ]
+            }
+          },
+          "block_order": []
         }
       },
       "block_order": [
-        "logo_block",
-        "text_block_1",
-        "text_block_2",
-        "menu_block",
-        "text_block_3"
+        "divider_3HLdM9",
+        "logo_KgLUdt",
+        "payment_icons_LJqyHX",
+        "footer_utilities_HpATtm"
       ],
+      "name": "Footer",
       "settings": {
-        "columns": 4
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "center",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 48,
+        "section_width": "page-width",
+        "section_height": "",
+        "color_scheme": "scheme-1",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "padding-block-start": 0,
+        "padding-block-end": 48
       }
     }
   },
