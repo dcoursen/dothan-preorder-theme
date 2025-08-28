@@ -8,7 +8,7 @@
         "logo_block": {
           "type": "logo",
           "settings": {
-            "logo_height": 48,
+            "logo_height": 50,
             "column": 1
           }
         },
