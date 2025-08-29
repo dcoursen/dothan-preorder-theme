@@ -194,58 +194,88 @@
                       {% endif %}
                       <div class="reviews-list">
                         {% if block.settings.google_rating != blank %}
-                          <div class="review-platform-item">
-                            <div class="platform-header">
-                              <span class="platform-name">Google</span>
-                              <div class="star-rating">
-                                {% for i in (1..5) %}
-                                  <span class="star star--full">★</span>
-                                {% endfor %}
-                                <span class="rating-text">{{ block.settings.google_rating }} ({{ block.settings.google_count }})</span>
+                          {% if block.settings.google_reviews_url != blank %}
+                            <a href="{{ block.settings.google_reviews_url }}" target="_blank" rel="noopener" class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Google</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.google_rating }} ({{ block.settings.google_count }})</span>
+                                </div>
+                              </div>
+                              <span class="review-cta-text">Leave a Google Review</span>
+                            </a>
+                          {% else %}
+                            <div class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Google</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.google_rating }} ({{ block.settings.google_count }})</span>
+                                </div>
                               </div>
                             </div>
-                            {% if block.settings.google_reviews_url != blank %}
-                              <a href="{{ block.settings.google_reviews_url }}" target="_blank" rel="noopener" class="review-cta-link">
-                                Leave a Google Review
-                              </a>
-                            {% endif %}
-                          </div>
+                          {% endif %}
                         {% endif %}
                         {% if block.settings.yelp_rating != blank %}
-                          <div class="review-platform-item">
-                            <div class="platform-header">
-                              <span class="platform-name">Yelp</span>
-                              <div class="star-rating">
-                                {% for i in (1..5) %}
-                                  <span class="star star--full">★</span>
-                                {% endfor %}
-                                <span class="rating-text">{{ block.settings.yelp_rating }} ({{ block.settings.yelp_count }})</span>
+                          {% if block.settings.yelp_url != blank %}
+                            <a href="{{ block.settings.yelp_url }}" target="_blank" rel="noopener" class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Yelp</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.yelp_rating }} ({{ block.settings.yelp_count }})</span>
+                                </div>
+                              </div>
+                              <span class="review-cta-text">Leave a Yelp Review</span>
+                            </a>
+                          {% else %}
+                            <div class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Yelp</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.yelp_rating }} ({{ block.settings.yelp_count }})</span>
+                                </div>
                               </div>
                             </div>
-                            {% if block.settings.yelp_url != blank %}
-                              <a href="{{ block.settings.yelp_url }}" target="_blank" rel="noopener" class="review-cta-link">
-                                Leave a Yelp Review
-                              </a>
-                            {% endif %}
-                          </div>
+                          {% endif %}
                         {% endif %}
                         {% if block.settings.facebook_rating != blank %}
-                          <div class="review-platform-item">
-                            <div class="platform-header">
-                              <span class="platform-name">Facebook</span>
-                              <div class="star-rating">
-                                {% for i in (1..5) %}
-                                  <span class="star star--full">★</span>
-                                {% endfor %}
-                                <span class="rating-text">{{ block.settings.facebook_rating }} ({{ block.settings.facebook_count }})</span>
+                          {% if block.settings.facebook_url != blank %}
+                            <a href="{{ block.settings.facebook_url }}" target="_blank" rel="noopener" class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Facebook</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.facebook_rating }} ({{ block.settings.facebook_count }})</span>
+                                </div>
+                              </div>
+                              <span class="review-cta-text">Leave a Facebook Review</span>
+                            </a>
+                          {% else %}
+                            <div class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Facebook</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.facebook_rating }} ({{ block.settings.facebook_count }})</span>
+                                </div>
                               </div>
                             </div>
-                            {% if block.settings.facebook_url != blank %}
-                              <a href="{{ block.settings.facebook_url }}" target="_blank" rel="noopener" class="review-cta-link">
-                                Leave a Facebook Review
-                              </a>
-                            {% endif %}
-                          </div>
+                          {% endif %}
                         {% endif %}
                       </div>
                     </div>
@@ -377,26 +407,39 @@
   .reviews-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
   }
   
-  .review-platform-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  .review-platform-card {
+    display: block;
+    padding: 1rem;
+    background: #ffffff;
+    border: 1px solid rgba(var(--color-foreground), 0.1);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .review-platform-card:hover {
+    background: #f8f9fa;
+    border-color: rgba(var(--color-foreground), 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
   .platform-header {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
   }
   
   .platform-name {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: rgba(var(--color-foreground), 0.9);
-    min-width: 70px;
   }
   
   .star-rating {
@@ -418,17 +461,15 @@
     margin-left: 0.25rem;
   }
   
-  .review-cta-link {
+  .review-cta-text {
+    display: block;
     color: #4a9eff;
-    text-decoration: none;
     font-size: 0.85rem;
     font-weight: 500;
-    transition: color 0.2s ease;
   }
   
-  .review-cta-link:hover {
+  .review-platform-card:hover .review-cta-text {
     color: #0066cc;
-    text-decoration: underline;
   }
   
   @media screen and (max-width: 749px) {
