@@ -8,7 +8,13 @@
         "logo_block": {
           "type": "logo",
           "settings": {
-            "logo_height": 50,
+            "show_badge": true,
+            "badge_text": "DN",
+            "badge_background": "#1f2937",
+            "badge_text_color": "#ffffff",
+            "business_name": "DOTHAN",
+            "business_subtitle": "NURSERIES",
+            "tagline": "",
             "column": 1
           }
         },
