@@ -20,9 +20,8 @@
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
     # The add_on_product metafield should contain an array of products
-    # Note: For list.product_reference metafields, sometimes .value only returns first item
-    # Try without .value to get the full ProductListDrop
-    assign cross_sell_products = product.metafields.custom.add_on_product
+    # For list.product_reference metafields, use .value to get the product array
+    assign cross_sell_products = product.metafields.custom.add_on_product.value
     assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
     assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
   endif
@@ -40,6 +39,19 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
+<div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
+DEBUG INFO:<br>
+Product ID: {{ product.id }}<br>
+Product Handle: {{ product.handle }}<br>
+cross_sell_products.value: {{ product.metafields.custom.cross_sell_products.value }}<br>
+add_on_product.value: {{ product.metafields.custom.add_on_product.value }}<br>
+add_on_product (no .value): {{ product.metafields.custom.add_on_product }}<br>
+Final cross_sell_products: {{ cross_sell_products }}<br>
+Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product.size }}
+</div>
+
+<!-- Debug: cross_sell_products = {{ cross_sell_products }}, size = {{ cross_sell_products.size }}, type = {{ cross_sell_products.type }} -->
+<!-- Debug: add_on_product = {{ product.metafields.custom.add_on_product }}, size = {{ product.metafields.custom.add_on_product.size }} -->
 
 {% if cross_sell_products != blank %}
   <div
@@ -75,19 +87,21 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Work around Shopify list.product_reference bug using string parsing {% endcomment %}
-      {% assign metafield_string = product.metafields.custom.add_on_product | string %}
-      {% assign product_gids = metafield_string | split: 'gid://shopify/Product/' %}
-      
-      <div style="background: lightcyan; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Metafield string: {{ metafield_string }}<br>
-        Split result size: {{ product_gids.size }}<br>
-        GID 1: {{ product_gids[1] }}<br>
-        GID 2: {{ product_gids[2] }}
+      <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 11px;">
+        ITERATION DEBUG: Starting loop over {{ cross_sell_products }}
       </div>
-      
       {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
+        <div style="background: lightblue; padding: 3px; margin: 2px; color: black; font-size: 10px;">
+          Loop {{ forloop.index }}: cross_product = {{ cross_product }}, ID = {{ cross_product.id }}
+        </div>
         {% if cross_product.id %}
+          {% unless forloop.first %}
+            <hr class="cross-sell__divider">
+          {% endunless %}
+          <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
+            <a href="{{ cross_product.url }}" class="cross-sell__product-image-link">
+              <div class="cross-sell__product-image">
+                {% if cross_product.featured_image %}
                   <img
                     src="{{ cross_product.featured_image | image_url: width: 200 }}"
                     srcset="{{ cross_product.featured_image | image_url: width: 100 }} 100w,
