@@ -88,11 +88,18 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% assign add_on_products = product.metafields.custom.add_on_product.value %}
       <div style="background: gray; padding: 10px; margin: 10px; color: white; font-size: 14px;">
-        ACCENTUATE PATTERN TEST:<br>
-        add_on_products size: {{ add_on_products.size }}<br>
-        add_on_products: {{ add_on_products }}<br>
+        RAW PRODUCTLISTDROP DISPLAY:<br>
+        Type: {{ add_on_products | class }}<br>
+        Size: {{ add_on_products.size }}<br>
+        Count: {{ add_on_products.count }}<br>
+        Length: {{ add_on_products.length }}<br>
+        Raw object: {{ add_on_products }}<br>
+        JSON: {{ add_on_products | json }}<br>
+        First: {{ add_on_products.first }}<br>
+        Last: {{ add_on_products.last }}<br>
+        Loop count: 
         {% for add_on_product in add_on_products %}
-          {{ add_on_product.title }}<br>
+          {{ forloop.index }}:{{ add_on_product.title }}{% unless forloop.last %}, {% endunless %}
         {% endfor %}
       </div>
       
