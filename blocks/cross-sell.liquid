@@ -12,9 +12,31 @@
     assign product = collections.all.products.first
   endif
 
-  assign add_on_product = product.metafields.custom.add_on_product.value
+  assign add_on_product_raw = product.metafields.custom.add_on_product.value
   assign cross_sell_title = product.metafields.custom.add_on_title.value | default: 'Buy it with'
   assign cross_sell_description = product.metafields.custom.add_on_description.value
+  
+  comment Check if we have a product object or text
+  if add_on_product_raw.id
+    comment We have a product object
+    assign add_on_product = add_on_product_raw
+  elsif add_on_product_raw != blank
+    comment We have text, try to find product by handle or title
+    assign product_handle = add_on_product_raw | handleize
+    assign add_on_product = collections.all.products[product_handle]
+    
+    comment If not found by handle, search by title
+    if add_on_product == blank
+      for search_product in collections.all.products
+        if search_product.title contains add_on_product_raw or add_on_product_raw contains search_product.title
+          assign add_on_product = search_product
+          break
+        endif
+      endfor
+    endif
+  else
+    assign add_on_product = blank
+  endif
   
   assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
   assign columns = block.settings.columns | default: 2
@@ -24,11 +46,11 @@
 <!-- Debug output to see what we're working with -->
 <div style="font-size: 12px; color: #999; padding: 10px; border: 1px solid #ddd; margin: 10px 0;">
   <strong>Debug Info:</strong><br>
-  add_on_product type: {{ add_on_product.type | default: 'no type' }}<br>
-  add_on_product id: {{ add_on_product.id | default: 'no id' }}<br>
-  add_on_product title: {{ add_on_product.title | default: 'no title' }}<br>
-  add_on_product: {% if add_on_product == blank %}blank{% else %}has value{% endif %}<br>
-  Raw data: {{ add_on_product | json | truncate: 300 }}
+  Raw metafield: {{ add_on_product_raw | json | truncate: 200 }}<br>
+  Product handle searched: {{ product_handle }}<br>
+  Found product id: {{ add_on_product.id | default: 'no id' }}<br>
+  Found product title: {{ add_on_product.title | default: 'no title' }}<br>
+  Final result: {% if add_on_product == blank %}blank{% else %}found product{% endif %}
 </div>
 
 {% if add_on_product != blank %}
