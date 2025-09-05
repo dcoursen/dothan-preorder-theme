@@ -75,6 +75,10 @@
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% for cross_product in cross_sell_products limit: 4 %}
         {% if cross_product.id %}
+          {% unless forloop.first %}
+            <hr class="cross-sell__divider">
+          {% endunless %}
+          
           <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
             <a href="{{ cross_product.url }}" class="cross-sell__product-image-link">
               <div class="cross-sell__product-image">
@@ -255,6 +259,13 @@
 
     .cross-sell__products {
       display: block;
+      width: 100%;
+    }
+
+    .cross-sell__divider {
+      border: none;
+      border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
+      margin: 1rem 0;
       width: 100%;
     }
 
