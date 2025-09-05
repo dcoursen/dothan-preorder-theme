@@ -1,9 +1,9 @@
 {%- comment -%}
   Cross-sell block for displaying "Buy it with" products
-  Uses product metafields:
-  - product.metafields.custom.add_on_product (product reference)
-  - product.metafields.custom.add_on_title (optional title)
-  - product.metafields.custom.add_on_description (optional description)
+  Uses product metafields following Shopify best practices:
+  - product.metafields.custom.cross_sell_products (List of product references)
+  - product.metafields.custom.cross_sell_title (optional title)
+  - product.metafields.custom.cross_sell_description (optional description)
 {%- endcomment -%}
 
 {% liquid
@@ -12,35 +12,31 @@
     assign product = collections.all.products.first
   endif
 
-  assign add_on_product_raw = product.metafields.custom.add_on_product.value
-  assign cross_sell_title = product.metafields.custom.add_on_title.value | default: 'Buy it with'
-  assign cross_sell_description = product.metafields.custom.add_on_description.value
+  comment "Get cross-sell products list - this should be a List of product references metafield"
+  assign cross_sell_products = product.metafields.custom.cross_sell_products.value
+  assign cross_sell_title = product.metafields.custom.cross_sell_title.value | default: 'Buy it with'
+  assign cross_sell_description = product.metafields.custom.cross_sell_description.value
   
-  if add_on_product_raw.id
-    assign add_on_product = add_on_product_raw
-  elsif add_on_product_raw != blank
-    assign product_handle = add_on_product_raw | handleize
-    assign add_on_product = collections.all.products[product_handle]
-    
-    if add_on_product == blank
-      assign add_on_product = blank
-      for search_product in collections.all.products limit: 250
-        assign product_title_lower = search_product.title | downcase
-        assign search_term_lower = add_on_product_raw | downcase
-        if product_title_lower == search_term_lower
-          assign add_on_product = search_product
-          break
-        elsif product_title_lower contains search_term_lower
-          assign add_on_product = search_product
-          break
-        elsif search_term_lower contains product_title_lower
-          assign add_on_product = search_product
-          break
-        endif
-      endfor
+  comment "Fallback: Check old metafield name for backward compatibility"
+  if cross_sell_products == blank
+    assign old_product = product.metafields.custom.add_on_product.value
+    if old_product != blank
+      if old_product.id
+        assign cross_sell_products = old_product
+      else
+        comment "Handle text-based product search for old setup"
+        for search_product in collections.all.products limit: 250
+          assign product_title_lower = search_product.title | downcase
+          assign search_term_lower = old_product | downcase
+          if product_title_lower == search_term_lower or product_title_lower contains search_term_lower
+            assign cross_sell_products = search_product
+            break
+          endif
+        endfor
+      endif
     endif
-  else
-    assign add_on_product = blank
+    assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
+    assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
   endif
   
   assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
@@ -48,8 +44,18 @@
   assign columns_mobile = block.settings.columns_mobile | default: 1
 %}
 
+<!-- Debug: Cross-sell Configuration -->
+<div style="padding: 10px; background: #f0f0f0; margin: 10px 0; font-size: 12px; border: 1px solid #ccc;">
+  <strong>Cross-sell Debug:</strong><br>
+  Product: {{ product.title | default: 'No product found' }}<br>
+  New metafield (cross_sell_products): {{ cross_sell_products | json | default: 'Empty' }}<br>
+  Old metafield (add_on_product): {{ product.metafields.custom.add_on_product.value | json | default: 'Empty' }}<br>
+  Title: {{ cross_sell_title | default: 'No title' }}<br>
+  Description: {{ cross_sell_description | default: 'No description' }}<br>
+  Products found: {% if cross_sell_products != blank %}✅ YES{% else %}❌ NO{% endif %}
+</div>
 
-{% if add_on_product != blank %}
+{% if cross_sell_products != blank %}
   <div
     class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }}"
     {{ block.shopify_attributes }}
@@ -65,61 +71,74 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% assign cross_product = add_on_product %}
-      <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
-        <div class="cross-sell__product-image">
-          {% if cross_product.featured_image %}
-            <img
-              src="{{ cross_product.featured_image | image_url: width: 200 }}"
-              srcset="{{ cross_product.featured_image | image_url: width: 100 }} 100w,
-                      {{ cross_product.featured_image | image_url: width: 200 }} 200w,
-                      {{ cross_product.featured_image | image_url: width: 300 }} 300w"
-              sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
-              alt="{{ cross_product.featured_image.alt | escape }}"
-              loading="lazy"
-              width="{{ cross_product.featured_image.width }}"
-              height="{{ cross_product.featured_image.height }}"
-            >
-          {% endif %}
-        </div>
-        
-        <div class="cross-sell__product-details">
-          <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
-          
-          <div class="cross-sell__product-price">
-            {% if cross_product.compare_at_price > cross_product.price %}
-              <span class="cross-sell__price--compare">{{ cross_product.compare_at_price | money }}</span>
-            {% endif %}
-            <span class="cross-sell__price">{{ cross_product.price | money }}</span>
-          </div>
-
-          <form class="cross-sell__add-form" data-product-form>
-            <input type="hidden" name="id" value="{{ cross_product.selected_or_first_available_variant.id }}">
-            <input type="hidden" name="quantity" value="1">
+      {% liquid
+        comment "Handle both single product and list of products"
+        if cross_sell_products.id
+          assign products_to_show = cross_sell_products | split: ','
+          assign products_to_show[0] = cross_sell_products
+        else
+          assign products_to_show = cross_sell_products
+        endif
+      %}
+      
+      {% for cross_product in products_to_show limit: 4 %}
+        {% if cross_product.id %}
+          <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
+            <div class="cross-sell__product-image">
+              {% if cross_product.featured_image %}
+                <img
+                  src="{{ cross_product.featured_image | image_url: width: 200 }}"
+                  srcset="{{ cross_product.featured_image | image_url: width: 100 }} 100w,
+                          {{ cross_product.featured_image | image_url: width: 200 }} 200w,
+                          {{ cross_product.featured_image | image_url: width: 300 }} 300w"
+                  sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
+                  alt="{{ cross_product.featured_image.alt | escape }}"
+                  loading="lazy"
+                  width="{{ cross_product.featured_image.width }}"
+                  height="{{ cross_product.featured_image.height }}"
+                >
+              {% endif %}
+            </div>
             
-            <button 
-              type="button"
-              class="button cross-sell__add-button"
-              data-add-to-cart
-              data-product-id="{{ cross_product.id }}"
-              data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
-              {% unless cross_product.available %}disabled{% endunless %}
-            >
-              <span class="cross-sell__add-text">
-                {% if cross_product.available %}
-                  + {{ 'products.product.add' | t | default: 'Add' }}
-                {% else %}
-                  {{ 'products.product.sold_out' | t }}
+            <div class="cross-sell__product-details">
+              <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
+              
+              <div class="cross-sell__product-price">
+                {% if cross_product.compare_at_price > cross_product.price %}
+                  <span class="cross-sell__price--compare">{{ cross_product.compare_at_price | money }}</span>
                 {% endif %}
-              </span>
-            </button>
-          </form>
+                <span class="cross-sell__price">{{ cross_product.price | money }}</span>
+              </div>
 
-          <a href="{{ cross_product.url }}" class="cross-sell__more-info">
-            {{ 'products.product.more_info' | t | default: 'More info' }}
-          </a>
-        </div>
-      </div>
+              <form class="cross-sell__add-form" data-product-form>
+                <input type="hidden" name="id" value="{{ cross_product.selected_or_first_available_variant.id }}">
+                <input type="hidden" name="quantity" value="1">
+                
+                <button 
+                  type="button"
+                  class="button cross-sell__add-button"
+                  data-add-to-cart
+                  data-product-id="{{ cross_product.id }}"
+                  data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
+                  {% unless cross_product.available %}disabled{% endunless %}
+                >
+                  <span class="cross-sell__add-text">
+                    {% if cross_product.available %}
+                      + {{ 'products.product.add' | t | default: 'Add' }}
+                    {% else %}
+                      {{ 'products.product.sold_out' | t }}
+                    {% endif %}
+                  </span>
+                </button>
+              </form>
+
+              <a href="{{ cross_product.url }}" class="cross-sell__more-info">
+                {{ 'products.product.more_info' | t | default: 'More info' }}
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
     </div>
   </div>
 
@@ -371,7 +390,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Configure cross-sell products through product metafields: add_on_product, add_on_title, add_on_description"
+      "content": "Configure cross-sell products through product metafields: custom.cross_sell_products (List of product references), custom.cross_sell_title, custom.cross_sell_description. Maintains backward compatibility with old add_on_* metafields."
     },
     {
       "type": "color_scheme",

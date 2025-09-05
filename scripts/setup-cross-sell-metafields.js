@@ -19,21 +19,22 @@ metafield definitions in your Shopify admin:
 
 1. Go to your Shopify Admin > Settings > Custom data > Products
 
-2. Add these metafield definitions:
+2. Add these metafield definitions (UPDATED FOR SHOPIFY BEST PRACTICES):
 
-   A. CROSS-SELL PRODUCTS
+   A. CROSS-SELL PRODUCTS (REQUIRED)
       - Name: Cross-sell Products
       - Namespace and key: custom.cross_sell_products
-      - Type: Product > List of products
+      - Type: Product reference > List of product references
       - Description: Products to display in the "Buy it with" section
+      - IMPORTANT: Must be "List of product references" to add multiple products
 
-   B. CROSS-SELL TITLE
+   B. CROSS-SELL TITLE (OPTIONAL)
       - Name: Cross-sell Title
       - Namespace and key: custom.cross_sell_title
       - Type: Single line text
       - Description: Title for the cross-sell section (default: "Buy it with")
 
-   C. CROSS-SELL DESCRIPTION
+   C. CROSS-SELL DESCRIPTION (OPTIONAL)
       - Name: Cross-sell Description
       - Namespace and key: custom.cross_sell_description
       - Type: Multi-line text
@@ -42,9 +43,15 @@ metafield definitions in your Shopify admin:
 3. After creating the metafield definitions:
    - Go to a product in your admin
    - Scroll down to the Metafields section
-   - Fill in the Cross-sell Products field with related products
+   - Click "Add products" in the Cross-sell Products field
+   - Select 1-4 related products from the dropdown
    - Optionally set a custom title and description
    - Save the product
+
+IMPORTANT NOTES:
+- The metafield MUST be "List of product references" type, not single product
+- You can add multiple products by clicking "Add products" multiple times
+- The block maintains backward compatibility with old "add_on_product" setup
 
 4. The cross-sell block will automatically appear on the product page
    when cross-sell products are selected.
