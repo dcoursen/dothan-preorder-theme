@@ -210,77 +210,90 @@
                 <div class="review-platforms">
                   {% if block.settings.show_google_reviews %}
                     <div class="review-platform">
-                      {% if block.settings.google_reviews_url != blank %}
-                        <a href="{{ block.settings.google_reviews_url }}" target="_blank" class="review-link">
-                      {% endif %}
-                      <div class="review-info">
-                        <div class="review-header">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                          </svg>
-                          <span>Google</span>
-                        </div>
-                        <div class="review-rating">
-                          <span class="rating">{{ block.settings.google_rating | default: "4.9" }}</span>
-                          <div class="stars">★★★★★</div>
-                          <span class="count">({{ block.settings.google_count | default: "568" }})</span>
+                      <div class="platform-name">Google</div>
+                      <div class="platform-row">
+                        <svg class="platform-icon" width="24" height="24" viewBox="0 0 488 512" fill="none">
+                          <g id="google-icon">
+                            <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" fill="#4285F4"/>
+                          </g>
+                        </svg>
+                        <div class="platform-content">
+                          {% assign rating_value = block.settings.google_rating | default: "4.9" | times: 1.0 %}
+                          <div class="stars-container" data-rating="{{ rating_value }}">
+                            {% for i in (1..5) %}
+                              {% assign star_fill = 0 %}
+                              {% if rating_value >= i %}
+                                {% assign star_fill = 100 %}
+                              {% elsif rating_value > i | minus: 1 %}
+                                {% assign decimal_part = rating_value | minus: i | plus: 1 | times: 100 %}
+                                {% assign star_fill = decimal_part %}
+                              {% endif %}
+                              <span class="star" style="--star-fill: {{ star_fill }}%">★</span>
+                            {% endfor %}
+                          </div>
+                          <span class="rating-value">{{ block.settings.google_rating | default: "4.9" }}</span>
+                          <span class="review-count">({{ block.settings.google_count | default: "568" }})</span>
                         </div>
                       </div>
-                      {% if block.settings.google_reviews_url != blank %}
-                        </a>
-                      {% endif %}
+                      <a href="{{ block.settings.google_reviews_url | default: '#' }}" target="_blank" class="leave-review-link">Leave a Google Review</a>
                     </div>
                   {% endif %}
 
                   {% if block.settings.show_yelp_reviews %}
                     <div class="review-platform">
-                      {% if block.settings.yelp_url != blank %}
-                        <a href="{{ block.settings.yelp_url }}" target="_blank" class="review-link">
-                      {% endif %}
-                      <div class="review-info">
-                        <div class="review-header">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M12.017 0C6.396 0 1.807 4.589 1.807 10.21 1.807 15.831 6.396 20.42 12.017 20.42c5.621 0 10.21-4.589 10.21-10.21C22.227 4.589 17.638.001 12.017.001zm0 18.655c-4.666 0-8.445-3.779-8.445-8.445s3.779-8.444 8.445-8.444 8.445 3.778 8.445 8.444-3.779 8.445-8.445 8.445z" fill="#D32323"/>
-                            <path d="M15.108 8.717l-2.29.924-1.516-1.516.924-2.29c.152-.376.076-.808-.19-1.074l-.951-.951c-.342-.342-.895-.342-1.237 0l-.951.951c-.266.266-.342.698-.19 1.074l.924 2.29-1.516 1.516-2.29-.924c-.376-.152-.808-.076-1.074.19l-.951.951c-.342.342-.342.895 0 1.237l.951.951c.266.266.698.342 1.074.19l2.29-.924 1.516 1.516-.924 2.29c-.152.376-.076.808.19 1.074l.951.951c.342.342.895.342 1.237 0l.951-.951c.266-.266.342-.698.19-1.074l-.924-2.29 1.516-1.516 2.29.924c.376.152.808.076 1.074-.19l.951-.951c.342-.342.342-.895 0-1.237l-.951-.951c-.266-.266-.698-.342-1.074-.19z" fill="#D32323"/>
-                          </svg>
-                          <span>Yelp</span>
-                        </div>
-                        <div class="review-rating">
-                          <span class="rating">{{ block.settings.yelp_rating | default: "4.9" }}</span>
-                          <div class="stars">★★★★★</div>
-                          <span class="count">({{ block.settings.yelp_count | default: "9" }})</span>
+                      <div class="platform-name">Yelp</div>
+                      <div class="platform-row">
+                        <svg class="platform-icon yelp-icon" width="24" height="24" viewBox="0 0 384 512" fill="none">
+                          <path d="M42.9 240.32l99.62 48.61c19.2 9.4 16.2 37.51-4.5 42.71L30.5 358.45a22.79 22.79 0 0 1-28.21-19.6 197.16 197.16 0 0 1 9-85.32 22.8 22.8 0 0 1 31.61-13.21zm44 239.25a199.45 199.45 0 0 0 79.42 32.11A22.78 22.78 0 0 0 192.94 490l3.9-110.82c.7-21.3-25.5-31.91-39.81-16.1l-74.21 82.4a22.82 22.82 0 0 0 4.09 34.09zm145.34-109.92l58.81 94a22.93 22.93 0 0 0 34 5.5 198.36 198.36 0 0 0 52.71-67.61A23 23 0 0 0 364.17 370l-105.42-34.26c-20.31-6.5-37.81 15.8-26.51 33.91zm148.33-132.23a197.44 197.44 0 0 0-50.41-69.31 22.85 22.85 0 0 0-34 4.4l-62 91.92c-11.9 17.7 4.7 40.61 25.2 34.71L366 268.63a23 23 0 0 0 14.61-31.21zM62.11 30.18a22.86 22.86 0 0 0-9.9 32l104.12 180.44c11.7 20.2 42.61 11.9 42.61-11.4V22.88a22.67 22.67 0 0 0-24.5-22.8 320.37 320.37 0 0 0-112.33 30.1z" fill="#c41200"/>
+                        </svg>
+                        <div class="platform-content">
+                          {% assign rating_value = block.settings.yelp_rating | default: "4.5" | times: 1.0 %}
+                          <div class="stars-container" data-rating="{{ rating_value }}">
+                            {% for i in (1..5) %}
+                              {% assign star_fill = 0 %}
+                              {% if rating_value >= i %}
+                                {% assign star_fill = 100 %}
+                              {% elsif rating_value > i | minus: 1 %}
+                                {% assign decimal_part = rating_value | minus: i | plus: 1 | times: 100 %}
+                                {% assign star_fill = decimal_part %}
+                              {% endif %}
+                              <span class="star" style="--star-fill: {{ star_fill }}%">★</span>
+                            {% endfor %}
+                          </div>
+                          <span class="rating-value">{{ block.settings.yelp_rating | default: "4.5" }}</span>
+                          <span class="review-count">({{ block.settings.yelp_count | default: "89" }})</span>
                         </div>
                       </div>
-                      {% if block.settings.yelp_url != blank %}
-                        </a>
-                      {% endif %}
+                      <a href="{{ block.settings.yelp_url | default: '#' }}" target="_blank" class="leave-review-link">Leave a Yelp Review</a>
                     </div>
                   {% endif %}
 
                   {% if block.settings.show_facebook_reviews %}
                     <div class="review-platform">
-                      {% if block.settings.facebook_url != blank %}
-                        <a href="{{ block.settings.facebook_url }}" target="_blank" class="review-link">
-                      {% endif %}
-                      <div class="review-info">
-                        <div class="review-header">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
-                          </svg>
-                          <span>Facebook</span>
-                        </div>
-                        <div class="review-rating">
-                          <span class="rating">{{ block.settings.facebook_rating | default: "4.9" }}</span>
-                          <div class="stars">★★★★★</div>
-                          <span class="count">({{ block.settings.facebook_count | default: "311" }})</span>
+                      <div class="platform-name">Facebook</div>
+                      <div class="platform-row">
+                        <svg class="platform-icon" width="24" height="24" viewBox="0 0 320 512" fill="none">
+                          <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" fill="#1877F2"/>
+                        </svg>
+                        <div class="platform-content">
+                          {% assign rating_value = block.settings.facebook_rating | default: "4.8" | times: 1.0 %}
+                          <div class="stars-container" data-rating="{{ rating_value }}">
+                            {% for i in (1..5) %}
+                              {% assign star_fill = 0 %}
+                              {% if rating_value >= i %}
+                                {% assign star_fill = 100 %}
+                              {% elsif rating_value > i | minus: 1 %}
+                                {% assign decimal_part = rating_value | minus: i | plus: 1 | times: 100 %}
+                                {% assign star_fill = decimal_part %}
+                              {% endif %}
+                              <span class="star" style="--star-fill: {{ star_fill }}%">★</span>
+                            {% endfor %}
+                          </div>
+                          <span class="rating-value">{{ block.settings.facebook_rating | default: "4.8" }}</span>
+                          <span class="review-count">({{ block.settings.facebook_count | default: "42" }})</span>
                         </div>
                       </div>
-                      {% if block.settings.facebook_url != blank %}
-                        </a>
-                      {% endif %}
+                      <a href="{{ block.settings.facebook_url | default: '#' }}" target="_blank" class="leave-review-link">Leave a Facebook Review</a>
                     </div>
                   {% endif %}
                 </div>
@@ -494,57 +507,104 @@
   .review-platforms {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
   }
 
   .review-platform {
-    border: 1px solid #e9ecef;
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    padding: 12px;
+    padding: 16px;
     transition: all 0.3s ease;
   }
 
   .review-platform:hover {
-    border-color: #28a745;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.15);
   }
 
-  .review-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
+  .platform-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
   }
 
-  .review-header {
+  .platform-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .platform-content {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+  }
+
+  .platform-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .platform-icon.yelp-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .stars-container {
+    display: inline-flex;
+    gap: 1px;
+  }
+
+  .star {
+    position: relative;
+    color: #e0e0e0;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .star::before {
+    content: '★';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #FFA500;
+    overflow: hidden;
+    width: var(--star-fill);
+  }
+
+  .rating-value {
     font-weight: 600;
     font-size: 14px;
-    color: #495057;
-  }
-
-  .review-rating {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .review-rating .rating {
-    font-weight: bold;
-    font-size: 16px;
     color: #333;
+    margin-left: 4px;
   }
 
-  .review-rating .stars {
-    color: #ffc107;
-    font-size: 14px;
+  .review-count {
+    color: #666;
+    font-size: 13px;
+    margin-left: 2px;
   }
 
-  .review-rating .count {
-    color: #6c757d;
-    font-size: 12px;
+  .leave-review-link {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    transition: color 0.2s ease;
+    margin-left: 32px;
+  }
+
+  .leave-review-link:hover {
+    color: #2e7d32;
+    text-decoration: underline;
   }
 
   /* Copyright Section */
