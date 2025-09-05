@@ -21,19 +21,8 @@
   if cross_sell_products == blank
     assign old_product = product.metafields.custom.add_on_product.value
     if old_product != blank
-      if old_product.id
-        assign cross_sell_products = old_product
-      else
-        # Handle text-based product search for old setup
-        for search_product in collections.all.products limit: 250
-          assign product_title_lower = search_product.title | downcase
-          assign search_term_lower = old_product | downcase
-          if product_title_lower == search_term_lower or product_title_lower contains search_term_lower
-            assign cross_sell_products = search_product
-            break
-          endif
-        endfor
-      endif
+      # For list metafields, check if it's already an array or single product
+      assign cross_sell_products = old_product
     endif
     assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
     assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
@@ -82,11 +71,14 @@
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% liquid
         # Handle both single product and list of products
-        if cross_sell_products.id
-          assign products_to_show = cross_sell_products | split: ','
-          assign products_to_show[0] = cross_sell_products
-        else
+        if cross_sell_products.size
+          # It's an array of products
           assign products_to_show = cross_sell_products
+        elsif cross_sell_products.id
+          # It's a single product, convert to array
+          assign products_to_show = cross_sell_products
+        else
+          assign products_to_show = blank
         endif
       %}
       
