@@ -39,9 +39,13 @@
 %}
 
 
-<!-- DEBUG: cross_sell_products = {{ cross_sell_products }} -->
-<!-- DEBUG: cross_sell_products size = {{ cross_sell_products.size }} -->
-<!-- DEBUG: cross_sell_products type = {{ cross_sell_products.type }} -->
+<!-- ALWAYS VISIBLE DEBUG -->
+<!-- Product: {{ product.title }} -->
+<!-- New metafield: {{ product.metafields.custom.cross_sell_products.value }} -->
+<!-- Legacy metafield: {{ product.metafields.custom.add_on_product.value }} -->
+<!-- Final cross_sell_products: {{ cross_sell_products }} -->
+<!-- cross_sell_products blank?: {{ cross_sell_products == blank }} -->
+<!-- cross_sell_products size: {{ cross_sell_products.size }} -->
 
 {% if cross_sell_products != blank %}
   <div
