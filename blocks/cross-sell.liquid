@@ -19,11 +19,8 @@
   
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
-    assign old_product = product.metafields.custom.add_on_product.value
-    if old_product != blank
-      # For list metafields, check if it's already an array or single product
-      assign cross_sell_products = old_product
-    endif
+    # The add_on_product metafield should contain an array of products
+    assign cross_sell_products = product.metafields.custom.add_on_product.value
     assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
     assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
   endif
@@ -59,16 +56,8 @@
       </div>
       
       {% liquid
-        # Handle both single product and list of products
-        if cross_sell_products.size
-          # It's an array of products
-          assign products_to_show = cross_sell_products
-        elsif cross_sell_products.id
-          # It's a single product, convert to array
-          assign products_to_show = cross_sell_products
-        else
-          assign products_to_show = blank
-        endif
+        # For list metafields, cross_sell_products should be an array we can iterate directly
+        assign products_to_show = cross_sell_products
       %}
       
       <div style="font-size: 10px; color: #666; margin: 5px 0;">
