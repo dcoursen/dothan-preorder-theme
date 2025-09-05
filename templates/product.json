@@ -237,6 +237,18 @@
               },
               "block_order": []
             },
+            "cross_sell_block": {
+              "type": "cross-sell",
+              "settings": {
+                "color_scheme": "scheme-1",
+                "columns": "2",
+                "columns_mobile": "1",
+                "padding-block-start": 20,
+                "padding-block-end": 20,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
             "group_JbmQwr": {
               "type": "group",
               "name": "Policies",
@@ -480,6 +492,7 @@
             "variant_picker_R3rGDr",
             "preorder_display_modern",
             "buy_buttons_eYQEYi",
+            "cross_sell_block",
             "group_JbmQwr",
             "text_aEtTtq"
           ]
