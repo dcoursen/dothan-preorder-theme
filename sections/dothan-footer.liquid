@@ -223,11 +223,12 @@
                         {% assign rating = block.settings.google_rating | default: "4.9" | times: 1.0 %}
                         {% assign full_stars = rating | floor %}
                         {% assign decimal = rating | minus: full_stars %}
+                        {% assign next_star = full_stars | plus: 1 %}
                         <div class="stars-wrapper">
                           {% for i in (1..5) %}
                             {% if i <= full_stars %}
                               <span class="star filled">★</span>
-                            {% elsif i == full_stars | plus: 1 and decimal > 0 %}
+                            {% elsif i == next_star and decimal > 0 %}
                               <span class="star partial" data-fill="{{ decimal | times: 100 | round }}">★</span>
                             {% else %}
                               <span class="star empty">★</span>
@@ -255,11 +256,12 @@
                         {% assign rating = block.settings.yelp_rating | default: "4.5" | times: 1.0 %}
                         {% assign full_stars = rating | floor %}
                         {% assign decimal = rating | minus: full_stars %}
+                        {% assign next_star = full_stars | plus: 1 %}
                         <div class="stars-wrapper">
                           {% for i in (1..5) %}
                             {% if i <= full_stars %}
                               <span class="star filled">★</span>
-                            {% elsif i == full_stars | plus: 1 and decimal > 0 %}
+                            {% elsif i == next_star and decimal > 0 %}
                               <span class="star partial" data-fill="{{ decimal | times: 100 | round }}">★</span>
                             {% else %}
                               <span class="star empty">★</span>
@@ -285,11 +287,12 @@
                         {% assign rating = block.settings.facebook_rating | default: "4.8" | times: 1.0 %}
                         {% assign full_stars = rating | floor %}
                         {% assign decimal = rating | minus: full_stars %}
+                        {% assign next_star = full_stars | plus: 1 %}
                         <div class="stars-wrapper">
                           {% for i in (1..5) %}
                             {% if i <= full_stars %}
                               <span class="star filled">★</span>
-                            {% elsif i == full_stars | plus: 1 and decimal > 0 %}
+                            {% elsif i == next_star and decimal > 0 %}
                               <span class="star partial" data-fill="{{ decimal | times: 100 | round }}">★</span>
                             {% else %}
                               <span class="star empty">★</span>
