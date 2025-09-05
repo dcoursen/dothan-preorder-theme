@@ -86,7 +86,7 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% assign add_on_products = product.metafields.custom.add_on_product.value %}
+      {% assign add_on_products = product.metafields.custom.add_on_product %}
       <div style="background: gray; padding: 10px; margin: 10px; color: white; font-size: 14px;">
         RAW PRODUCTLISTDROP DISPLAY:<br>
         Type: {{ add_on_products | class }}<br>
