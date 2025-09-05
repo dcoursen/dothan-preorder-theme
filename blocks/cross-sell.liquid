@@ -32,6 +32,10 @@
   assign border_width = block.settings.border_width | default: 1
   assign border_color = block.settings.border_color | default: '#e5e5e5'
   assign button_style = block.settings.button_style | default: 'solid'
+  assign title_font_size = block.settings.title_font_size | default: '1.1rem'
+  assign title_color = block.settings.title_color | default: 'var(--color-foreground)'
+  assign description_font_size = block.settings.description_font_size | default: '0.9rem'
+  assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
 
@@ -43,7 +47,7 @@
   >
     <div class="cross-sell__header">
       {% if cross_sell_title != blank %}
-        <h3 class="cross-sell__title">{{ cross_sell_title }}</h3>
+        <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }};">{{ cross_sell_title }}</h3>
       {% endif %}
       
       {% if cross_sell_description != blank %}
@@ -64,7 +68,7 @@
             assign description_text = cross_sell_description
           endif
         %}
-        <div class="cross-sell__description">{{ description_text }}</div>
+        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }};">{{ description_text }}</div>
       {% endif %}
     </div>
 
@@ -91,42 +95,44 @@
             </a>
             
             <div class="cross-sell__product-details">
-              <a href="{{ cross_product.url }}" class="cross-sell__product-title-link">
-                <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
-              </a>
-              
-              <div class="cross-sell__product-price">
-                {% if cross_product.compare_at_price > cross_product.price %}
-                  <span class="cross-sell__price--compare">{{ cross_product.compare_at_price | money }}</span>
-                {% endif %}
-                <span class="cross-sell__price">{{ cross_product.price | money }}</span>
+              <div class="cross-sell__product-info">
+                <a href="{{ cross_product.url }}" class="cross-sell__product-title-link">
+                  <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
+                </a>
               </div>
+              
+              <div class="cross-sell__product-actions">
+                <div class="cross-sell__product-price">
+                  {% if cross_product.compare_at_price > cross_product.price %}
+                    <span class="cross-sell__price--compare">{{ cross_product.compare_at_price | money }}</span>
+                  {% endif %}
+                  <span class="cross-sell__price">{{ cross_product.price | money }}</span>
+                </div>
 
-              <form class="cross-sell__add-form" data-product-form>
-                <input type="hidden" name="id" value="{{ cross_product.selected_or_first_available_variant.id }}">
-                <input type="hidden" name="quantity" value="1">
-                
-                <button 
-                  type="button"
-                  class="button cross-sell__add-button"
-                  data-add-to-cart
-                  data-product-id="{{ cross_product.id }}"
-                  data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
-                  {% unless cross_product.available %}disabled{% endunless %}
-                >
-                  <span class="cross-sell__add-text">
+                <form class="cross-sell__add-form" data-product-form>
+                  <input type="hidden" name="id" value="{{ cross_product.selected_or_first_available_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  
+                  <button 
+                    type="submit"
+                    class="btn button cross-sell__add-button"
+                    data-add-to-cart
+                    data-product-id="{{ cross_product.id }}"
+                    data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
+                    {% unless cross_product.available %}disabled{% endunless %}
+                  >
                     {% if cross_product.available %}
                       + Add
                     {% else %}
                       Sold out
                     {% endif %}
-                  </span>
-                </button>
-              </form>
+                  </button>
+                </form>
 
-              <a href="{{ cross_product.url }}" class="cross-sell__more-info">
-                More info
-              </a>
+                <a href="{{ cross_product.url }}" class="cross-sell__more-info">
+                  More info
+                </a>
+              </div>
             </div>
           </div>
         {% endif %}
@@ -156,8 +162,8 @@
         if (!variantId) return;
 
         button.disabled = true;
-        const originalText = button.querySelector('.cross-sell__add-text').innerText;
-        button.querySelector('.cross-sell__add-text').innerText = 'Adding...';
+        const originalText = button.innerText;
+        button.innerText = 'Adding...';
 
         try {
           const response = await fetch('/cart/add.js', {
@@ -176,7 +182,7 @@
 
           if (response.ok) {
             const data = await response.json();
-            button.querySelector('.cross-sell__add-text').innerText = '✓ Added';
+            button.innerText = '✓ Added';
             
             // Dispatch multiple cart events to trigger all possible cart updates
             document.dispatchEvent(new CustomEvent('cart:updated', {
@@ -209,7 +215,7 @@
             }
 
             setTimeout(() => {
-              button.querySelector('.cross-sell__add-text').innerText = originalText;
+              button.innerText = originalText;
               button.disabled = false;
             }, 2000);
           } else {
@@ -217,9 +223,9 @@
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
-          button.querySelector('.cross-sell__add-text').innerText = 'Error';
+          button.innerText = 'Error';
           setTimeout(() => {
-            button.querySelector('.cross-sell__add-text').innerText = originalText;
+            button.innerText = originalText;
             button.disabled = false;
           }, 2000);
         }
@@ -244,16 +250,12 @@
     }
 
     .cross-sell__title {
-      font-size: 1.1rem;
       font-weight: 600;
       margin: 0 0 0.5rem 0;
-      color: var(--color-foreground);
     }
 
     .cross-sell__description {
       margin: 0;
-      color: var(--color-foreground-secondary, #666);
-      font-size: 0.9rem;
       line-height: 1.4;
     }
 
@@ -290,8 +292,21 @@
     .cross-sell__product-details {
       flex: 1;
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .cross-sell__product-info {
+      flex: 1;
+    }
+
+    .cross-sell__product-actions {
+      display: flex;
       flex-direction: column;
+      align-items: flex-end;
       gap: 0.5rem;
+      min-width: 120px;
     }
 
     .cross-sell__product-title {
@@ -306,7 +321,9 @@
       display: flex;
       gap: 0.5rem;
       align-items: center;
+      justify-content: flex-end;
       font-size: 0.95rem;
+      text-align: right;
     }
 
     .cross-sell__price--compare {
@@ -321,8 +338,9 @@
     }
 
     .cross-sell__add-button {
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       font-size: 0.9rem;
+      font-weight: 500;
       width: auto;
       min-width: 100px;
       height: auto;
@@ -331,10 +349,12 @@
       justify-content: center;
       background: var(--color-button);
       color: var(--color-button-text);
-      border: none;
+      border: 2px solid var(--color-button);
       border-radius: var(--border-radius-button, 4px);
       cursor: pointer;
       transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
     .cross-sell__add-button:hover {
@@ -388,7 +408,8 @@
       font-size: 0.8rem;
       color: var(--color-primary);
       text-decoration: underline;
-      margin-top: 0.25rem;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .cross-sell__more-info:hover {
@@ -475,6 +496,36 @@
         }
       ],
       "default": "solid"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "text",
+      "id": "title_font_size",
+      "label": "Title font size",
+      "default": "1.1rem",
+      "info": "Use CSS units like rem, em, px"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "description_font_size",
+      "label": "Description font size",
+      "default": "0.9rem",
+      "info": "Use CSS units like rem, em, px"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#666666"
     },
     {
       "type": "select",
