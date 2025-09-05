@@ -86,11 +86,13 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
+      {% assign add_on_products = product.metafields.custom.add_on_product.value %}
       <div style="background: gray; padding: 10px; margin: 10px; color: white; font-size: 14px;">
-        SIMPLE TEST:<br>
-        Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
-        {% for product_item in product.metafields.custom.add_on_product.value %}
-          {{ product_item.title }}<br>
+        ACCENTUATE PATTERN TEST:<br>
+        add_on_products size: {{ add_on_products.size }}<br>
+        add_on_products: {{ add_on_products }}<br>
+        {% for add_on_product in add_on_products %}
+          {{ add_on_product.title }}<br>
         {% endfor %}
       </div>
       
