@@ -90,10 +90,145 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
       <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 11px;">
         ITERATION DEBUG: Starting loop over {{ cross_sell_products }}
       </div>
+      {% comment %} Manual iteration to work around Shopify bug {% endcomment %}
+      {% assign products_array = product.metafields.custom.add_on_product.value %}
+      
+      {% assign product_0 = products_array[0] %}
+      {% assign product_1 = products_array[1] %}
+      
+      <div style="background: lightgreen; padding: 3px; margin: 2px; color: black; font-size: 10px;">
+        Manual Product 0: {{ product_0.title }} (ID: {{ product_0.id }})<br>
+        Manual Product 1: {{ product_1.title }} (ID: {{ product_1.id }})
+      </div>
+      
+      {% if product_0.id %}
+        <div class="cross-sell__product-item" data-product-id="{{ product_0.id }}">
+            <a href="{{ product_0.url }}" class="cross-sell__product-image-link">
+              <div class="cross-sell__product-image">
+                {% if product_0.featured_image %}
+                  <img
+                    src="{{ product_0.featured_image | image_url: width: 200 }}"
+                    srcset="{{ product_0.featured_image | image_url: width: 100 }} 100w,
+                            {{ product_0.featured_image | image_url: width: 200 }} 200w,
+                            {{ product_0.featured_image | image_url: width: 300 }} 300w"
+                    sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
+                    alt="{{ product_0.featured_image.alt | escape }}"
+                    loading="lazy"
+                    width="{{ product_0.featured_image.width }}"
+                    height="{{ product_0.featured_image.height }}"
+                  >
+                {% endif %}
+              </div>
+            </a>
+            
+            <div class="cross-sell__product-details">
+              <div class="cross-sell__product-info">
+                <a href="{{ product_0.url }}" class="cross-sell__product-title-link">
+                  <h4 class="cross-sell__product-title">{{ product_0.title | truncate: 50 }}</h4>
+                </a>
+              </div>
+              
+              <div class="cross-sell__product-actions">
+                <div class="cross-sell__product-price">
+                  {% if product_0.compare_at_price > product_0.price %}
+                    <span class="cross-sell__price--compare">{{ product_0.compare_at_price | money }}</span>
+                  {% endif %}
+                  <span class="cross-sell__price">{{ product_0.price | money }}</span>
+                </div>
+
+                <form class="cross-sell__add-form" data-product-form>
+                  <input type="hidden" name="id" value="{{ product_0.selected_or_first_available_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  
+                  <button 
+                    type="submit"
+                    class="{% if button_style == 'outline' %}button-secondary{% else %}button{% endif %} cross-sell__add-button"
+                    data-add-to-cart
+                    data-product-id="{{ product_0.id }}"
+                    data-variant-id="{{ product_0.selected_or_first_available_variant.id }}"
+                    {% unless product_0.available %}disabled{% endunless %}
+                  >
+                    {% if product_0.available %}
+                      + Add
+                    {% else %}
+                      Sold out
+                    {% endif %}
+                  </button>
+                </form>
+
+                <a href="{{ product_0.url }}" class="cross-sell__more-info">
+                  More info
+                </a>
+              </div>
+            </div>
+          </div>
+      {% endif %}
+      
+      {% if product_1.id %}
+        <hr class="cross-sell__divider">
+        <div class="cross-sell__product-item" data-product-id="{{ product_1.id }}">
+            <a href="{{ product_1.url }}" class="cross-sell__product-image-link">
+              <div class="cross-sell__product-image">
+                {% if product_1.featured_image %}
+                  <img
+                    src="{{ product_1.featured_image | image_url: width: 200 }}"
+                    srcset="{{ product_1.featured_image | image_url: width: 100 }} 100w,
+                            {{ product_1.featured_image | image_url: width: 200 }} 200w,
+                            {{ product_1.featured_image | image_url: width: 300 }} 300w"
+                    sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
+                    alt="{{ product_1.featured_image.alt | escape }}"
+                    loading="lazy"
+                    width="{{ product_1.featured_image.width }}"
+                    height="{{ product_1.featured_image.height }}"
+                  >
+                {% endif %}
+              </div>
+            </a>
+            
+            <div class="cross-sell__product-details">
+              <div class="cross-sell__product-info">
+                <a href="{{ product_1.url }}" class="cross-sell__product-title-link">
+                  <h4 class="cross-sell__product-title">{{ product_1.title | truncate: 50 }}</h4>
+                </a>
+              </div>
+              
+              <div class="cross-sell__product-actions">
+                <div class="cross-sell__product-price">
+                  {% if product_1.compare_at_price > product_1.price %}
+                    <span class="cross-sell__price--compare">{{ product_1.compare_at_price | money }}</span>
+                  {% endif %}
+                  <span class="cross-sell__price">{{ product_1.price | money }}</span>
+                </div>
+
+                <form class="cross-sell__add-form" data-product-form>
+                  <input type="hidden" name="id" value="{{ product_1.selected_or_first_available_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  
+                  <button 
+                    type="submit"
+                    class="{% if button_style == 'outline' %}button-secondary{% else %}button{% endif %} cross-sell__add-button"
+                    data-add-to-cart
+                    data-product-id="{{ product_1.id }}"
+                    data-variant-id="{{ product_1.selected_or_first_available_variant.id }}"
+                    {% unless product_1.available %}disabled{% endunless %}
+                  >
+                    {% if product_1.available %}
+                      + Add
+                    {% else %}
+                      Sold out
+                    {% endif %}
+                  </button>
+                </form>
+
+                <a href="{{ product_1.url }}" class="cross-sell__more-info">
+                  More info
+                </a>
+              </div>
+            </div>
+          </div>
+      {% endif %}
+      
       {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
-        <div style="background: lightblue; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-          Loop {{ forloop.index }}: cross_product = {{ cross_product }}, ID = {{ cross_product.id }}
-        </div>
         {% if cross_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
