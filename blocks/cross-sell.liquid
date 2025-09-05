@@ -12,19 +12,19 @@
     assign product = collections.all.products.first
   endif
 
-  comment "Get cross-sell products list - this should be a List of product references metafield"
+  # Get cross-sell products list - this should be a List of product references metafield
   assign cross_sell_products = product.metafields.custom.cross_sell_products.value
   assign cross_sell_title = product.metafields.custom.cross_sell_title.value | default: 'Buy it with'
   assign cross_sell_description = product.metafields.custom.cross_sell_description.value
   
-  comment "Fallback: Check old metafield name for backward compatibility"
+  # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
     assign old_product = product.metafields.custom.add_on_product.value
     if old_product != blank
       if old_product.id
         assign cross_sell_products = old_product
       else
-        comment "Handle text-based product search for old setup"
+        # Handle text-based product search for old setup
         for search_product in collections.all.products limit: 250
           assign product_title_lower = search_product.title | downcase
           assign search_term_lower = old_product | downcase
@@ -72,7 +72,7 @@
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% liquid
-        comment "Handle both single product and list of products"
+        # Handle both single product and list of products
         if cross_sell_products.id
           assign products_to_show = cross_sell_products | split: ','
           assign products_to_show[0] = cross_sell_products
