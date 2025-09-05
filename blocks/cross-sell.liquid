@@ -113,6 +113,13 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
         {% endfor %}
       </div>
       
+      <div style="background: lime; padding: 5px; margin: 5px; color: black; font-size: 12px;">
+        TESTING DIRECT ITERATION (no variable assignment):<br>
+        {% for related_product in product.metafields.custom.add_on_product.value %}
+          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
+        {% endfor %}
+      </div>
+      
       {% if product_0.id %}
         <div class="cross-sell__product-item" data-product-id="{{ product_0.id }}">
             <a href="{{ product_0.url }}" class="cross-sell__product-image-link">
@@ -240,7 +247,7 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
           </div>
       {% endif %}
       
-      {% for related_product in cross_sell_products limit: 4 %}
+      {% for related_product in product.metafields.custom.add_on_product.value limit: 4 %}
         {% if related_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
