@@ -96,7 +96,8 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% for cross_product in cross_sell_products limit: 4 %}
+      {% comment %} Try accessing the metafield directly in the loop {% endcomment %}
+      {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
         <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title }}, ID: {{ cross_product.id }} -->
         {% if cross_product.id %}
           {% unless forloop.first %}
