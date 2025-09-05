@@ -39,6 +39,10 @@
 %}
 
 
+<!-- DEBUG: cross_sell_products = {{ cross_sell_products }} -->
+<!-- DEBUG: cross_sell_products size = {{ cross_sell_products.size }} -->
+<!-- DEBUG: cross_sell_products type = {{ cross_sell_products.type }} -->
+
 {% if cross_sell_products != blank %}
   <div
     class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }} button-style--{{ button_style }}"
@@ -74,6 +78,7 @@
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% for cross_product in cross_sell_products limit: 4 %}
+        <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title }}, ID: {{ cross_product.id }} -->
         {% if cross_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
