@@ -40,14 +40,16 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
-<!-- DEBUG START -->
-<!-- Product ID: {{ product.id }} -->
-<!-- cross_sell_products.value: {{ product.metafields.custom.cross_sell_products.value }} -->
-<!-- cross_sell_products: {{ product.metafields.custom.cross_sell_products }} -->
-<!-- add_on_product.value: {{ product.metafields.custom.add_on_product.value }} -->  
-<!-- add_on_product: {{ product.metafields.custom.add_on_product }} -->
-<!-- Final cross_sell_products: {{ cross_sell_products }}, size: {{ cross_sell_products.size }} -->
-<!-- DEBUG END -->
+<div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
+DEBUG INFO:<br>
+Product ID: {{ product.id }}<br>
+Product Handle: {{ product.handle }}<br>
+cross_sell_products.value: {{ product.metafields.custom.cross_sell_products.value }}<br>
+add_on_product.value: {{ product.metafields.custom.add_on_product.value }}<br>
+add_on_product: {{ product.metafields.custom.add_on_product }}<br>
+Final cross_sell_products: {{ cross_sell_products }}<br>
+Size: {{ cross_sell_products.size }}
+</div>
 
 <!-- Debug: cross_sell_products = {{ cross_sell_products }}, size = {{ cross_sell_products.size }}, type = {{ cross_sell_products.type }} -->
 <!-- Debug: add_on_product = {{ product.metafields.custom.add_on_product }}, size = {{ product.metafields.custom.add_on_product.size }} -->
