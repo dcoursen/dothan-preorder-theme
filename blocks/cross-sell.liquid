@@ -38,16 +38,17 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
-<!-- CROSS-SELL BLOCK TEST: This should always be visible -->
-<div style="background: red; color: white; padding: 10px; margin: 20px 0;">
-  CROSS-SELL BLOCK IS LOADING: {{ product.title }}
+{%- comment -%} DEBUG INFO {%- endcomment -%}
+<div style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
+  <strong>CROSS-SELL DEBUG:</strong><br>
+  Product: {{ product.title }}<br>
+  New metafield: {{ product.metafields.custom.cross_sell_products.value }}<br>
+  Legacy metafield: {{ product.metafields.custom.add_on_product.value }}<br>
+  Final cross_sell_products: {{ cross_sell_products }}<br>
+  Is blank: {% if cross_sell_products == blank %}TRUE{% else %}FALSE{% endif %}<br>
+  Size: {{ cross_sell_products.size }}<br>
+  Type: {{ cross_sell_products.type | default: 'unknown' }}
 </div>
-<!-- Product: {{ product.title }} -->
-<!-- New metafield: {{ product.metafields.custom.cross_sell_products.value }} -->
-<!-- Legacy metafield: {{ product.metafields.custom.add_on_product.value }} -->
-<!-- Final cross_sell_products: {{ cross_sell_products }} -->
-<!-- cross_sell_products blank: {% if cross_sell_products == blank %}TRUE{% else %}FALSE{% endif %} -->
-<!-- cross_sell_products size: {{ cross_sell_products.size }} -->
 
 {% if cross_sell_products != blank %}
   <div
