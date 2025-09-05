@@ -90,15 +90,30 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
       <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 11px;">
         ITERATION DEBUG: Starting loop over {{ cross_sell_products }}
       </div>
-      {% comment %} Manual iteration to work around Shopify bug {% endcomment %}
-      {% assign products_array = product.metafields.custom.add_on_product.value %}
-      
-      {% assign product_0 = products_array[0] %}
-      {% assign product_1 = products_array[1] %}
+      {% comment %} Test different access methods based on Shopify Community solution {% endcomment %}
+      {% assign products_with_value = product.metafields.custom.add_on_product.value %}
+      {% assign products_without_value = product.metafields.custom.add_on_product %}
       
       <div style="background: lightgreen; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Manual Product 0: {{ product_0.title }} (ID: {{ product_0.id }})<br>
-        Manual Product 1: {{ product_1.title }} (ID: {{ product_1.id }})
+        Testing iteration methods:<br>
+        With .value size: {{ products_with_value.size }}<br>
+        Without .value size: {{ products_without_value.size }}<br>
+        First product with .value: {{ products_with_value.first.title }}<br>
+        First product without .value: {{ products_without_value.first.title }}
+      </div>
+      
+      <div style="background: yellow; padding: 3px; margin: 2px; color: black; font-size: 10px;">
+        Testing direct iteration with .value:
+        {% for test_product in products_with_value limit: 2 %}
+          <br>Product {{ forloop.index }}: {{ test_product.title }} ({{ test_product.id }})
+        {% endfor %}
+      </div>
+      
+      <div style="background: pink; padding: 3px; margin: 2px; color: black; font-size: 10px;">
+        Testing direct iteration without .value:
+        {% for test_product in products_without_value limit: 2 %}
+          <br>Product {{ forloop.index }}: {{ test_product.title }} ({{ test_product.id }})
+        {% endfor %}
       </div>
       
       {% if product_0.id %}
