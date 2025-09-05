@@ -44,7 +44,7 @@
 <!-- New metafield: {{ product.metafields.custom.cross_sell_products.value }} -->
 <!-- Legacy metafield: {{ product.metafields.custom.add_on_product.value }} -->
 <!-- Final cross_sell_products: {{ cross_sell_products }} -->
-<!-- cross_sell_products blank?: {{ cross_sell_products == blank }} -->
+<!-- cross_sell_products blank: {% if cross_sell_products == blank %}TRUE{% else %}FALSE{% endif %} -->
 <!-- cross_sell_products size: {{ cross_sell_products.size }} -->
 
 {% if cross_sell_products != blank %}
