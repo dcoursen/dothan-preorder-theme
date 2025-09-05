@@ -75,7 +75,7 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
+      {% for cross_product in product.metafields.custom.add_on_product limit: 4 %}
         <div style="background: lightcyan; padding: 3px; margin: 2px; color: black; font-size: 10px;">
           Product {{ forloop.index }}: {{ cross_product.title }} (ID: {{ cross_product.id }}, Available: {{ cross_product.available }})
         </div>
