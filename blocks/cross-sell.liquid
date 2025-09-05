@@ -78,7 +78,6 @@
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
           {% endunless %}
-          
           <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
             <a href="{{ cross_product.url }}" class="cross-sell__product-image-link">
               <div class="cross-sell__product-image">
@@ -119,7 +118,7 @@
                   
                   <button 
                     type="submit"
-                    class="{% if button_style == 'outline' %}button-secondary{% else %}button{% endif %} cross-sell__add-button"
+                    class="btn button cross-sell__add-button"
                     data-add-to-cart
                     data-product-id="{{ cross_product.id }}"
                     data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
@@ -145,10 +144,6 @@
   </div>
 
   <script type="module">
-    // Import Horizons theme events
-    import { CartUpdateEvent, ThemeEvents } from '{{ 'events.js' | asset_url }}';
-    import { fetchConfig } from '{{ 'utilities.js' | asset_url }}';
-
     class CrossSellBlock extends HTMLElement {
       constructor() {
         super();
@@ -166,7 +161,6 @@
         event.preventDefault();
         const button = event.currentTarget;
         const variantId = button.dataset.variantId;
-        const productId = button.dataset.productId;
         
         if (!variantId) return;
 
@@ -175,49 +169,60 @@
         button.innerText = 'Adding...';
 
         try {
-          // Use Shopify's add to cart endpoint with proper form data
-          const formData = new FormData();
-          formData.append('id', variantId);
-          formData.append('quantity', '1');
-          
-          const fetchCfg = fetchConfig('javascript', { body: formData });
-          
-          const response = await fetch(Theme.routes.cart_add_url || '/cart/add', {
-            ...fetchCfg,
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
             headers: {
-              ...fetchCfg.headers,
+              'Content-Type': 'application/json',
               'Accept': 'application/json'
-            }
+            },
+            body: JSON.stringify({
+              items: [{
+                id: variantId,
+                quantity: 1
+              }]
+            })
           });
 
           if (response.ok) {
             const data = await response.json();
             button.innerText = '✓ Added';
             
-            // Get fresh cart data
-            const cartResponse = await fetch('/cart.js');
-            const cartData = await cartResponse.json();
+            // Dispatch multiple cart events to trigger all possible cart updates
+            document.dispatchEvent(new CustomEvent('cart:updated', {
+              detail: { cart: data }
+            }));
             
-            // Dispatch proper Horizons theme CartUpdateEvent
-            const cartUpdateEvent = new CartUpdateEvent(cartData, 'cross-sell-block', {
-              itemCount: cartData.item_count,
-              source: 'cross-sell-block',
-              productId: productId,
-              variantId: variantId,
-              didError: false
-            });
-            
-            document.dispatchEvent(cartUpdateEvent);
+            document.dispatchEvent(new CustomEvent('cart:items-added', {
+              detail: { items: data.items }
+            }));
 
-            // Reset button after delay
+            document.dispatchEvent(new CustomEvent('cart:refresh'));
+
+            // Force refresh cart UI elements
+            const cartCount = document.querySelector('.header-actions__cart-count, .cart-count, [data-cart-count]');
+            const cartDrawer = document.querySelector('cart-drawer, [data-cart-drawer]');
+            
+            // Update cart count
+            if (cartCount) {
+              fetch('/cart.js')
+                .then(res => res.json())
+                .then(cart => {
+                  cartCount.textContent = cart.item_count;
+                  cartCount.setAttribute('data-cart-count', cart.item_count);
+                });
+            }
+            
+            // Trigger cart drawer refresh
+            if (cartDrawer && cartDrawer.refresh) {
+              cartDrawer.refresh();
+            }
+
             setTimeout(() => {
               button.innerText = originalText;
               button.disabled = false;
             }, 2000);
-            
           } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to add item');
+            throw new Error('Failed to add item');
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
@@ -298,13 +303,12 @@
       flex: 1;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 1rem;
     }
 
     .cross-sell__product-info {
       flex: 1;
-      max-width: 60%;
     }
 
     .cross-sell__product-actions {
@@ -312,8 +316,7 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 0.5rem;
-      min-width: 140px;
-      flex-shrink: 0;
+      min-width: 120px;
     }
 
     .cross-sell__product-title {
@@ -345,9 +348,50 @@
     }
 
     .cross-sell__add-button {
-      width: 100%;
-      min-width: 120px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      width: auto;
+      min-width: 100px;
+      height: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-button);
+      color: var(--color-button-text);
+      border: 2px solid var(--color-button);
+      border-radius: var(--border-radius-button, 4px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
       white-space: nowrap;
+    }
+
+    .cross-sell__add-button:hover {
+      background: var(--color-button-hover);
+    }
+
+    /* Button style variants */
+    .button-style--solid .cross-sell__add-button {
+      background: var(--color-button);
+      color: var(--color-button-text);
+      border: 2px solid var(--color-button);
+    }
+
+    .button-style--solid .cross-sell__add-button:hover {
+      background: var(--color-button-hover);
+      border-color: var(--color-button-hover);
+    }
+
+    .button-style--outline .cross-sell__add-button {
+      background: transparent;
+      color: var(--color-button);
+      border: 2px solid var(--color-button);
+    }
+
+    .button-style--outline .cross-sell__add-button:hover {
+      background: var(--color-button);
+      color: var(--color-button-text);
     }
 
     /* Clickable product links */
@@ -363,6 +407,11 @@
 
     .cross-sell__product-title-link:hover .cross-sell__product-title {
       color: var(--color-link-hover, #333);
+    }
+
+    .cross-sell__add-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .cross-sell__more-info {
