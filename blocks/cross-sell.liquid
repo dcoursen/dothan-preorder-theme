@@ -38,7 +38,10 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
-<!-- ALWAYS VISIBLE DEBUG -->
+<!-- CROSS-SELL BLOCK TEST: This should always be visible -->
+<div style="background: red; color: white; padding: 10px; margin: 20px 0;">
+  CROSS-SELL BLOCK IS LOADING: {{ product.title }}
+</div>
 <!-- Product: {{ product.title }} -->
 <!-- New metafield: {{ product.metafields.custom.cross_sell_products.value }} -->
 <!-- Legacy metafield: {{ product.metafields.custom.add_on_product.value }} -->
