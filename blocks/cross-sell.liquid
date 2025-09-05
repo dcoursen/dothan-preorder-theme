@@ -19,10 +19,10 @@
   
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
-    # The add_on_product metafield should contain an array of products
-    assign cross_sell_products = product.metafields.custom.add_on_product.value
-    assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
-    assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
+    # The add_on_product metafield returns a ProductListDrop - we can iterate directly
+    assign cross_sell_products = product.metafields.custom.add_on_product
+    assign cross_sell_title = product.metafields.custom.add_on_title | default: cross_sell_title
+    assign cross_sell_description = product.metafields.custom.add_on_description | default: cross_sell_description
   endif
   
   assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
@@ -38,16 +38,24 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
-{%- comment -%} DEBUG INFO {%- endcomment -%}
+{%- comment -%} DEBUG INFO - Remove this after testing {%- endcomment -%}
 <div style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
   <strong>CROSS-SELL DEBUG:</strong><br>
   Product: {{ product.title }}<br>
-  New metafield: {{ product.metafields.custom.cross_sell_products.value }}<br>
-  Legacy metafield: {{ product.metafields.custom.add_on_product.value }}<br>
+  Raw add_on_product: {{ product.metafields.custom.add_on_product }}<br>
   Final cross_sell_products: {{ cross_sell_products }}<br>
   Is blank: {% if cross_sell_products == blank %}TRUE{% else %}FALSE{% endif %}<br>
   Size: {{ cross_sell_products.size }}<br>
-  Type: {{ cross_sell_products.type | default: 'unknown' }}
+  Count of products found: 
+  {% assign product_count = 0 %}
+  {% for p in cross_sell_products %}
+    {% assign product_count = product_count | plus: 1 %}
+  {% endfor %}
+  {{ product_count }}<br>
+  Product titles: 
+  {% for p in cross_sell_products %}
+    [{{ forloop.index }}: {{ p.title }}]
+  {% endfor %}
 </div>
 
 {% if cross_sell_products != blank %}
