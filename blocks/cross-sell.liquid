@@ -20,7 +20,9 @@
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
     # The add_on_product metafield should contain an array of products
-    assign cross_sell_products = product.metafields.custom.add_on_product.value
+    # Note: For list.product_reference metafields, sometimes .value only returns first item
+    # Try without .value to get the full ProductListDrop
+    assign cross_sell_products = product.metafields.custom.add_on_product
     assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
     assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
   endif
@@ -38,6 +40,9 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
+
+<!-- Debug: cross_sell_products = {{ cross_sell_products }}, size = {{ cross_sell_products.size }}, type = {{ cross_sell_products.type }} -->
+<!-- Debug: add_on_product = {{ product.metafields.custom.add_on_product }}, size = {{ product.metafields.custom.add_on_product.size }} -->
 
 {% if cross_sell_products != blank %}
   <div
