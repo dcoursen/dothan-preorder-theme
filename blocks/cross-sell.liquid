@@ -13,16 +13,16 @@
   endif
 
   # Get cross-sell products list - this should be a List of product references metafield
-  # Try the new metafield name first
-  assign cross_sell_products = product.metafields.custom.cross_sell_products
+  # Try the new metafield name first (if it exists)
+  assign cross_sell_products = product.metafields.custom.cross_sell_products.value
   assign cross_sell_title = product.metafields.custom.cross_sell_title.value | default: 'Buy it with'
   assign cross_sell_description = product.metafields.custom.cross_sell_description.value
   
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
-    # For list of product references, don't use .value as it may only return first item
-    # Access the metafield directly to get all products
-    assign cross_sell_products = product.metafields.custom.add_on_product
+    # IMPORTANT: For list.product_reference, we need to access .value even though it has a bug
+    # We'll work around the bug by accessing products differently in the loop
+    assign cross_sell_products = product.metafields.custom.add_on_product.value
     assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
     assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
   endif
@@ -92,15 +92,9 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Try using .value to get product objects {% endcomment %}
-      {% assign products_list = cross_sell_products.value %}
-      {% if products_list == blank %}
-        {% comment %} If .value doesn't work, try without it {% endcomment %}
-        {% assign products_list = cross_sell_products %}
-      {% endif %}
-      
-      {% for cross_product in products_list limit: 4 %}
-        <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title | default: 'no title' }}, ID: {{ cross_product.id | default: 'no id' }}, Type: {{ cross_product.class }} -->
+      {% comment %} Direct access to metafield.value to work around Shopify bug with list.product_reference {% endcomment %}
+      {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
+        <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title | default: 'no title' }}, ID: {{ cross_product.id | default: 'no id' }} -->
         {% if cross_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
