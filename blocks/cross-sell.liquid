@@ -103,17 +103,16 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
       </div>
       
       <div style="background: yellow; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Testing direct iteration with .value:
-        {% for test_product in products_with_value limit: 2 %}
-          <br>Product {{ forloop.index }}: {{ test_product.title }} ({{ test_product.id }})
+        Testing OFFICIAL Shopify syntax with item.product:
+        {% for item in products_with_value limit: 2 %}
+          <br>Product {{ forloop.index }}: {{ item.product.title }} ({{ item.product.id }})
         {% endfor %}
       </div>
       
       <div style="background: pink; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Testing direct iteration without .value:
-        {% for test_product in products_without_value limit: 2 %}
-          <br>Product {{ forloop.index }}: {{ test_product.title }} ({{ test_product.id }})
-        {% endfor %}
+        Testing count method: {{ products_with_value.count }}<br>
+        First item: {{ products_with_value.first.product.title }}<br>
+        Last item: {{ products_with_value.last.product.title }}
       </div>
       
       {% if product_0.id %}
