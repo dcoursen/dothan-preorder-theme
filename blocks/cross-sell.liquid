@@ -28,13 +28,18 @@
   assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
   assign columns = block.settings.columns | default: 2
   assign columns_mobile = block.settings.columns_mobile | default: 1
+  assign background_color = block.settings.background_color | default: '#f5f5f5'
+  assign border_width = block.settings.border_width | default: 1
+  assign border_color = block.settings.border_color | default: '#e5e5e5'
+  assign button_style = block.settings.button_style | default: 'solid'
 %}
 
 
 {% if cross_sell_products != blank %}
   <div
-    class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }}"
+    class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }} button-style--{{ button_style }}"
     {{ block.shopify_attributes }}
+    style="background-color: {{ background_color }}; border: {{ border_width }}px solid {{ border_color }};"
   >
     <div class="cross-sell__header">
       {% if cross_sell_title != blank %}
@@ -42,11 +47,24 @@
       {% endif %}
       
       {% if cross_sell_description != blank %}
-        <!-- Debug description -->
-        <div style="font-size: 10px; color: red; margin: 5px 0;">
-          DEBUG: Description type: {{ cross_sell_description | json | truncate: 200 }}
-        </div>
-        <div class="cross-sell__description">{{ cross_sell_description }}</div>
+        {% liquid
+          # Handle rich text metafield - extract text from JSON structure
+          if cross_sell_description.type == 'root'
+            assign description_text = ''
+            for child in cross_sell_description.children
+              if child.type == 'paragraph'
+                for text_child in child.children
+                  if text_child.type == 'text'
+                    assign description_text = description_text | append: text_child.value
+                  endif
+                endfor
+              endif
+            endfor
+          else
+            assign description_text = cross_sell_description
+          endif
+        %}
+        <div class="cross-sell__description">{{ description_text }}</div>
       {% endif %}
     </div>
 
@@ -54,24 +72,28 @@
       {% for cross_product in cross_sell_products limit: 4 %}
         {% if cross_product.id %}
           <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
-            <div class="cross-sell__product-image">
-              {% if cross_product.featured_image %}
-                <img
-                  src="{{ cross_product.featured_image | image_url: width: 200 }}"
-                  srcset="{{ cross_product.featured_image | image_url: width: 100 }} 100w,
-                          {{ cross_product.featured_image | image_url: width: 200 }} 200w,
-                          {{ cross_product.featured_image | image_url: width: 300 }} 300w"
-                  sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
-                  alt="{{ cross_product.featured_image.alt | escape }}"
-                  loading="lazy"
-                  width="{{ cross_product.featured_image.width }}"
-                  height="{{ cross_product.featured_image.height }}"
-                >
-              {% endif %}
-            </div>
+            <a href="{{ cross_product.url }}" class="cross-sell__product-image-link">
+              <div class="cross-sell__product-image">
+                {% if cross_product.featured_image %}
+                  <img
+                    src="{{ cross_product.featured_image | image_url: width: 200 }}"
+                    srcset="{{ cross_product.featured_image | image_url: width: 100 }} 100w,
+                            {{ cross_product.featured_image | image_url: width: 200 }} 200w,
+                            {{ cross_product.featured_image | image_url: width: 300 }} 300w"
+                    sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
+                    alt="{{ cross_product.featured_image.alt | escape }}"
+                    loading="lazy"
+                    width="{{ cross_product.featured_image.width }}"
+                    height="{{ cross_product.featured_image.height }}"
+                  >
+                {% endif %}
+              </div>
+            </a>
             
             <div class="cross-sell__product-details">
-              <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
+              <a href="{{ cross_product.url }}" class="cross-sell__product-title-link">
+                <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
+              </a>
               
               <div class="cross-sell__product-price">
                 {% if cross_product.compare_at_price > cross_product.price %}
@@ -156,19 +178,34 @@
             const data = await response.json();
             button.querySelector('.cross-sell__add-text').innerText = '✓ Added';
             
-            // Dispatch cart update event
+            // Dispatch multiple cart events to trigger all possible cart updates
+            document.dispatchEvent(new CustomEvent('cart:updated', {
+              detail: { cart: data }
+            }));
+            
             document.dispatchEvent(new CustomEvent('cart:items-added', {
               detail: { items: data.items }
             }));
 
-            // Update cart count if element exists
-            const cartCount = document.querySelector('.header-actions__cart-count');
+            document.dispatchEvent(new CustomEvent('cart:refresh'));
+
+            // Force refresh cart UI elements
+            const cartCount = document.querySelector('.header-actions__cart-count, .cart-count, [data-cart-count]');
+            const cartDrawer = document.querySelector('cart-drawer, [data-cart-drawer]');
+            
+            // Update cart count
             if (cartCount) {
               fetch('/cart.js')
                 .then(res => res.json())
                 .then(cart => {
                   cartCount.textContent = cart.item_count;
+                  cartCount.setAttribute('data-cart-count', cart.item_count);
                 });
+            }
+            
+            // Trigger cart drawer refresh
+            if (cartDrawer && cartDrawer.refresh) {
+              cartDrawer.refresh();
             }
 
             setTimeout(() => {
@@ -195,9 +232,10 @@
   {% style %}
     .cross-sell-block {
       margin-top: 1.5rem;
-      padding: 0;
-      border-radius: 0;
+      padding: 1.25rem;
+      border-radius: var(--border-radius, 8px);
       width: 100%;
+      box-sizing: border-box;
     }
 
     .cross-sell__header {
@@ -227,11 +265,11 @@
     .cross-sell__product-item {
       display: flex;
       gap: 1rem;
-      padding: 1.25rem;
+      padding: 0;
       margin-bottom: 0;
-      background: var(--color-background, transparent);
-      border: 1px solid var(--color-border, #e5e5e5);
-      border-radius: var(--border-radius, 8px);
+      background: transparent;
+      border: none;
+      border-radius: 0;
       width: 100%;
       box-sizing: border-box;
     }
@@ -303,6 +341,44 @@
       background: var(--color-button-hover);
     }
 
+    /* Button style variants */
+    .button-style--solid .cross-sell__add-button {
+      background: var(--color-button);
+      color: var(--color-button-text);
+      border: 2px solid var(--color-button);
+    }
+
+    .button-style--solid .cross-sell__add-button:hover {
+      background: var(--color-button-hover);
+      border-color: var(--color-button-hover);
+    }
+
+    .button-style--outline .cross-sell__add-button {
+      background: transparent;
+      color: var(--color-button);
+      border: 2px solid var(--color-button);
+    }
+
+    .button-style--outline .cross-sell__add-button:hover {
+      background: var(--color-button);
+      color: var(--color-button-text);
+    }
+
+    /* Clickable product links */
+    .cross-sell__product-image-link {
+      display: block;
+      text-decoration: none;
+    }
+
+    .cross-sell__product-title-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .cross-sell__product-title-link:hover .cross-sell__product-title {
+      color: var(--color-link-hover, #333);
+    }
+
     .cross-sell__add-button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -361,6 +437,44 @@
       "id": "color_scheme",
       "label": "Color scheme",
       "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "solid"
     },
     {
       "type": "select",
