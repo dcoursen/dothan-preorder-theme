@@ -115,7 +115,7 @@
                   
                   <button 
                     type="submit"
-                    class="button button--primary button--full-width cross-sell__add-button"
+                    class="{% if button_style == 'outline' %}button-secondary{% else %}button{% endif %} cross-sell__add-button"
                     data-add-to-cart
                     data-product-id="{{ cross_product.id }}"
                     data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
@@ -141,6 +141,10 @@
   </div>
 
   <script type="module">
+    // Import Horizons theme events
+    import { CartUpdateEvent, ThemeEvents } from '{{ 'events.js' | asset_url }}';
+    import { fetchConfig } from '{{ 'utilities.js' | asset_url }}';
+
     class CrossSellBlock extends HTMLElement {
       constructor() {
         super();
@@ -158,6 +162,7 @@
         event.preventDefault();
         const button = event.currentTarget;
         const variantId = button.dataset.variantId;
+        const productId = button.dataset.productId;
         
         if (!variantId) return;
 
@@ -166,109 +171,39 @@
         button.innerText = 'Adding...';
 
         try {
-          const response = await fetch('/cart/add.js', {
-            method: 'POST',
+          // Use Shopify's add to cart endpoint with proper form data
+          const formData = new FormData();
+          formData.append('id', variantId);
+          formData.append('quantity', '1');
+          
+          const fetchCfg = fetchConfig('javascript', { body: formData });
+          
+          const response = await fetch(Theme.routes.cart_add_url || '/cart/add', {
+            ...fetchCfg,
             headers: {
-              'Content-Type': 'application/json',
+              ...fetchCfg.headers,
               'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-              items: [{
-                id: variantId,
-                quantity: 1
-              }]
-            })
+            }
           });
 
           if (response.ok) {
             const data = await response.json();
             button.innerText = '✓ Added';
             
-            // Get fresh cart data to ensure accurate updates
+            // Get fresh cart data
             const cartResponse = await fetch('/cart.js');
             const cartData = await cartResponse.json();
             
-            // Dispatch comprehensive cart events
-            document.dispatchEvent(new CustomEvent('cart:updated', {
-              detail: { cart: cartData, variant: data }
-            }));
-            
-            document.dispatchEvent(new CustomEvent('cart:items-added', {
-              detail: { items: cartData.items, addedItem: data }
-            }));
-
-            document.dispatchEvent(new CustomEvent('cart:refresh', {
-              detail: { cart: cartData }
-            }));
-
-            // Update all possible cart count elements immediately
-            const cartCountSelectors = [
-              '.header-actions__cart-count',
-              '.cart-count', 
-              '[data-cart-count]',
-              '.cart-icon-count',
-              '.cart-badge',
-              '.header__cart-count',
-              '.site-header__cart-count'
-            ];
-            
-            cartCountSelectors.forEach(selector => {
-              const element = document.querySelector(selector);
-              if (element) {
-                element.textContent = cartData.item_count;
-                element.setAttribute('data-cart-count', cartData.item_count);
-                // Show/hide based on count
-                if (cartData.item_count > 0) {
-                  element.style.display = '';
-                } else {
-                  element.style.display = 'none';
-                }
-              }
+            // Dispatch proper Horizons theme CartUpdateEvent
+            const cartUpdateEvent = new CartUpdateEvent(cartData, 'cross-sell-block', {
+              itemCount: cartData.item_count,
+              source: 'cross-sell-block',
+              productId: productId,
+              variantId: variantId,
+              didError: false
             });
             
-            // Update cart drawer/sidebar content
-            const cartDrawerSelectors = [
-              'cart-drawer',
-              '[data-cart-drawer]',
-              '.cart-drawer',
-              'cart-sidebar',
-              '.cart-sidebar'
-            ];
-            
-            cartDrawerSelectors.forEach(selector => {
-              const cartElement = document.querySelector(selector);
-              if (cartElement) {
-                if (cartElement.refresh && typeof cartElement.refresh === 'function') {
-                  cartElement.refresh();
-                }
-                // Try to trigger a cart refresh event on the element
-                cartElement.dispatchEvent(new CustomEvent('cart:refresh', {
-                  detail: { cart: cartData }
-                }));
-              }
-            });
-            
-            // Force refresh any cart content by fetching cart HTML
-            const cartContentElements = document.querySelectorAll('[data-cart-items], .cart-items, .mini-cart-items');
-            if (cartContentElements.length > 0) {
-              try {
-                const cartHtmlResponse = await fetch('/cart?view=ajax');
-                if (cartHtmlResponse.ok) {
-                  const cartHtml = await cartHtmlResponse.text();
-                  const parser = new DOMParser();
-                  const cartDoc = parser.parseFromString(cartHtml, 'text/html');
-                  
-                  cartContentElements.forEach(element => {
-                    const newCartContent = cartDoc.querySelector('[data-cart-items], .cart-items, .mini-cart-items');
-                    if (newCartContent) {
-                      element.innerHTML = newCartContent.innerHTML;
-                    }
-                  });
-                }
-              } catch (e) {
-                console.log('Could not refresh cart HTML:', e);
-              }
-            }
+            document.dispatchEvent(cartUpdateEvent);
 
             // Reset button after delay
             setTimeout(() => {
@@ -276,13 +211,9 @@
               button.disabled = false;
             }, 2000);
             
-            // Final cart refresh attempt after a short delay
-            setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('cart:updated'));
-              document.body.classList.add('cart-updated');
-            }, 100);
           } else {
-            throw new Error('Failed to add item');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add item');
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
@@ -403,54 +334,9 @@
     }
 
     .cross-sell__add-button {
-      padding: 0.75rem 1.25rem !important;
-      font-size: 0.9rem !important;
-      font-weight: 500 !important;
-      width: 100% !important;
-      min-width: 120px !important;
-      height: auto !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      background: var(--color-button) !important;
-      color: var(--color-button-text) !important;
-      border: 2px solid var(--color-button) !important;
-      border-radius: var(--border-radius, 4px) !important;
-      cursor: pointer !important;
-      transition: all 0.2s ease !important;
-      text-decoration: none !important;
-      white-space: nowrap !important;
-      box-shadow: var(--shadow-button, none) !important;
-    }
-
-    .cross-sell__add-button:hover {
-      background: var(--color-button-hover) !important;
-      border-color: var(--color-button-hover) !important;
-      transform: translateY(-1px) !important;
-      box-shadow: var(--shadow-button-hover, 0 4px 12px rgba(0,0,0,0.1)) !important;
-    }
-
-    /* Button style variants */
-    .button-style--solid .cross-sell__add-button {
-      background: var(--color-button) !important;
-      color: var(--color-button-text) !important;
-      border: 2px solid var(--color-button) !important;
-    }
-
-    .button-style--solid .cross-sell__add-button:hover {
-      background: var(--color-button-hover) !important;
-      border-color: var(--color-button-hover) !important;
-    }
-
-    .button-style--outline .cross-sell__add-button {
-      background: transparent !important;
-      color: var(--color-button) !important;
-      border: 2px solid var(--color-button) !important;
-    }
-
-    .button-style--outline .cross-sell__add-button:hover {
-      background: var(--color-button) !important;
-      color: var(--color-button-text) !important;
+      width: 100%;
+      min-width: 120px;
+      white-space: nowrap;
     }
 
     /* Clickable product links */
@@ -466,11 +352,6 @@
 
     .cross-sell__product-title-link:hover .cross-sell__product-title {
       color: var(--color-link-hover, #333);
-    }
-
-    .cross-sell__add-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     .cross-sell__more-info {
