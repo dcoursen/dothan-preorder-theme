@@ -94,25 +94,12 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
       {% assign products_with_value = product.metafields.custom.add_on_product.value %}
       {% assign products_without_value = product.metafields.custom.add_on_product %}
       
-      <div style="background: lightgreen; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Testing iteration methods:<br>
-        With .value size: {{ products_with_value.size }}<br>
-        Without .value size: {{ products_without_value.size }}<br>
-        First product with .value: {{ products_with_value.first.title }}<br>
-        First product without .value: {{ products_without_value.first.title }}
-      </div>
-      
-      <div style="background: yellow; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Testing OFFICIAL Shopify syntax with item.product:
-        {% for item in products_with_value limit: 2 %}
-          <br>Product {{ forloop.index }}: {{ item.product.title }} ({{ item.product.id }})
+      <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 12px;">
+        TESTING CORRECT APPROACH based on your code:<br>
+        Size: {{ cross_sell_products.size }}<br>
+        {% for related_product in cross_sell_products %}
+          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
         {% endfor %}
-      </div>
-      
-      <div style="background: pink; padding: 3px; margin: 2px; color: black; font-size: 10px;">
-        Testing count method: {{ products_with_value.count }}<br>
-        First item: {{ products_with_value.first.product.title }}<br>
-        Last item: {{ products_with_value.last.product.title }}
       </div>
       
       {% if product_0.id %}
@@ -242,25 +229,25 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
           </div>
       {% endif %}
       
-      {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
-        {% if cross_product.id %}
+      {% for related_product in cross_sell_products limit: 4 %}
+        {% if related_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
           {% endunless %}
-          <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
-            <a href="{{ cross_product.url }}" class="cross-sell__product-image-link">
+          <div class="cross-sell__product-item" data-product-id="{{ related_product.id }}">
+            <a href="{{ related_product.url }}" class="cross-sell__product-image-link">
               <div class="cross-sell__product-image">
-                {% if cross_product.featured_image %}
+                {% if related_product.featured_image %}
                   <img
-                    src="{{ cross_product.featured_image | image_url: width: 200 }}"
-                    srcset="{{ cross_product.featured_image | image_url: width: 100 }} 100w,
-                            {{ cross_product.featured_image | image_url: width: 200 }} 200w,
-                            {{ cross_product.featured_image | image_url: width: 300 }} 300w"
+                    src="{{ related_product.featured_image | image_url: width: 200 }}"
+                    srcset="{{ related_product.featured_image | image_url: width: 100 }} 100w,
+                            {{ related_product.featured_image | image_url: width: 200 }} 200w,
+                            {{ related_product.featured_image | image_url: width: 300 }} 300w"
                     sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
-                    alt="{{ cross_product.featured_image.alt | escape }}"
+                    alt="{{ related_product.featured_image.alt | escape }}"
                     loading="lazy"
-                    width="{{ cross_product.featured_image.width }}"
-                    height="{{ cross_product.featured_image.height }}"
+                    width="{{ related_product.featured_image.width }}"
+                    height="{{ related_product.featured_image.height }}"
                   >
                 {% endif %}
               </div>
@@ -268,32 +255,32 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
             
             <div class="cross-sell__product-details">
               <div class="cross-sell__product-info">
-                <a href="{{ cross_product.url }}" class="cross-sell__product-title-link">
-                  <h4 class="cross-sell__product-title">{{ cross_product.title | truncate: 50 }}</h4>
+                <a href="{{ related_product.url }}" class="cross-sell__product-title-link">
+                  <h4 class="cross-sell__product-title">{{ related_product.title | truncate: 50 }}</h4>
                 </a>
               </div>
               
               <div class="cross-sell__product-actions">
                 <div class="cross-sell__product-price">
-                  {% if cross_product.compare_at_price > cross_product.price %}
-                    <span class="cross-sell__price--compare">{{ cross_product.compare_at_price | money }}</span>
+                  {% if related_product.compare_at_price > related_product.price %}
+                    <span class="cross-sell__price--compare">{{ related_product.compare_at_price | money }}</span>
                   {% endif %}
-                  <span class="cross-sell__price">{{ cross_product.price | money }}</span>
+                  <span class="cross-sell__price">{{ related_product.price | money }}</span>
                 </div>
 
                 <form class="cross-sell__add-form" data-product-form>
-                  <input type="hidden" name="id" value="{{ cross_product.selected_or_first_available_variant.id }}">
+                  <input type="hidden" name="id" value="{{ related_product.selected_or_first_available_variant.id }}">
                   <input type="hidden" name="quantity" value="1">
                   
                   <button 
                     type="submit"
                     class="{% if button_style == 'outline' %}button-secondary{% else %}button{% endif %} cross-sell__add-button"
                     data-add-to-cart
-                    data-product-id="{{ cross_product.id }}"
-                    data-variant-id="{{ cross_product.selected_or_first_available_variant.id }}"
-                    {% unless cross_product.available %}disabled{% endunless %}
+                    data-product-id="{{ related_product.id }}"
+                    data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
+                    {% unless related_product.available %}disabled{% endunless %}
                   >
-                    {% if cross_product.available %}
+                    {% if related_product.available %}
                       + Add
                     {% else %}
                       Sold out
@@ -301,7 +288,7 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
                   </button>
                 </form>
 
-                <a href="{{ cross_product.url }}" class="cross-sell__more-info">
+                <a href="{{ related_product.url }}" class="cross-sell__more-info">
                   More info
                 </a>
               </div>
