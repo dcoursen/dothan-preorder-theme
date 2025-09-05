@@ -86,52 +86,11 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 11px;">
-        ITERATION DEBUG: Starting loop over {{ cross_sell_products }}
-      </div>
-      {% comment %} Test different access methods based on Shopify Community solution {% endcomment %}
-      {% assign products_with_value = product.metafields.custom.add_on_product.value %}
-      {% assign products_without_value = product.metafields.custom.add_on_product %}
-      
-      <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 12px;">
-        TESTING CORRECT APPROACH based on your code:<br>
-        cross_sell_products type: {{ cross_sell_products.type }}<br>
-        Size: {{ cross_sell_products.size }}<br>
-        Count: {{ cross_sell_products.count }}<br>
-        First: {{ cross_sell_products.first.title }}<br>
-        Last: {{ cross_sell_products.last.title }}<br>
-        {% for related_product in cross_sell_products %}
-          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
+      <div style="background: gray; padding: 10px; margin: 10px; color: white; font-size: 14px;">
+        SIMPLE TEST:<br>
+        {% for product_item in product.metafields.custom.add_on_product.value %}
+          {{ product_item.title }}<br>
         {% endfor %}
-      </div>
-      
-      <div style="background: pink; padding: 5px; margin: 5px; color: black; font-size: 12px;">
-        TESTING WITH .value explicitly:<br>
-        .value Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
-        {% for related_product in product.metafields.custom.add_on_product.value %}
-          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
-        {% endfor %}
-      </div>
-      
-      <div style="background: lime; padding: 5px; margin: 5px; color: black; font-size: 12px;">
-        TESTING DIRECT ITERATION (no variable assignment):<br>
-        {% for related_product in product.metafields.custom.add_on_product.value %}
-          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
-        {% endfor %}
-      </div>
-      
-      <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 12px;">
-        TESTING WITHOUT .value (accessing metafield directly):<br>
-        {% for related_product in product.metafields.custom.add_on_product %}
-          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
-        {% endfor %}
-      </div>
-      
-      <div style="background: purple; padding: 5px; margin: 5px; color: white; font-size: 12px;">
-        TESTING ARRAY ACCESS:<br>
-        Raw: {{ product.metafields.custom.add_on_product }}<br>
-        Array[0]: {{ product.metafields.custom.add_on_product[0].title }}<br>
-        Array[1]: {{ product.metafields.custom.add_on_product[1].title }}
       </div>
       
       {% if product_0.id %}
