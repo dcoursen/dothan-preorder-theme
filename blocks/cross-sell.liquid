@@ -47,29 +47,7 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      
-      <!-- Debug: Loop Logic -->
-      <div style="font-size: 10px; color: #666; margin: 5px 0;">
-        DEBUG: cross_sell_products.size: {{ cross_sell_products.size | default: 'null' }}<br>
-        DEBUG: cross_sell_products.id: {{ cross_sell_products.id | default: 'null' }}<br>
-        DEBUG: cross_sell_products type: {{ cross_sell_products | json | truncate: 100 }}<br>
-      </div>
-      
-      {% liquid
-        # For list metafields, cross_sell_products should be an array we can iterate directly
-        assign products_to_show = cross_sell_products
-      %}
-      
-      <div style="font-size: 10px; color: #666; margin: 5px 0;">
-        DEBUG: products_to_show: {{ products_to_show | json | truncate: 100 }}<br>
-        DEBUG: Loop will run for: {% if products_to_show != blank %}{{ products_to_show.size | default: '1 item' }}{% else %}0 items{% endif %}
-      </div>
-      
-      {% for cross_product in products_to_show limit: 4 %}
-        <div style="font-size: 10px; color: red; margin: 5px 0;">
-          DEBUG LOOP: cross_product.title = {{ cross_product.title | default: 'NO TITLE' }}<br>
-          DEBUG LOOP: cross_product.id = {{ cross_product.id | default: 'NO ID' }}
-        </div>
+      {% for cross_product in cross_sell_products limit: 4 %}
         {% if cross_product.id %}
           <div class="cross-sell__product-item" data-product-id="{{ cross_product.id }}">
             <div class="cross-sell__product-image">
@@ -112,16 +90,16 @@
                 >
                   <span class="cross-sell__add-text">
                     {% if cross_product.available %}
-                      + {{ 'products.product.add' | t | default: 'Add' }}
+                      + Add
                     {% else %}
-                      {{ 'products.product.sold_out' | t }}
+                      Sold out
                     {% endif %}
                   </span>
                 </button>
               </form>
 
               <a href="{{ cross_product.url }}" class="cross-sell__more-info">
-                {{ 'products.product.more_info' | t | default: 'More info' }}
+                More info
               </a>
             </div>
           </div>
