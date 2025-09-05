@@ -44,21 +44,17 @@
 <div style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
   <strong>CROSS-SELL DEBUG:</strong><br>
   Product: {{ product.title }}<br>
-  Raw metafield (no .value): {{ product.metafields.custom.add_on_product }}<br>
-  Raw metafield.value: {{ product.metafields.custom.add_on_product.value }}<br>
-  Final cross_sell_products: {{ cross_sell_products }}<br>
-  Is blank: {% if cross_sell_products == blank %}TRUE{% else %}FALSE{% endif %}<br>
-  Size: {{ cross_sell_products.size }}<br>
-  First item test: {{ cross_sell_products.first.title | default: 'no title' }}<br>
-  Count of products found: 
-  {% assign product_count = 0 %}
-  {% for p in cross_sell_products %}
-    {% assign product_count = product_count | plus: 1 %}
-  {% endfor %}
-  {{ product_count }}<br>
-  Product titles: 
-  {% for p in cross_sell_products %}
-    [{{ forloop.index }}: {{ p.title | default: 'untitled' }} - ID: {{ p.id }}]
+  Metafield test 1: {{ product.metafields.custom.add_on_product }}<br>
+  Metafield test 2: {{ product.metafields.custom.add_on_product.value }}<br>
+  Metafield type: {{ product.metafields.custom.add_on_product.type }}<br>
+  First with .value: {{ product.metafields.custom.add_on_product.value.first.title | default: 'none' }}<br>
+  All with .value:
+  {% for p in product.metafields.custom.add_on_product.value %}
+    [{{ p.title }}]
+  {% endfor %}<br>
+  Direct iteration:
+  {% for p in product.metafields.custom.add_on_product %}
+    [{{ p.title | default: p }}]
   {% endfor %}
 </div>
 
@@ -96,9 +92,15 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Loop through products - metafield returns iterable list {% endcomment %}
-      {% for cross_product in cross_sell_products limit: 4 %}
-        <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title }}, ID: {{ cross_product.id }} -->
+      {% comment %} Try using .value to get product objects {% endcomment %}
+      {% assign products_list = cross_sell_products.value %}
+      {% if products_list == blank %}
+        {% comment %} If .value doesn't work, try without it {% endcomment %}
+        {% assign products_list = cross_sell_products %}
+      {% endif %}
+      
+      {% for cross_product in products_list limit: 4 %}
+        <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title | default: 'no title' }}, ID: {{ cross_product.id | default: 'no id' }}, Type: {{ cross_product.class }} -->
         {% if cross_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
