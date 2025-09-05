@@ -46,9 +46,9 @@ Product ID: {{ product.id }}<br>
 Product Handle: {{ product.handle }}<br>
 cross_sell_products.value: {{ product.metafields.custom.cross_sell_products.value }}<br>
 add_on_product.value: {{ product.metafields.custom.add_on_product.value }}<br>
-add_on_product: {{ product.metafields.custom.add_on_product }}<br>
+add_on_product (no .value): {{ product.metafields.custom.add_on_product }}<br>
 Final cross_sell_products: {{ cross_sell_products }}<br>
-Size: {{ cross_sell_products.size }}
+Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product.size }}
 </div>
 
 <!-- Debug: cross_sell_products = {{ cross_sell_products }}, size = {{ cross_sell_products.size }}, type = {{ cross_sell_products.type }} -->
@@ -88,7 +88,13 @@ Size: {{ cross_sell_products.size }}
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
+      <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 11px;">
+        ITERATION DEBUG: Starting loop over {{ cross_sell_products }}
+      </div>
       {% for cross_product in cross_sell_products limit: 4 %}
+        <div style="background: lightblue; padding: 3px; margin: 2px; color: black; font-size: 10px;">
+          Loop {{ forloop.index }}: cross_product = {{ cross_product }}, ID = {{ cross_product.id }}
+        </div>
         {% if cross_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
