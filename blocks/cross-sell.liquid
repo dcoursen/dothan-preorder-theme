@@ -88,6 +88,7 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       <div style="background: gray; padding: 10px; margin: 10px; color: white; font-size: 14px;">
         SIMPLE TEST:<br>
+        Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
         {% for product_item in product.metafields.custom.add_on_product.value %}
           {{ product_item.title }}<br>
         {% endfor %}
