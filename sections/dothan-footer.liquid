@@ -222,10 +222,11 @@
                           <div class="stars-container" data-rating="{{ rating_value }}">
                             {% for i in (1..5) %}
                               {% assign star_fill = 0 %}
+                              {% assign prev_i = i | minus: 1 %}
                               {% if rating_value >= i %}
                                 {% assign star_fill = 100 %}
-                              {% elsif rating_value > i | minus: 1 %}
-                                {% assign decimal_part = rating_value | minus: i | plus: 1 | times: 100 %}
+                              {% elsif rating_value > prev_i %}
+                                {% assign decimal_part = rating_value | minus: prev_i | times: 100 %}
                                 {% assign star_fill = decimal_part %}
                               {% endif %}
                               <span class="star" style="--star-fill: {{ star_fill }}%">★</span>
@@ -251,10 +252,11 @@
                           <div class="stars-container" data-rating="{{ rating_value }}">
                             {% for i in (1..5) %}
                               {% assign star_fill = 0 %}
+                              {% assign prev_i = i | minus: 1 %}
                               {% if rating_value >= i %}
                                 {% assign star_fill = 100 %}
-                              {% elsif rating_value > i | minus: 1 %}
-                                {% assign decimal_part = rating_value | minus: i | plus: 1 | times: 100 %}
+                              {% elsif rating_value > prev_i %}
+                                {% assign decimal_part = rating_value | minus: prev_i | times: 100 %}
                                 {% assign star_fill = decimal_part %}
                               {% endif %}
                               <span class="star" style="--star-fill: {{ star_fill }}%">★</span>
@@ -280,10 +282,11 @@
                           <div class="stars-container" data-rating="{{ rating_value }}">
                             {% for i in (1..5) %}
                               {% assign star_fill = 0 %}
+                              {% assign prev_i = i | minus: 1 %}
                               {% if rating_value >= i %}
                                 {% assign star_fill = 100 %}
-                              {% elsif rating_value > i | minus: 1 %}
-                                {% assign decimal_part = rating_value | minus: i | plus: 1 | times: 100 %}
+                              {% elsif rating_value > prev_i %}
+                                {% assign decimal_part = rating_value | minus: prev_i | times: 100 %}
                                 {% assign star_fill = decimal_part %}
                               {% endif %}
                               <span class="star" style="--star-fill: {{ star_fill }}%">★</span>
