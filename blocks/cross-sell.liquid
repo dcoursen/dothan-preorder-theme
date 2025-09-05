@@ -16,16 +16,12 @@
   assign cross_sell_title = product.metafields.custom.add_on_title.value | default: 'Buy it with'
   assign cross_sell_description = product.metafields.custom.add_on_description.value
   
-  comment Check if we have a product object or text
   if add_on_product_raw.id
-    comment We have a product object
     assign add_on_product = add_on_product_raw
   elsif add_on_product_raw != blank
-    comment We have text, try to find product by handle or title
     assign product_handle = add_on_product_raw | handleize
     assign add_on_product = collections.all.products[product_handle]
     
-    comment If not found by handle, search by title
     if add_on_product == blank
       for search_product in collections.all.products
         if search_product.title contains add_on_product_raw or add_on_product_raw contains search_product.title
