@@ -44,17 +44,19 @@
 <div style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 12px;">
   <strong>CROSS-SELL DEBUG:</strong><br>
   Product: {{ product.title }}<br>
-  Metafield test 1: {{ product.metafields.custom.add_on_product }}<br>
-  Metafield test 2: {{ product.metafields.custom.add_on_product.value }}<br>
-  Metafield type: {{ product.metafields.custom.add_on_product.type }}<br>
-  First with .value: {{ product.metafields.custom.add_on_product.value.first.title | default: 'none' }}<br>
-  All with .value:
-  {% for p in product.metafields.custom.add_on_product.value %}
-    [{{ p.title }}]
-  {% endfor %}<br>
-  Direct iteration:
+  Metafield: {{ product.metafields.custom.add_on_product }}<br>
+  Metafield.value: {{ product.metafields.custom.add_on_product.value }}<br>
+  Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
+  First: {{ product.metafields.custom.add_on_product.value[0].title }}<br>
+  Second: {{ product.metafields.custom.add_on_product.value[1].title }}<br>
+  Third: {{ product.metafields.custom.add_on_product.value[2].title }}<br>
+  Loop without .value:
   {% for p in product.metafields.custom.add_on_product %}
-    [{{ p.title | default: p }}]
+    [{{ forloop.index }}: {{ p.title }}]
+  {% endfor %}<br>
+  Loop with .value:
+  {% for p in product.metafields.custom.add_on_product.value %}
+    [{{ forloop.index }}: {{ p.title }}]
   {% endfor %}
 </div>
 
@@ -92,8 +94,8 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Direct access to metafield.value to work around Shopify bug with list.product_reference {% endcomment %}
-      {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
+      {% comment %} Try without .value - Shopify list.product_reference bug workaround {% endcomment %}
+      {% for cross_product in product.metafields.custom.add_on_product limit: 4 %}
         <!-- DEBUG: Loop {{ forloop.index }}: {{ cross_product.title | default: 'no title' }}, ID: {{ cross_product.id | default: 'no id' }} -->
         {% if cross_product.id %}
           {% unless forloop.first %}
