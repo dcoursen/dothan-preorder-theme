@@ -91,7 +91,7 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
       <div style="background: orange; padding: 5px; margin: 5px; color: black; font-size: 11px;">
         ITERATION DEBUG: Starting loop over {{ cross_sell_products }}
       </div>
-      {% for cross_product in product.metafields.custom.add_on_product limit: 4 %}
+      {% for cross_product in product.metafields.custom.add_on_product.value limit: 4 %}
         <div style="background: lightblue; padding: 3px; margin: 2px; color: black; font-size: 10px;">
           Loop {{ forloop.index }}: cross_product = {{ cross_product }}, ID = {{ cross_product.id }}
         </div>
