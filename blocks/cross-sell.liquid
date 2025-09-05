@@ -19,8 +19,7 @@
   
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
-    # The add_on_product metafield should contain an array of products
-    # For list.product_reference metafields, use .value to get the product array
+    # For list.product_reference metafields, we need to access the .value to get the actual product list
     assign cross_sell_products = product.metafields.custom.add_on_product.value
     assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
     assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
@@ -96,8 +95,20 @@ Using add_on_product WITHOUT .value: {{ product.metafields.custom.add_on_product
       
       <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 12px;">
         TESTING CORRECT APPROACH based on your code:<br>
+        cross_sell_products type: {{ cross_sell_products.type }}<br>
         Size: {{ cross_sell_products.size }}<br>
+        Count: {{ cross_sell_products.count }}<br>
+        First: {{ cross_sell_products.first.title }}<br>
+        Last: {{ cross_sell_products.last.title }}<br>
         {% for related_product in cross_sell_products %}
+          Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
+        {% endfor %}
+      </div>
+      
+      <div style="background: pink; padding: 5px; margin: 5px; color: black; font-size: 12px;">
+        TESTING WITH .value explicitly:<br>
+        .value Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
+        {% for related_product in product.metafields.custom.add_on_product.value %}
           Product {{ forloop.index }}: {{ related_product.title }} (ID: {{ related_product.id }})<br>
         {% endfor %}
       </div>
