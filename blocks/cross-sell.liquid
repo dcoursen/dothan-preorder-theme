@@ -33,25 +33,6 @@
   assign columns_mobile = block.settings.columns_mobile | default: 1
 %}
 
-<!-- Debug: Cross-sell Configuration -->
-<div style="padding: 10px; background: #f0f0f0; margin: 10px 0; font-size: 12px; border: 1px solid #ccc;">
-  <strong>Cross-sell Debug:</strong><br>
-  Product: {{ product.title | default: 'No product found' }}<br>
-  
-  <strong>RAW METAFIELDS (without .value):</strong><br>
-  cross_sell_products raw: {{ product.metafields.custom.cross_sell_products | json }}<br>
-  add_on_product raw: {{ product.metafields.custom.add_on_product | json }}<br>
-  add_on_title raw: {{ product.metafields.custom.add_on_title | json }}<br>
-  add_on_description raw: {{ product.metafields.custom.add_on_description | json }}<br>
-  
-  <strong>WITH .value:</strong><br>
-  New metafield (cross_sell_products): {{ cross_sell_products | json | default: 'Empty' }}<br>
-  Old metafield (add_on_product): {{ product.metafields.custom.add_on_product.value | json | default: 'Empty' }}<br>
-  Title: {{ cross_sell_title | default: 'No title' }}<br>
-  Description: {{ cross_sell_description | default: 'No description' }}<br>
-  
-  Products found: {% if cross_sell_products != blank %}✅ YES{% else %}❌ NO{% endif %}
-</div>
 
 {% if cross_sell_products != blank %}
   <div
