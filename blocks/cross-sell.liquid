@@ -77,6 +77,13 @@
       Type: {{ product.metafields.custom.add_on_product.value | type }}<br>
       Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
       First item: {{ product.metafields.custom.add_on_product.value.first | json | truncate: 100 }}<br>
+      <br><strong>Loop Investigation:</strong><br>
+      {% assign loop_count = 0 %}
+      {% for test_product in related_products %}
+        {% assign loop_count = loop_count | plus: 1 %}
+        Item {{ loop_count }}: {{ test_product.title | default: "NO TITLE" }} (Available: {{ test_product.available | default: "unknown" }})<br>
+      {% endfor %}
+      Total iterations: {{ loop_count }}<br>
     </div>
 
     {% if related_products != blank %}
