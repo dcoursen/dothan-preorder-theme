@@ -37,29 +37,13 @@
   
   # Parse description if it's JSON, otherwise use as-is
   assign add_on_description = add_on_description_raw
-  if add_on_description_raw contains '"type":"root"'
-    # It's a rich text JSON - extract all text values
-    assign parsed_text = ''
-    assign parts = add_on_description_raw | split: '"value":"'
-    for part in parts
-      if forloop.index > 1
-        assign text_segment = part | split: '"' | first
-        if parsed_text != blank
-          assign parsed_text = parsed_text | append: ' '
-        endif
-        assign parsed_text = parsed_text | append: text_segment
-      endif
-    endfor
-    if parsed_text != blank
-      assign add_on_description = parsed_text
-    endif
-  elsif add_on_description_raw contains '"value":"'
-    # Simple JSON with value field
-    assign value_split = add_on_description_raw | split: '"value":"'
-    if value_split.size > 1
-      assign text_with_end = value_split[1]
-      assign text_parts = text_with_end | split: '"'
-      assign add_on_description = text_parts[0]
+  if add_on_description_raw contains '"type":"text"' and add_on_description_raw contains '"value":"'
+    # Extract text from the JSON structure {"type":"root","children":[{"type":"paragraph","children":[{"type":"text","value":"Looking to stun your neighbors? These supporting actors will really turn up the drama and be the envy of the neighborhood."}]}]}
+    assign value_parts = add_on_description_raw | split: '"value":"'
+    if value_parts.size > 1
+      assign text_with_quotes = value_parts[1]
+      assign text_clean = text_with_quotes | split: '"' | first
+      assign add_on_description = text_clean
     endif
   endif
   
