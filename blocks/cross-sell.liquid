@@ -87,12 +87,10 @@
                 {% endif %}
               </div>
               <div class="related-product-details">
-                <div class="related-product-header">
-                  <h4 class="related-product-name">{{ related_product.title }}</h4>
-                  <div class="related-product-price">{{ related_product.price | money }}</div>
-                </div>
+                <h4 class="related-product-name">{{ related_product.title }}</h4>
               </div>
               <div class="related-product-actions">
+                <div class="related-product-price">{{ related_product.price | money }}</div>
                 <button 
                   type="button"
                   class="related-product-add-btn {% if button_style == 'outline' %}outline-style{% else %}solid-style{% endif %}{% unless related_product.available %} sold-out{% endunless %}"
@@ -247,7 +245,7 @@
       display: flex;
       align-items: flex-start;
       gap: 1rem;
-      padding: {{ product_spacing }}rem 0;
+      padding: {{ product_spacing }}px 0;
     }
 
     .related-product-image {
@@ -267,12 +265,6 @@
       flex: 1;
     }
 
-    .related-product-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
     .related-product-name {
       font-size: {{ product_title_size }};
       font-weight: 500;
@@ -286,7 +278,8 @@
       font-size: {{ product_price_size }};
       font-weight: 600;
       color: {{ product_price_color }};
-      margin: 0;
+      margin: 0 0 0.5rem 0;
+      text-align: center;
     }
 
     .related-product-actions {
@@ -636,11 +629,11 @@
       "type": "range",
       "id": "product_spacing",
       "label": "Product spacing",
-      "min": 0.5,
-      "max": 3,
-      "step": 0.1,
-      "unit": "rem",
-      "default": 1,
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
       "info": "Padding between products"
     },
     {
