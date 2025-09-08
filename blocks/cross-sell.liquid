@@ -16,25 +16,16 @@
     assign product = collections.all.products.first
   endif
 
-  # Get related products using the correct pattern
+  # Get related products using the correct pattern  
   assign related_products = product.metafields.custom.add_on_product.value
-  if related_products == blank
-    assign related_products = product.metafields.custom.cross_sell_products.value
-  endif
   
-  assign add_on_title = product.metafields.custom.cross_sell_title.value
-  if add_on_title == blank
-    assign add_on_title = product.metafields.custom.add_on_title
-  endif
+  assign add_on_title = product.metafields.custom.add_on_title.value
   if add_on_title == blank
     assign add_on_title = 'Goes great with'
   endif
   
   # Use metafield_tag for rich text metafields - handles JSON parsing automatically
-  assign add_on_description_metafield = product.metafields.custom.cross_sell_description
-  if add_on_description_metafield == blank
-    assign add_on_description_metafield = product.metafields.custom.add_on_description
-  endif
+  assign add_on_description_metafield = product.metafields.custom.add_on_description
   
   # Parse title if it's JSON too
   if add_on_title contains '"value":"'
