@@ -19,10 +19,20 @@
   
   # Fallback: Check old metafield name for backward compatibility
   if cross_sell_products == blank
-    # For list.product_reference metafields, we need to access the .value to get the actual product list
-    assign cross_sell_products = product.metafields.custom.add_on_product.value
-    assign cross_sell_title = product.metafields.custom.add_on_title.value | default: cross_sell_title
-    assign cross_sell_description = product.metafields.custom.add_on_description.value | default: cross_sell_description
+    # Try accessing without .value first (for list.product_reference type)
+    assign cross_sell_products = product.metafields.custom.add_on_product
+    if cross_sell_products == blank
+      # If still blank, try with .value
+      assign cross_sell_products = product.metafields.custom.add_on_product.value
+    endif
+    assign cross_sell_title = product.metafields.custom.add_on_title.value
+    if cross_sell_title == blank
+      assign cross_sell_title = product.metafields.custom.add_on_title | default: 'Goes great with'
+    endif
+    assign cross_sell_description = product.metafields.custom.add_on_description.value
+    if cross_sell_description == blank
+      assign cross_sell_description = product.metafields.custom.add_on_description
+    endif
   endif
   
   assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
@@ -38,6 +48,18 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
+
+<!-- Debug Info -->
+<div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
+  DEBUG INFO:<br>
+  Product Handle: {{ product.handle }}<br>
+  cross_sell_products type: {{ cross_sell_products.first }}<br>
+  cross_sell_products size: {{ cross_sell_products.size }}<br>
+  Direct access add_on_product: {{ product.metafields.custom.add_on_product }}<br>
+  Direct access size: {{ product.metafields.custom.add_on_product.size }}<br>
+  First item: {{ product.metafields.custom.add_on_product.first }}<br>
+  First item ID: {{ product.metafields.custom.add_on_product.first.id }}<br>
+</div>
 
 {% if cross_sell_products != blank %}
   <div
@@ -74,7 +96,7 @@
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% comment %} The metafield returns product references directly when it's a list.product_reference type {% endcomment %}
-      {% for related_product in product.metafields.custom.add_on_product %}
+      {% for related_product in cross_sell_products %}
         {% if related_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
