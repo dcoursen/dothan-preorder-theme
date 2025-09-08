@@ -78,123 +78,18 @@
       {% endif %}
     </div>
 
-    <!-- DEBUG: Product lookup -->
-    <div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
-      <strong>DEBUG - Product Lookup:</strong><br>
-      Products count: {{ add_on_products.size }}<br>
-      {% for gid in add_on_products %}
-        Product {{ forloop.index }} GID: {{ gid | truncate: 80 }}<br>
-      {% endfor %}
-    </div>
-
-    <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Handle GIDs - multiple fallback strategies {% endcomment %}
-      {% for product_gid in add_on_products %}
-        {% assign related_product = blank %}
-        
-        {% comment %} Strategy 1: Direct handle lookup for known products {% endcomment %}
-        {% if product_gid contains '8749976846498' %}
-          {% assign related_product = collections.all.products['cassia-peanut-tree'] %}
-        {% elsif product_gid contains '8749972553890' %}
-          {% assign related_product = collections.all.products['snowball-viburnum'] %}
-        {% endif %}
-        
-        {% comment %} Strategy 2: Search by ID if direct lookup failed {% endcomment %}
-        {% if related_product == blank %}
-          {% assign product_id_string = product_gid | split: '/' | last %}
-          {% assign product_id_num = product_id_string | plus: 0 %}
-          
-          {% for p in collections.all.products limit: 250 %}
-            {% if p.id == product_id_num %}
-              {% assign related_product = p %}
-              {% break %}
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-        
-        {% comment %} Strategy 3: Try string comparison of IDs {% endcomment %}
-        {% if related_product == blank %}
-          {% for p in collections.all.products limit: 250 %}
-            {% assign p_id_string = p.id | append: '' %}
-            {% if p_id_string == product_id_string %}
-              {% assign related_product = p %}
-              {% break %}
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-        
-        <!-- DEBUG: Product found check -->
-        <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 10px;">
-          Product {{ forloop.index }}: GID={{ product_gid | truncate: 50 }}<br>
-          Found product: {{ related_product.title | default: "NOT FOUND" }}<br>
-          Product ID: {{ related_product.id | default: "N/A" }}
-        </div>
-
-        {% if related_product.id %}
-          {% unless forloop.first %}
-            <hr class="cross-sell__divider">
-          {% endunless %}
-          <div class="cross-sell__product-item" data-product-id="{{ related_product.id }}">
-            <a href="{{ related_product.url }}" class="cross-sell__product-image-link">
-              <div class="cross-sell__product-image">
-                {% if related_product.featured_image %}
-                  <img
-                    src="{{ related_product.featured_image | image_url: width: 200 }}"
-                    srcset="{{ related_product.featured_image | image_url: width: 100 }} 100w,
-                            {{ related_product.featured_image | image_url: width: 200 }} 200w,
-                            {{ related_product.featured_image | image_url: width: 300 }} 300w"
-                    sizes="(max-width: 749px) calc(100vw / {{ columns_mobile }}), calc(100vw / {{ columns }})"
-                    alt="{{ related_product.featured_image.alt | escape }}"
-                    loading="lazy"
-                    width="{{ related_product.featured_image.width }}"
-                    height="{{ related_product.featured_image.height }}"
-                  >
-                {% endif %}
-              </div>
-            </a>
-            
-            <div class="cross-sell__product-details">
-              <div class="cross-sell__product-info">
-                <a href="{{ related_product.url }}" class="cross-sell__product-title-link">
-                  <h4 class="cross-sell__product-title">{{ related_product.title | truncate: 50 }}</h4>
-                </a>
-              </div>
-              
-              <div class="cross-sell__product-actions">
-                <div class="cross-sell__product-price">
-                  {% if related_product.compare_at_price > related_product.price %}
-                    <span class="cross-sell__price--compare">{{ related_product.compare_at_price | money }}</span>
-                  {% endif %}
-                  <span class="cross-sell__price">{{ related_product.price | money }}</span>
-                </div>
-
-                <form class="cross-sell__add-form" data-product-form>
-                  <input type="hidden" name="id" value="{{ related_product.selected_or_first_available_variant.id }}">
-                  <input type="hidden" name="quantity" value="1">
-                  
-                  <button 
-                    type="submit"
-                    class="{% if button_style == 'outline' %}button-secondary{% else %}button{% endif %} cross-sell__add-button"
-                    data-add-to-cart
-                    data-product-id="{{ related_product.id }}"
-                    data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
-                    {% unless related_product.available %}disabled{% endunless %}
-                  >
-                    {% if related_product.available %}
-                      + Add
-                    {% else %}
-                      Sold out
-                    {% endif %}
-                  </button>
-                </form>
-
-                <a href="{{ related_product.url }}" class="cross-sell__more-info">
-                  More info
-                </a>
-              </div>
+    <div class="cross-sell__products">
+      {% comment %} Use the simple metafield approach - no complex GID parsing needed {% endcomment %}
+      {% for related_product in add_on_products %}
+        <a href="{{ shop.url | append: '/products/' | append: related_product.handle }}">
+          <div class="related-product">
+            <div class="related-product-image">
+              <img src="{{ related_product.featured_image | img_url: 'medium' }}" alt="{{ related_product.title }}" />
             </div>
+            <div class="related-product-name">{{ related_product.title }}</div>
+            <div class="related-product-price">{{ related_product.price | money }}</div>
           </div>
-        {% endif %}
+        </a>
       {% endfor %}
     </div>
   </div>
@@ -319,15 +214,49 @@
     }
 
     .cross-sell__products {
-      display: block;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
       width: 100%;
     }
 
-    .cross-sell__divider {
-      border: none;
-      border-top: 1px solid #e5e5e5;
-      margin: 1rem 0;
+    .related-product {
+      display: block;
+      padding: 1rem;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      text-decoration: none;
+      color: inherit;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .related-product:hover {
+      border-color: #ccc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .related-product-image {
+      margin-bottom: 0.5rem;
+    }
+
+    .related-product-image img {
       width: 100%;
+      height: auto;
+      max-width: 150px;
+      border-radius: 4px;
+    }
+
+    .related-product-name {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #000;
+    }
+
+    .related-product-price {
+      font-weight: 600;
+      color: #000;
     }
 
     .cross-sell__product-item {
