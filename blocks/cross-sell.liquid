@@ -78,6 +78,15 @@
       {% endif %}
     </div>
 
+    <!-- DEBUG: Product lookup -->
+    <div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
+      <strong>DEBUG - Product Lookup:</strong><br>
+      Products count: {{ add_on_products.size }}<br>
+      {% for gid in add_on_products %}
+        Product {{ forloop.index }} GID: {{ gid | truncate: 80 }}<br>
+      {% endfor %}
+    </div>
+
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
       {% comment %} Handle GIDs - multiple fallback strategies {% endcomment %}
       {% for product_gid in add_on_products %}
@@ -114,6 +123,13 @@
           {% endfor %}
         {% endif %}
         
+        <!-- DEBUG: Product found check -->
+        <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 10px;">
+          Product {{ forloop.index }}: GID={{ product_gid | truncate: 50 }}<br>
+          Found product: {{ related_product.title | default: "NOT FOUND" }}<br>
+          Product ID: {{ related_product.id | default: "N/A" }}
+        </div>
+
         {% if related_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
