@@ -44,6 +44,7 @@
   assign border_width = block.settings.border_width | default: 1
   assign border_color = block.settings.border_color | default: '#e5e5e5'
   assign button_style = block.settings.button_style | default: 'solid'
+  assign button_radius = block.settings.button_radius | default: 25
   assign title_font_size = block.settings.title_font_size | default: '1.1rem'
   assign title_color = block.settings.title_color | default: 'var(--color-foreground)'
   assign description_font_size = block.settings.description_font_size | default: '0.9rem'
@@ -80,14 +81,14 @@
                 {% endif %}
               </div>
               <div class="related-product-details">
-                <div class="related-product-info">
+                <div class="related-product-header">
                   <h4 class="related-product-name">{{ related_product.title }}</h4>
                   <div class="related-product-price">{{ related_product.price | money }}</div>
                 </div>
                 <div class="related-product-actions">
                   <button 
                     type="button"
-                    class="related-product-add-btn{% unless related_product.available %} sold-out{% endunless %}"
+                    class="related-product-add-btn {% if button_style == 'outline' %}outline-style{% else %}solid-style{% endif %}{% unless related_product.available %} sold-out{% endunless %}"
                     data-product-id="{{ related_product.id }}"
                     data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
                     data-add-to-cart
@@ -257,20 +258,23 @@
     .related-product-details {
       flex: 1;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 0.75rem;
     }
 
-    .related-product-info {
-      flex: 1;
+    .related-product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .related-product-name {
       font-size: 1rem;
       font-weight: 500;
-      margin: 0 0 0.25rem 0;
+      margin: 0;
       color: #000;
       line-height: 1.3;
+      flex: 1;
     }
 
     .related-product-price {
@@ -283,34 +287,61 @@
     .related-product-actions {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.5rem;
     }
 
     .related-product-add-btn {
-      background: #000;
-      color: #fff;
-      border: none;
       padding: 0.75rem 1.5rem;
-      border-radius: 25px;
+      border-radius: {{ button_radius }}px;
       font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
       min-width: 100px;
+      border: 2px solid #000;
     }
 
-    .related-product-add-btn:hover {
+    .related-product-add-btn.solid-style {
+      background: #000;
+      color: #fff;
+    }
+
+    .related-product-add-btn.outline-style {
+      background: transparent;
+      color: #000;
+    }
+
+    .related-product-add-btn.solid-style:hover {
       opacity: 0.8;
+    }
+
+    .related-product-add-btn.outline-style:hover {
+      background: #000;
+      color: #fff;
     }
 
     .related-product-add-btn.sold-out {
       background: #999;
+      color: #fff;
+      border-color: #999;
       cursor: not-allowed;
+    }
+
+    .related-product-add-btn.sold-out.outline-style {
+      background: transparent;
+      color: #999;
     }
 
     .related-product-add-btn.sold-out:hover {
       opacity: 1;
+      background: #999;
+      color: #fff;
+    }
+
+    .related-product-add-btn.sold-out.outline-style:hover {
+      background: transparent;
+      color: #999;
     }
 
     .related-product-add-btn:disabled {
@@ -548,6 +579,17 @@
         }
       ],
       "default": "solid"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 25,
+      "info": "0 = square corners, 50 = fully rounded"
     },
     {
       "type": "header",
