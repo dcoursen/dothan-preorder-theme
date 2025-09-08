@@ -69,9 +69,22 @@
       {% endif %}
     </div>
 
+    <!-- DEBUG: Check metafield data -->
+    <div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
+      <strong>DEBUG - Metafield Investigation:</strong><br>
+      Raw metafield: {{ product.metafields.custom.add_on_product | json | truncate: 200 }}<br>
+      With .value: {{ product.metafields.custom.add_on_product.value | json | truncate: 200 }}<br>
+      Type: {{ product.metafields.custom.add_on_product.value | type }}<br>
+      Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
+      First item: {{ product.metafields.custom.add_on_product.value.first | json | truncate: 100 }}<br>
+    </div>
+
     {% if related_products.size > 0 %}
       <div class="cross-sell__products">
         {% for related_product in related_products %}
+          <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 10px;">
+            Product {{ forloop.index }}: {{ related_product.title | default: "NO TITLE" }} ({{ related_product | type }})
+          </div>
           <a href="{{ related_product.url }}">
             <div class="related-product">
               <div class="related-product-image">
