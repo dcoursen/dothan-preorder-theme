@@ -7,31 +7,37 @@
 {%- endcomment -%}
 
 {% liquid
-  assign product = closest.product
+  # Get the product context properly
+  if product == blank or product == nil
+    assign product = section.settings.product | default: page.product | default: closest.product
+  endif
+  
   if request.visual_preview_mode and product == blank
     assign product = collections.all.products.first
   endif
 
-  # Get cross-sell products list - this should be a List of product references metafield
+  # First try the new metafield names
   assign cross_sell_products = product.metafields.custom.cross_sell_products.value
   assign cross_sell_title = product.metafields.custom.cross_sell_title.value | default: 'Buy it with'
   assign cross_sell_description = product.metafields.custom.cross_sell_description.value
   
-  # Fallback: Check old metafield name for backward compatibility
+  # Fallback to old metafield names - try both with and without .value
   if cross_sell_products == blank
-    # Try accessing without .value first (for list.product_reference type)
     assign cross_sell_products = product.metafields.custom.add_on_product
-    if cross_sell_products == blank
-      # If still blank, try with .value
-      assign cross_sell_products = product.metafields.custom.add_on_product.value
-    endif
-    assign cross_sell_title = product.metafields.custom.add_on_title.value
+  endif
+  
+  # Get title and description with fallbacks
+  if cross_sell_title == blank
+    assign cross_sell_title = product.metafields.custom.add_on_title
     if cross_sell_title == blank
-      assign cross_sell_title = product.metafields.custom.add_on_title | default: 'Goes great with'
+      assign cross_sell_title = 'Goes great with'
     endif
-    assign cross_sell_description = product.metafields.custom.add_on_description.value
+  endif
+  
+  if cross_sell_description == blank
+    assign cross_sell_description = product.metafields.custom.add_on_description
     if cross_sell_description == blank
-      assign cross_sell_description = product.metafields.custom.add_on_description
+      assign cross_sell_description = 'Looking to stun your neighbors? These supporting actors will really turn up the drama and be the envy of the neighborhood.'
     endif
   endif
   
@@ -52,14 +58,19 @@
 <!-- Debug Info -->
 <div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
   DEBUG INFO:<br>
+  Product ID: {{ product.id }}<br>
   Product Handle: {{ product.handle }}<br>
+  Direct metafield access: {{ product.metafields.custom.add_on_product }}<br>
+  Metafield size: {{ product.metafields.custom.add_on_product.size }}<br>
+  cross_sell_products variable: {{ cross_sell_products }}<br>
   cross_sell_products size: {{ cross_sell_products.size }}<br>
-  {% for gid in cross_sell_products %}
-    GID {{ forloop.index }}: {{ gid }}<br>
-    {% assign pid_string = gid | split: '/' | last %}
-    Product ID: {{ pid_string }}<br>
-    {% assign pid = pid_string | plus: 0 %}
-    Product from all_products: {{ all_products[gid].title }}<br>
+  Title: {{ cross_sell_title }}<br>
+  Description: {{ cross_sell_description }}<br>
+  {% for item in product.metafields.custom.add_on_product %}
+    Item {{ forloop.index }}: {{ item }}<br>
+    Item type: {{ item.type }}<br>
+    Item ID: {{ item.id }}<br>
+    Item title: {{ item.title }}<br>
   {% endfor %}
 </div>
 
