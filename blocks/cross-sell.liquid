@@ -73,10 +73,19 @@
     <div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
       <strong>DEBUG - Metafield Investigation:</strong><br>
       Raw metafield: {{ product.metafields.custom.add_on_product | json | truncate: 200 }}<br>
-      With .value: {{ product.metafields.custom.add_on_product.value | json | truncate: 200 }}<br>
+      With .value (FULL): {{ product.metafields.custom.add_on_product.value | json | truncate: 500 }}<br>
       Type: {{ product.metafields.custom.add_on_product.value | type }}<br>
       Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
       First item: {{ product.metafields.custom.add_on_product.value.first | json | truncate: 100 }}<br>
+      <br><strong>Alternative Access Tests:</strong><br>
+      Without .value: {{ product.metafields.custom.add_on_product | type }}<br>
+      Direct iteration test:<br>
+      {% assign direct_count = 0 %}
+      {% for test_item in product.metafields.custom.add_on_product.value %}
+        {% assign direct_count = direct_count | plus: 1 %}
+        Direct {{ direct_count }}: {{ test_item.title | default: "NO TITLE" }} (ID: {{ test_item.id | default: "NO ID" }})<br>
+      {% endfor %}
+      Direct total: {{ direct_count }}<br>
       <br><strong>Loop Investigation:</strong><br>
       {% assign loop_count = 0 %}
       {% for test_product in related_products %}
