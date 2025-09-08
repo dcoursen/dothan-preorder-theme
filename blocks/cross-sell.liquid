@@ -69,55 +69,38 @@
       {% endif %}
     </div>
 
-    <!-- DEBUG: Check metafield data -->
-    <div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
-      <strong>DEBUG - Metafield Investigation:</strong><br>
-      Raw metafield: {{ product.metafields.custom.add_on_product | json | truncate: 200 }}<br>
-      With .value (FULL): {{ product.metafields.custom.add_on_product.value | json | truncate: 500 }}<br>
-      Type: {{ product.metafields.custom.add_on_product.value | type }}<br>
-      Size: {{ product.metafields.custom.add_on_product.value.size }}<br>
-      First item: {{ product.metafields.custom.add_on_product.value.first | json | truncate: 100 }}<br>
-      <br><strong>Alternative Access Tests:</strong><br>
-      Without .value: {{ product.metafields.custom.add_on_product | type }}<br>
-      Direct iteration test:<br>
-      {% assign direct_count = 0 %}
-      {% for test_item in product.metafields.custom.add_on_product.value %}
-        {% assign direct_count = direct_count | plus: 1 %}
-        Direct {{ direct_count }}: {{ test_item.title | default: "NO TITLE" }} (ID: {{ test_item.id | default: "NO ID" }})<br>
-      {% endfor %}
-      Direct total: {{ direct_count }}<br>
-      <br><strong>Loop Investigation:</strong><br>
-      {% assign loop_count = 0 %}
-      {% for test_product in related_products %}
-        {% assign loop_count = loop_count | plus: 1 %}
-        Item {{ loop_count }}: {{ test_product.title | default: "NO TITLE" }} (Available: {{ test_product.available | default: "unknown" }})<br>
-      {% endfor %}
-      Total iterations: {{ loop_count }}<br>
-    </div>
-
     {% if related_products != blank %}
       <div class="cross-sell__products">
         {% for related_product in related_products %}
-          <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 10px;">
-            Product {{ forloop.index }}: {{ related_product.title | default: "NO TITLE" }} ({{ related_product | type }})
-          </div>
           {% if related_product.title %}
-            <a href="{{ related_product.url }}">
-              <div class="related-product">
-                <div class="related-product-image">
-                  {% if related_product.featured_image %}
-                    <img src="{{ related_product.featured_image | image_url: width: 300 }}" alt="{{ related_product.title }}">
-                  {% endif %}
-                </div>
-                <div class="related-product-name">{{ related_product.title }}</div>
-                <div class="related-product-price">{{ related_product.price | money }}</div>
+            <div class="related-product-item">
+              <div class="related-product-image">
+                {% if related_product.featured_image %}
+                  <img src="{{ related_product.featured_image | image_url: width: 100 }}" alt="{{ related_product.title }}">
+                {% endif %}
               </div>
-            </a>
+              <div class="related-product-details">
+                <div class="related-product-info">
+                  <h4 class="related-product-name">{{ related_product.title }}</h4>
+                  <div class="related-product-price">{{ related_product.price | money }}</div>
+                </div>
+                <div class="related-product-actions">
+                  <button 
+                    type="button"
+                    class="related-product-add-btn"
+                    data-product-id="{{ related_product.id }}"
+                    data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
+                    data-add-to-cart
+                  >
+                    + Add
+                  </button>
+                  <a href="{{ related_product.url }}" class="related-product-more-link">More info</a>
+                </div>
+              </div>
+            </div>
           {% endif %}
         {% endfor %}
       </div>
-    {% else %}
-      <p>No related products found.</p>
     {% endif %}
   </div>
 
@@ -241,48 +224,91 @@
     }
 
     .cross-sell__products {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
+      display: block;
       width: 100%;
     }
 
-    .related-product {
-      display: block;
-      padding: 1rem;
-      border: 1px solid #e5e5e5;
-      border-radius: 4px;
-      text-decoration: none;
-      color: inherit;
-      flex: 1;
-      min-width: 200px;
-      text-align: center;
+    .related-product-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid #f0f0f0;
     }
 
-    .related-product:hover {
-      border-color: #ccc;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    .related-product-item:last-child {
+      border-bottom: none;
     }
 
     .related-product-image {
-      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
     }
 
     .related-product-image img {
       width: 100%;
-      height: auto;
-      max-width: 150px;
-      border-radius: 4px;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .related-product-details {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .related-product-info {
+      flex: 1;
     }
 
     .related-product-name {
+      font-size: 1rem;
       font-weight: 500;
-      margin-bottom: 0.5rem;
+      margin: 0 0 0.25rem 0;
       color: #000;
+      line-height: 1.3;
     }
 
     .related-product-price {
+      font-size: 1rem;
       font-weight: 600;
+      color: #000;
+      margin: 0;
+    }
+
+    .related-product-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+
+    .related-product-add-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .related-product-add-btn:hover {
+      opacity: 0.8;
+    }
+
+    .related-product-more-link {
+      color: #666;
+      text-decoration: underline;
+      font-size: 0.85rem;
+    }
+
+    .related-product-more-link:hover {
       color: #000;
     }
 
