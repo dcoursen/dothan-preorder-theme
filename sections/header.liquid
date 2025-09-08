@@ -313,10 +313,14 @@
       }
     }
 
-    /* Force white background for all sticky states */
+    /* Force white background for all sticky states - override transparency */
     &[data-sticky-state='active'] {
-      --header-bg-color: var(--color-background);
-      background-color: var(--color-background);
+      --header-bg-color: var(--color-background) !important;
+      background-color: var(--color-background) !important;
+      
+      .header__row {
+        background-color: var(--color-background) !important;
+      }
     }
 
     .header__row {
@@ -383,6 +387,14 @@
 
   .header[data-sticky-state='active'] {
     view-transition-name: sticky-header;
+    
+    /* Force solid background for all sticky headers */
+    --header-bg-color: var(--color-background) !important;
+    background-color: var(--color-background) !important;
+  }
+  
+  .header[data-sticky-state='active'] .header__row {
+    background-color: var(--color-background) !important;
   }
 
   .header__row {
