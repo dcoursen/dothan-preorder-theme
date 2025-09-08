@@ -16,30 +16,31 @@
     assign product = collections.all.products.first
   endif
 
-  # First try the new metafield names
+  # Get metafields without defaults first
   assign cross_sell_products = product.metafields.custom.cross_sell_products.value
-  assign cross_sell_title = product.metafields.custom.cross_sell_title.value | default: 'Buy it with'
+  assign cross_sell_title = product.metafields.custom.cross_sell_title.value
   assign cross_sell_description = product.metafields.custom.cross_sell_description.value
   
-  # Fallback to old metafield names - try both with and without .value
+  # Fallback to old metafield names
   if cross_sell_products == blank
     assign cross_sell_products = product.metafields.custom.add_on_product
   endif
   
-  # Get title with fallbacks
   if cross_sell_title == blank
     assign cross_sell_title = product.metafields.custom.add_on_title
-    if cross_sell_title == blank
-      assign cross_sell_title = 'Goes great with'
-    endif
   endif
   
-  # Get description with fallbacks  
   if cross_sell_description == blank
     assign cross_sell_description = product.metafields.custom.add_on_description
-    if cross_sell_description == blank
-      assign cross_sell_description = 'Looking to stun your neighbors? These supporting actors will really turn up the drama and be the envy of the neighborhood.'
-    endif
+  endif
+  
+  # Apply final defaults only if still blank
+  if cross_sell_title == blank
+    assign cross_sell_title = 'Goes great with'
+  endif
+  
+  if cross_sell_description == blank
+    assign cross_sell_description = 'Looking to stun your neighbors? These supporting actors will really turn up the drama and be the envy of the neighborhood.'
   endif
   
   # Parse rich text JSON - more robust approach
