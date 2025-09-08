@@ -26,7 +26,7 @@
     assign cross_sell_products = product.metafields.custom.add_on_product
   endif
   
-  # Get title and description with fallbacks
+  # Get title with fallbacks
   if cross_sell_title == blank
     assign cross_sell_title = product.metafields.custom.add_on_title
     if cross_sell_title == blank
@@ -34,10 +34,40 @@
     endif
   endif
   
+  # Get description with fallbacks  
   if cross_sell_description == blank
     assign cross_sell_description = product.metafields.custom.add_on_description
     if cross_sell_description == blank
       assign cross_sell_description = 'Looking to stun your neighbors? These supporting actors will really turn up the drama and be the envy of the neighborhood.'
+    endif
+  endif
+  
+  # Parse rich text for both title and description if they're JSON objects
+  if cross_sell_title contains '"type":"root"'
+    assign parsed_title = ''
+    assign title_parts = cross_sell_title | split: '"value":"'
+    for part in title_parts
+      if forloop.index > 1
+        assign text_value = part | split: '"' | first
+        assign parsed_title = parsed_title | append: text_value
+      endif
+    endfor
+    if parsed_title != blank
+      assign cross_sell_title = parsed_title
+    endif
+  endif
+  
+  if cross_sell_description contains '"type":"root"'
+    assign parsed_desc = ''
+    assign desc_parts = cross_sell_description | split: '"value":"'
+    for part in desc_parts
+      if forloop.index > 1
+        assign text_value = part | split: '"' | first
+        assign parsed_desc = parsed_desc | append: text_value
+      endif
+    endfor
+    if parsed_desc != blank
+      assign cross_sell_description = parsed_desc
     endif
   endif
   
@@ -64,43 +94,11 @@
   >
     <div class="cross-sell__header">
       {% if cross_sell_title != blank %}
-        {% liquid
-          # Handle rich text for title if needed
-          assign title_text = cross_sell_title
-          if cross_sell_title.type == 'root'
-            assign title_text = ''
-            for child in cross_sell_title.children
-              if child.type == 'paragraph'
-                for text_child in child.children
-                  if text_child.type == 'text'
-                    assign title_text = title_text | append: text_child.value
-                  endif
-                endfor
-              endif
-            endfor
-          endif
-        %}
-        <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }}; margin: 0 0 0.5rem 0; font-weight: 600;">{{ title_text }}</h3>
+        <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }}; margin: 0 0 0.5rem 0; font-weight: 600;">{{ cross_sell_title }}</h3>
       {% endif %}
       
       {% if cross_sell_description != blank %}
-        {% liquid
-          # Handle rich text metafield - extract text from JSON structure
-          assign description_text = cross_sell_description
-          if cross_sell_description.type == 'root'
-            assign description_text = ''
-            for child in cross_sell_description.children
-              if child.type == 'paragraph'
-                for text_child in child.children
-                  if text_child.type == 'text'
-                    assign description_text = description_text | append: text_child.value
-                  endif
-                endfor
-              endif
-            endfor
-          endif
-        %}
-        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }}; margin-bottom: 1rem;">{{ description_text }}</div>
+        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }}; margin-bottom: 1rem;">{{ cross_sell_description }}</div>
       {% endif %}
     </div>
 
