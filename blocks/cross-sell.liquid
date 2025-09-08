@@ -53,12 +53,14 @@
 <div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
   DEBUG INFO:<br>
   Product Handle: {{ product.handle }}<br>
-  cross_sell_products type: {{ cross_sell_products.first }}<br>
   cross_sell_products size: {{ cross_sell_products.size }}<br>
-  Direct access add_on_product: {{ product.metafields.custom.add_on_product }}<br>
-  Direct access size: {{ product.metafields.custom.add_on_product.size }}<br>
-  First item: {{ product.metafields.custom.add_on_product.first }}<br>
-  First item ID: {{ product.metafields.custom.add_on_product.first.id }}<br>
+  {% for gid in cross_sell_products %}
+    GID {{ forloop.index }}: {{ gid }}<br>
+    {% assign pid_string = gid | split: '/' | last %}
+    Product ID: {{ pid_string }}<br>
+    {% assign pid = pid_string | plus: 0 %}
+    Product from all_products: {{ all_products[gid].title }}<br>
+  {% endfor %}
 </div>
 
 {% if cross_sell_products != blank %}
@@ -95,8 +97,25 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} The metafield returns product references directly when it's a list.product_reference type {% endcomment %}
-      {% for related_product in cross_sell_products %}
+      {% comment %} Handle GIDs - extract product ID and fetch product {% endcomment %}
+      {% for product_gid in cross_sell_products %}
+        {% comment %} Extract the numeric ID from the GID string {% endcomment %}
+        {% assign product_id_string = product_gid | split: '/' | last %}
+        {% assign product_id = product_id_string | plus: 0 %}
+        
+        {% comment %} Get the product using the all_products collection {% endcomment %}
+        {% assign related_product = all_products[product_gid] %}
+        
+        {% comment %} If first approach doesn't work, try iterating through all products {% endcomment %}
+        {% if related_product == blank %}
+          {% for p in collections.all.products %}
+            {% if p.id == product_id %}
+              {% assign related_product = p %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        
         {% if related_product.id %}
           {% unless forloop.first %}
             <hr class="cross-sell__divider">
