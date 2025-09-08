@@ -87,16 +87,6 @@
 %}
 
 
-<!-- DEBUG: Check parsed values -->
-<div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
-  <strong>DEBUG - Parsed Values:</strong><br>
-  Title: {{ add_on_title }}<br>
-  Description: {{ add_on_description }}<br>
-  Products count: {{ add_on_products.size }}<br>
-  {% for gid in add_on_products %}
-    Product {{ forloop.index }} GID: {{ gid | truncate: 50 }}<br>
-  {% endfor %}
-</div>
 
 {% comment %} Show the add-on block if we have products {% endcomment %}
 {% if add_on_products.size > 0 or add_on_products != blank %}
