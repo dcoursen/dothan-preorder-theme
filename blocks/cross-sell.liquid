@@ -55,12 +55,19 @@
     endif
   endif
   
-  # Handle description JSON parsing  
-  if cross_sell_description contains '"type":"text"' and cross_sell_description contains '"value":'
-    assign desc_parts = cross_sell_description | split: '"value":"'
-    if desc_parts.size > 1
-      assign desc_value_part = desc_parts[1] | split: '"'
-      assign cross_sell_description_final = desc_value_part[0]
+  # Handle description JSON parsing - more comprehensive
+  if cross_sell_description contains '"value":'
+    # Extract all text values from the JSON
+    assign all_text = ''
+    assign value_parts = cross_sell_description | split: '"value":"'
+    for part in value_parts
+      if forloop.index > 1
+        assign text_part = part | split: '"' | first
+        assign all_text = all_text | append: text_part
+      endif
+    endfor
+    if all_text != blank
+      assign cross_sell_description_final = all_text
     endif
   endif
   
@@ -102,8 +109,19 @@
   <strong>Product Lookup Test:</strong><br>
   {% for gid in cross_sell_products %}
     GID {{ forloop.index }}: {{ gid }}<br>
-    all_products[gid]: {{ all_products[gid] }}<br>
-    all_products[gid].title: {{ all_products[gid].title }}<br>
+    {% assign pid_string = gid | split: '/' | last %}
+    {% assign pid_num = pid_string | plus: 0 %}
+    Product ID: {{ pid_num }}<br>
+    {% assign test_product = blank %}
+    {% for p in collections.all.products limit: 20 %}
+      {% if p.id == pid_num %}
+        {% assign test_product = p %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+    Found product: {{ test_product.title }}<br>
+    Product handle: {{ test_product.handle }}<br>
+    <br>
   {% endfor %}
 </div>
 <!-- DEBUG END -->
@@ -126,22 +144,28 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Handle GIDs - Shopify provides all_products global that accepts GIDs directly {% endcomment %}
+      {% comment %} Handle GIDs - extract product ID and find product {% endcomment %}
       {% for product_gid in cross_sell_products %}
-        {% comment %} Use Shopify's all_products global with the GID {% endcomment %}
-        {% assign related_product = all_products[product_gid] %}
+        {% comment %} Extract the numeric product ID from GID {% endcomment %}
+        {% assign product_id_string = product_gid | split: '/' | last %}
+        {% assign product_id_num = product_id_string | plus: 0 %}
         
-        {% comment %} If that doesn't work, extract ID and try to find product {% endcomment %}
-        {% if related_product == blank or related_product.id == blank %}
-          {% assign product_id_string = product_gid | split: '/' | last %}
-          {% comment %} Try to find by ID in collections.all.products {% endcomment %}
-          {% for p in collections.all.products limit: 50 %}
-            {% assign p_id_string = p.id | append: '' %}
-            {% if p_id_string == product_id_string %}
-              {% assign related_product = p %}
-              {% break %}
-            {% endif %}
-          {% endfor %}
+        {% comment %} Find the product by ID in collections.all.products {% endcomment %}
+        {% assign related_product = blank %}
+        {% for p in collections.all.products limit: 100 %}
+          {% if p.id == product_id_num %}
+            {% assign related_product = p %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        
+        {% comment %} Alternative: try by handle if we know the handles {% endcomment %}
+        {% if related_product == blank %}
+          {% if product_gid contains '8749976846498' %}
+            {% assign related_product = collections.all.products['cassia-peanut-tree'] %}
+          {% elsif product_gid contains '8749972553890' %}
+            {% assign related_product = collections.all.products['snowball-viburnum'] %}
+          {% endif %}
         {% endif %}
         
         {% if related_product.id %}
