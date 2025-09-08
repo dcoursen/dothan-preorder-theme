@@ -42,34 +42,31 @@
     endif
   endif
   
-  # Parse rich text for both title and description if they're JSON objects
-  if cross_sell_title contains '"type":"root"'
-    assign parsed_title = ''
+  # Parse rich text JSON - more robust approach
+  assign cross_sell_title_final = cross_sell_title
+  assign cross_sell_description_final = cross_sell_description
+  
+  # Handle title JSON parsing
+  if cross_sell_title contains '"type":"text"' and cross_sell_title contains '"value":'
     assign title_parts = cross_sell_title | split: '"value":"'
-    for part in title_parts
-      if forloop.index > 1
-        assign text_value = part | split: '"' | first
-        assign parsed_title = parsed_title | append: text_value
-      endif
-    endfor
-    if parsed_title != blank
-      assign cross_sell_title = parsed_title
+    if title_parts.size > 1
+      assign title_value_part = title_parts[1] | split: '"' 
+      assign cross_sell_title_final = title_value_part[0]
     endif
   endif
   
-  if cross_sell_description contains '"type":"root"'
-    assign parsed_desc = ''
+  # Handle description JSON parsing  
+  if cross_sell_description contains '"type":"text"' and cross_sell_description contains '"value":'
     assign desc_parts = cross_sell_description | split: '"value":"'
-    for part in desc_parts
-      if forloop.index > 1
-        assign text_value = part | split: '"' | first
-        assign parsed_desc = parsed_desc | append: text_value
-      endif
-    endfor
-    if parsed_desc != blank
-      assign cross_sell_description = parsed_desc
+    if desc_parts.size > 1
+      assign desc_value_part = desc_parts[1] | split: '"'
+      assign cross_sell_description_final = desc_value_part[0]
     endif
   endif
+  
+  # Update the variables
+  assign cross_sell_title = cross_sell_title_final
+  assign cross_sell_description = cross_sell_description_final
   
   assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
   assign columns = block.settings.columns | default: 2
@@ -84,6 +81,32 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
+
+<!-- DEBUG START -->
+<div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
+  <strong>DEBUG INFO:</strong><br>
+  Product ID: {{ product.id }}<br>
+  Product Handle: {{ product.handle }}<br>
+  <br>
+  <strong>Raw Metafields:</strong><br>
+  add_on_product: {{ product.metafields.custom.add_on_product }}<br>
+  add_on_title: {{ product.metafields.custom.add_on_title }}<br>
+  add_on_description: {{ product.metafields.custom.add_on_description }}<br>
+  <br>
+  <strong>Processed Variables:</strong><br>
+  cross_sell_products: {{ cross_sell_products }}<br>
+  cross_sell_products size: {{ cross_sell_products.size }}<br>
+  cross_sell_title: {{ cross_sell_title }}<br>
+  cross_sell_description: {{ cross_sell_description }}<br>
+  <br>
+  <strong>Product Lookup Test:</strong><br>
+  {% for gid in cross_sell_products %}
+    GID {{ forloop.index }}: {{ gid }}<br>
+    all_products[gid]: {{ all_products[gid] }}<br>
+    all_products[gid].title: {{ all_products[gid].title }}<br>
+  {% endfor %}
+</div>
+<!-- DEBUG END -->
 
 {% comment %} Always show the cross-sell block if we have products {% endcomment %}
 {% if cross_sell_products.size > 0 or cross_sell_products != blank %}
