@@ -87,12 +87,13 @@
                 <div class="related-product-actions">
                   <button 
                     type="button"
-                    class="related-product-add-btn"
+                    class="related-product-add-btn{% unless related_product.available %} sold-out{% endunless %}"
                     data-product-id="{{ related_product.id }}"
                     data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
                     data-add-to-cart
+                    {% unless related_product.available %}disabled{% endunless %}
                   >
-                    + Add
+                    {% if related_product.available %}+ Add{% else %}Sold out{% endif %}
                   </button>
                   <a href="{{ related_product.url }}" class="related-product-more-link">More info</a>
                 </div>
@@ -282,7 +283,7 @@
     .related-product-actions {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
       gap: 0.5rem;
     }
 
@@ -296,16 +297,31 @@
       font-weight: 500;
       cursor: pointer;
       transition: opacity 0.2s;
+      min-width: 100px;
     }
 
     .related-product-add-btn:hover {
       opacity: 0.8;
     }
 
+    .related-product-add-btn.sold-out {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .related-product-add-btn.sold-out:hover {
+      opacity: 1;
+    }
+
+    .related-product-add-btn:disabled {
+      cursor: not-allowed;
+    }
+
     .related-product-more-link {
       color: #666;
       text-decoration: underline;
       font-size: 0.85rem;
+      text-align: center;
     }
 
     .related-product-more-link:hover {
