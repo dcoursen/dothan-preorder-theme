@@ -78,18 +78,36 @@
       {% endif %}
     </div>
 
+    <!-- DEBUG: Check what we have in add_on_products -->
+    <div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
+      <strong>DEBUG - add_on_products:</strong><br>
+      Type: {{ add_on_products | type }}<br>
+      Size: {{ add_on_products.size }}<br>
+      Content: {{ add_on_products | json | truncate: 200 }}<br>
+      First item: {{ add_on_products.first | json | truncate: 100 }}<br>
+      {% if add_on_products.first %}
+        First title: {{ add_on_products.first.title }}<br>
+        First handle: {{ add_on_products.first.handle }}<br>
+      {% endif %}
+    </div>
+
     <div class="cross-sell__products">
       {% comment %} Use the simple metafield approach - no complex GID parsing needed {% endcomment %}
       {% for related_product in add_on_products %}
-        <a href="{{ shop.url | append: '/products/' | append: related_product.handle }}">
-          <div class="related-product">
-            <div class="related-product-image">
-              <img src="{{ related_product.featured_image | img_url: 'medium' }}" alt="{{ related_product.title }}" />
+        <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 10px;">
+          Loop {{ forloop.index }}: {{ related_product | type }} - {{ related_product.title | default: "NO TITLE" }}
+        </div>
+        {% if related_product.title %}
+          <a href="{{ shop.url | append: '/products/' | append: related_product.handle }}">
+            <div class="related-product">
+              <div class="related-product-image">
+                <img src="{{ related_product.featured_image | img_url: 'medium' }}" alt="{{ related_product.title }}" />
+              </div>
+              <div class="related-product-name">{{ related_product.title }}</div>
+              <div class="related-product-price">{{ related_product.price | money }}</div>
             </div>
-            <div class="related-product-name">{{ related_product.title }}</div>
-            <div class="related-product-price">{{ related_product.price | money }}</div>
-          </div>
-        </a>
+          </a>
+        {% endif %}
       {% endfor %}
     </div>
   </div>
