@@ -37,7 +37,24 @@
   
   # Parse description if it's JSON, otherwise use as-is
   assign add_on_description = add_on_description_raw
-  if add_on_description_raw contains '"value":"'
+  if add_on_description_raw contains '"type":"root"'
+    # It's a rich text JSON - extract all text values
+    assign parsed_text = ''
+    assign parts = add_on_description_raw | split: '"value":"'
+    for part in parts
+      if forloop.index > 1
+        assign text_segment = part | split: '"' | first
+        if parsed_text != blank
+          assign parsed_text = parsed_text | append: ' '
+        endif
+        assign parsed_text = parsed_text | append: text_segment
+      endif
+    endfor
+    if parsed_text != blank
+      assign add_on_description = parsed_text
+    endif
+  elsif add_on_description_raw contains '"value":"'
+    # Simple JSON with value field
     assign value_split = add_on_description_raw | split: '"value":"'
     if value_split.size > 1
       assign text_with_end = value_split[1]
@@ -69,6 +86,17 @@
   assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
 %}
 
+
+<!-- DEBUG: Check parsed values -->
+<div style="background: lightyellow; padding: 10px; margin: 10px; color: black; font-size: 11px; border: 1px solid #ccc;">
+  <strong>DEBUG - Parsed Values:</strong><br>
+  Title: {{ add_on_title }}<br>
+  Description: {{ add_on_description }}<br>
+  Products count: {{ add_on_products.size }}<br>
+  {% for gid in add_on_products %}
+    Product {{ forloop.index }} GID: {{ gid | truncate: 50 }}<br>
+  {% endfor %}
+</div>
 
 {% comment %} Show the add-on block if we have products {% endcomment %}
 {% if add_on_products.size > 0 or add_on_products != blank %}
