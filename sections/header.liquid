@@ -313,6 +313,12 @@
       }
     }
 
+    /* Force white background for all sticky states */
+    &[data-sticky-state='active'] {
+      --header-bg-color: var(--color-background);
+      background-color: var(--color-background);
+    }
+
     .header__row {
       /* Slower transition for "out" animation */
       transition: color var(--animation-values-slow), border-color var(--animation-values-slow),
