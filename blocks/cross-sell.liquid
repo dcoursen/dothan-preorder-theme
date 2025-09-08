@@ -17,9 +17,9 @@
   endif
 
   # Get related products using the correct pattern
-  assign add_on_products = product.metafields.custom.add_on_product.value
-  if add_on_products == blank
-    assign add_on_products = product.metafields.custom.cross_sell_products.value
+  assign related_products = product.metafields.custom.add_on_product.value
+  if related_products == blank
+    assign related_products = product.metafields.custom.cross_sell_products.value
   endif
   
   assign add_on_title = product.metafields.custom.cross_sell_title.value
@@ -62,7 +62,7 @@
 
 
 {% comment %} Show the add-on block if we have products {% endcomment %}
-{% if add_on_products.size > 0 or add_on_products != blank %}
+{% if related_products.size > 0 or related_products != blank %}
   <div
     class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }} button-style--{{ button_style }}"
     {{ block.shopify_attributes }}
@@ -78,9 +78,9 @@
       {% endif %}
     </div>
 
-    {% if add_on_products.size > 0 %}
+    {% if related_products.size > 0 %}
       <div class="cross-sell__products">
-        {% for related_product in add_on_products %}
+        {% for related_product in related_products %}
           <a href="{{ related_product.url }}">
             <div class="related-product">
               <div class="related-product-image">
