@@ -46,55 +46,6 @@
 %}
 
 
-<!-- DEBUG START -->
-<div style="background: yellow; padding: 10px; margin: 10px; color: black; font-size: 12px;">
-  <strong>DEBUG INFO:</strong><br>
-  Product ID: {{ product.id }}<br>
-  Product Handle: {{ product.handle }}<br>
-  <br>
-  <strong>Raw Metafields:</strong><br>
-  add_on_product: {{ product.metafields.custom.add_on_product }}<br>
-  add_on_title: {{ product.metafields.custom.add_on_title }}<br>
-  add_on_description: {{ product.metafields.custom.add_on_description }}<br>
-  <br>
-  <strong>Direct Variables (No Processing):</strong><br>
-  add_on_products: {{ add_on_products }}<br>
-  add_on_products size: {{ add_on_products.size }}<br>
-  add_on_title: {{ add_on_title }}<br>
-  add_on_description: {{ add_on_description }}<br>
-  <br>
-  <strong>Product Lookup Test:</strong><br>
-  Products array size: {{ add_on_products.size }}<br>
-  Collections.all.products size: {{ collections.all.products.size }}<br>
-  {% for gid in add_on_products %}
-    <strong>GID {{ forloop.index }}:</strong> {{ gid }}<br>
-    {% assign pid_string = gid | split: '/' | last %}
-    {% assign pid_num = pid_string | plus: 0 %}
-    Extracted ID: {{ pid_num }} (type: {{ pid_num | type }})<br>
-    {% assign test_product = blank %}
-    {% assign found_count = 0 %}
-    {% for p in collections.all.products limit: 200 %}
-      {% assign found_count = found_count | plus: 1 %}
-      {% if p.id == pid_num %}
-        {% assign test_product = p %}
-        {% break %}
-      {% endif %}
-    {% endfor %}
-    Searched {{ found_count }} products<br>
-    Found product: {{ test_product.title | default: "NOT FOUND" }}<br>
-    
-    {% comment %} Try direct lookup by handle {% endcomment %}
-    {% if gid contains '8749976846498' %}
-      Direct lookup cassia: {{ collections.all.products['cassia-peanut-tree'].title }}<br>
-    {% endif %}
-    {% if gid contains '8749972553890' %}  
-      Direct lookup viburnum: {{ collections.all.products['snowball-viburnum'].title }}<br>
-    {% endif %}
-    <br>
-  {% endfor %}
-</div>
-<!-- DEBUG END -->
-
 {% comment %} Show the add-on block if we have products {% endcomment %}
 {% if add_on_products.size > 0 or add_on_products != blank %}
   <div
@@ -351,18 +302,22 @@
     .cross-sell__product-item {
       display: flex;
       gap: 1rem;
-      padding: 1rem 0;
+      padding: 0.75rem 0;
       margin-bottom: 0;
       background: transparent;
       border: none;
       border-radius: 0;
       width: 100%;
       box-sizing: border-box;
-      align-items: center;
+      align-items: flex-start;
     }
 
     .cross-sell__product-item:first-child {
       padding-top: 0;
+    }
+    
+    .cross-sell__product-item:last-child {
+      padding-bottom: 0;
     }
 
     .cross-sell__product-image {
@@ -470,15 +425,18 @@
     }
 
     .cross-sell__more-info {
-      font-size: 0.8rem;
-      color: var(--color-primary);
+      font-size: 0.85rem;
+      color: #007bff;
       text-decoration: underline;
-      text-align: center;
+      text-align: right;
       white-space: nowrap;
+      display: inline-block;
+      margin-top: 0.25rem;
     }
 
     .cross-sell__more-info:hover {
-      color: var(--color-primary-hover);
+      color: #0056b3;
+      text-decoration: underline;
     }
 
     /* Color scheme styles */
