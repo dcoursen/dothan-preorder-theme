@@ -16,12 +16,26 @@
     assign product = collections.all.products.first
   endif
 
-  # Use raw metafields directly - no complex processing
-  assign add_on_products = product.metafields.custom.add_on_product
-  assign add_on_title = product.metafields.custom.add_on_title
-  assign add_on_description_raw = product.metafields.custom.add_on_description
+  # Check for both new and old metafield names
+  assign add_on_products = product.metafields.custom.cross_sell_products.value
+  if add_on_products == blank
+    assign add_on_products = product.metafields.custom.add_on_product
+  endif
   
-  # Only parse description if it's JSON, otherwise use as-is
+  assign add_on_title = product.metafields.custom.cross_sell_title.value
+  if add_on_title == blank
+    assign add_on_title = product.metafields.custom.add_on_title
+  endif
+  if add_on_title == blank
+    assign add_on_title = 'Goes great with'
+  endif
+  
+  assign add_on_description_raw = product.metafields.custom.cross_sell_description.value
+  if add_on_description_raw == blank
+    assign add_on_description_raw = product.metafields.custom.add_on_description
+  endif
+  
+  # Parse description if it's JSON, otherwise use as-is
   assign add_on_description = add_on_description_raw
   if add_on_description_raw contains '"value":"'
     assign value_split = add_on_description_raw | split: '"value":"'
@@ -29,6 +43,16 @@
       assign text_with_end = value_split[1]
       assign text_parts = text_with_end | split: '"'
       assign add_on_description = text_parts[0]
+    endif
+  endif
+  
+  # Parse title if it's JSON too
+  if add_on_title contains '"value":"'
+    assign title_split = add_on_title | split: '"value":"'
+    if title_split.size > 1
+      assign title_text_with_end = title_split[1]
+      assign title_text_parts = title_text_with_end | split: '"'
+      assign add_on_title = title_text_parts[0]
     endif
   endif
   
