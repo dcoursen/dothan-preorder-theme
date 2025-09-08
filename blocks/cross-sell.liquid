@@ -30,21 +30,10 @@
     assign add_on_title = 'Goes great with'
   endif
   
-  assign add_on_description_raw = product.metafields.custom.cross_sell_description.value
-  if add_on_description_raw == blank
-    assign add_on_description_raw = product.metafields.custom.add_on_description
-  endif
-  
-  # Parse description if it's JSON, otherwise use as-is
-  assign add_on_description = add_on_description_raw
-  if add_on_description_raw contains '"type":"text"' and add_on_description_raw contains '"value":"'
-    # Extract text from the JSON structure {"type":"root","children":[{"type":"paragraph","children":[{"type":"text","value":"Looking to stun your neighbors? These supporting actors will really turn up the drama and be the envy of the neighborhood."}]}]}
-    assign value_parts = add_on_description_raw | split: '"value":"'
-    if value_parts.size > 1
-      assign text_with_quotes = value_parts[1]
-      assign text_clean = text_with_quotes | split: '"' | first
-      assign add_on_description = text_clean
-    endif
+  # Use metafield_tag for rich text metafields - handles JSON parsing automatically
+  assign add_on_description_metafield = product.metafields.custom.cross_sell_description
+  if add_on_description_metafield == blank
+    assign add_on_description_metafield = product.metafields.custom.add_on_description
   endif
   
   # Parse title if it's JSON too
@@ -84,8 +73,8 @@
         <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }}; margin: 0 0 0.5rem 0; font-weight: 600;">{{ add_on_title }}</h3>
       {% endif %}
       
-      {% if add_on_description != blank %}
-        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }}; margin-bottom: 1rem;">{{ add_on_description }}</div>
+      {% if add_on_description_metafield != blank %}
+        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }}; margin-bottom: 1rem;">{{ add_on_description_metafield | metafield_tag }}</div>
       {% endif %}
     </div>
 
