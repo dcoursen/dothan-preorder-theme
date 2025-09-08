@@ -60,16 +60,33 @@
   <div
     class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }} button-style--{{ button_style }}"
     {{ block.shopify_attributes }}
-    style="background-color: {{ background_color }}; border: {{ border_width }}px solid {{ border_color }};"
+    style="background-color: {{ background_color }}; border: {{ border_width }}px solid {{ border_color }}; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;"
   >
     <div class="cross-sell__header">
       {% if cross_sell_title != blank %}
-        <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }};">{{ cross_sell_title }}</h3>
+        {% liquid
+          # Handle rich text for title if needed
+          assign title_text = cross_sell_title
+          if cross_sell_title.type == 'root'
+            assign title_text = ''
+            for child in cross_sell_title.children
+              if child.type == 'paragraph'
+                for text_child in child.children
+                  if text_child.type == 'text'
+                    assign title_text = title_text | append: text_child.value
+                  endif
+                endfor
+              endif
+            endfor
+          endif
+        %}
+        <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }}; margin: 0 0 0.5rem 0; font-weight: 600;">{{ title_text }}</h3>
       {% endif %}
       
       {% if cross_sell_description != blank %}
         {% liquid
           # Handle rich text metafield - extract text from JSON structure
+          assign description_text = cross_sell_description
           if cross_sell_description.type == 'root'
             assign description_text = ''
             for child in cross_sell_description.children
@@ -81,11 +98,9 @@
                 endfor
               endif
             endfor
-          else
-            assign description_text = cross_sell_description
           endif
         %}
-        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }};">{{ description_text }}</div>
+        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }}; margin-bottom: 1rem;">{{ description_text }}</div>
       {% endif %}
     </div>
 
@@ -269,10 +284,12 @@
   {% style %}
     .cross-sell-block {
       margin-top: 1.5rem;
-      padding: 1.25rem;
-      border-radius: var(--border-radius, 8px);
+      padding: 1.5rem;
+      border-radius: 8px;
       width: 100%;
       box-sizing: border-box;
+      background: #f8f8f8;
+      border: 1px solid #e5e5e5;
     }
 
     .cross-sell__header {
@@ -283,11 +300,15 @@
     .cross-sell__title {
       font-weight: 600;
       margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+      color: #000;
     }
 
     .cross-sell__description {
-      margin: 0;
-      line-height: 1.4;
+      margin: 0 0 1rem 0;
+      line-height: 1.5;
+      color: #666;
+      font-size: 0.95rem;
     }
 
     .cross-sell__products {
@@ -297,7 +318,7 @@
 
     .cross-sell__divider {
       border: none;
-      border-top: 1px solid rgba(var(--color-foreground-rgb), 0.08);
+      border-top: 1px solid #e5e5e5;
       margin: 1rem 0;
       width: 100%;
     }
@@ -305,56 +326,60 @@
     .cross-sell__product-item {
       display: flex;
       gap: 1rem;
-      padding: 0;
+      padding: 1rem 0;
       margin-bottom: 0;
       background: transparent;
       border: none;
       border-radius: 0;
       width: 100%;
       box-sizing: border-box;
+      align-items: center;
+    }
+
+    .cross-sell__product-item:first-child {
+      padding-top: 0;
     }
 
     .cross-sell__product-image {
       flex-shrink: 0;
-      width: 80px;
-      height: 80px;
+      width: 60px;
+      height: 60px;
     }
 
     .cross-sell__product-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: var(--border-radius-sm, 4px);
+      border-radius: 4px;
     }
 
     .cross-sell__product-details {
       flex: 1;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 1rem;
     }
 
     .cross-sell__product-info {
       flex: 1;
-      max-width: 60%;
     }
 
     .cross-sell__product-actions {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.5rem;
-      min-width: 140px;
+      gap: 0.25rem;
+      min-width: 100px;
       flex-shrink: 0;
     }
 
     .cross-sell__product-title {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       margin: 0;
       font-weight: 500;
-      color: var(--color-foreground);
-      line-height: 1.2;
+      color: #000;
+      line-height: 1.3;
     }
 
     .cross-sell__product-price {
@@ -362,25 +387,46 @@
       gap: 0.5rem;
       align-items: center;
       justify-content: flex-end;
-      font-size: 0.95rem;
+      font-size: 1rem;
       text-align: right;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 0.5rem;
     }
 
     .cross-sell__price--compare {
       text-decoration: line-through;
-      color: var(--color-foreground-secondary, #999);
-      font-size: 0.85rem;
+      color: #999;
+      font-size: 0.9rem;
+      font-weight: normal;
     }
 
     .cross-sell__price {
       font-weight: 600;
-      color: var(--color-foreground);
+      color: #000;
     }
 
     .cross-sell__add-button {
       width: 100%;
-      min-width: 120px;
+      min-width: 80px;
       white-space: nowrap;
+      padding: 0.5rem 1rem;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .cross-sell__add-button:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+    
+    .cross-sell__add-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     /* Clickable product links */
