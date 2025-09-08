@@ -55,19 +55,15 @@
     endif
   endif
   
-  # Handle description JSON parsing - more comprehensive
-  if cross_sell_description contains '"value":'
-    # Extract all text values from the JSON
-    assign all_text = ''
-    assign value_parts = cross_sell_description | split: '"value":"'
-    for part in value_parts
-      if forloop.index > 1
-        assign text_part = part | split: '"' | first
-        assign all_text = all_text | append: text_part
-      endif
-    endfor
-    if all_text != blank
-      assign cross_sell_description_final = all_text
+  # Handle description JSON parsing - extract from specific pattern
+  if cross_sell_description contains '"value":"'
+    # Split by '"value":"' and get the text part
+    assign value_split = cross_sell_description | split: '"value":"'
+    if value_split.size > 1
+      # Get the part after "value":" and split by the closing quote
+      assign text_with_end = value_split[1]
+      assign text_parts = text_with_end | split: '"'
+      assign cross_sell_description_final = text_parts[0]
     endif
   endif
   
@@ -107,20 +103,32 @@
   cross_sell_description: {{ cross_sell_description }}<br>
   <br>
   <strong>Product Lookup Test:</strong><br>
+  Products array size: {{ cross_sell_products.size }}<br>
+  Collections.all.products size: {{ collections.all.products.size }}<br>
   {% for gid in cross_sell_products %}
-    GID {{ forloop.index }}: {{ gid }}<br>
+    <strong>GID {{ forloop.index }}:</strong> {{ gid }}<br>
     {% assign pid_string = gid | split: '/' | last %}
     {% assign pid_num = pid_string | plus: 0 %}
-    Product ID: {{ pid_num }}<br>
+    Extracted ID: {{ pid_num }} (type: {{ pid_num | type }})<br>
     {% assign test_product = blank %}
-    {% for p in collections.all.products limit: 20 %}
+    {% assign found_count = 0 %}
+    {% for p in collections.all.products limit: 200 %}
+      {% assign found_count = found_count | plus: 1 %}
       {% if p.id == pid_num %}
         {% assign test_product = p %}
         {% break %}
       {% endif %}
     {% endfor %}
-    Found product: {{ test_product.title }}<br>
-    Product handle: {{ test_product.handle }}<br>
+    Searched {{ found_count }} products<br>
+    Found product: {{ test_product.title | default: "NOT FOUND" }}<br>
+    
+    {% comment %} Try direct lookup by handle {% endcomment %}
+    {% if gid contains '8749976846498' %}
+      Direct lookup cassia: {{ collections.all.products['cassia-peanut-tree'].title }}<br>
+    {% endif %}
+    {% if gid contains '8749972553890' %}  
+      Direct lookup viburnum: {{ collections.all.products['snowball-viburnum'].title }}<br>
+    {% endif %}
     <br>
   {% endfor %}
 </div>
@@ -144,28 +152,39 @@
     </div>
 
     <div class="cross-sell__products cross-sell__products--{{ columns }}-cols cross-sell__products--mobile-{{ columns_mobile }}-cols">
-      {% comment %} Handle GIDs - extract product ID and find product {% endcomment %}
+      {% comment %} Handle GIDs - multiple fallback strategies {% endcomment %}
       {% for product_gid in cross_sell_products %}
-        {% comment %} Extract the numeric product ID from GID {% endcomment %}
-        {% assign product_id_string = product_gid | split: '/' | last %}
-        {% assign product_id_num = product_id_string | plus: 0 %}
-        
-        {% comment %} Find the product by ID in collections.all.products {% endcomment %}
         {% assign related_product = blank %}
-        {% for p in collections.all.products limit: 100 %}
-          {% if p.id == product_id_num %}
-            {% assign related_product = p %}
-            {% break %}
-          {% endif %}
-        {% endfor %}
         
-        {% comment %} Alternative: try by handle if we know the handles {% endcomment %}
+        {% comment %} Strategy 1: Direct handle lookup for known products {% endcomment %}
+        {% if product_gid contains '8749976846498' %}
+          {% assign related_product = collections.all.products['cassia-peanut-tree'] %}
+        {% elsif product_gid contains '8749972553890' %}
+          {% assign related_product = collections.all.products['snowball-viburnum'] %}
+        {% endif %}
+        
+        {% comment %} Strategy 2: Search by ID if direct lookup failed {% endcomment %}
         {% if related_product == blank %}
-          {% if product_gid contains '8749976846498' %}
-            {% assign related_product = collections.all.products['cassia-peanut-tree'] %}
-          {% elsif product_gid contains '8749972553890' %}
-            {% assign related_product = collections.all.products['snowball-viburnum'] %}
-          {% endif %}
+          {% assign product_id_string = product_gid | split: '/' | last %}
+          {% assign product_id_num = product_id_string | plus: 0 %}
+          
+          {% for p in collections.all.products limit: 250 %}
+            {% if p.id == product_id_num %}
+              {% assign related_product = p %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        
+        {% comment %} Strategy 3: Try string comparison of IDs {% endcomment %}
+        {% if related_product == blank %}
+          {% for p in collections.all.products limit: 250 %}
+            {% assign p_id_string = p.id | append: '' %}
+            {% if p_id_string == product_id_string %}
+              {% assign related_product = p %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
         {% endif %}
         
         {% if related_product.id %}
