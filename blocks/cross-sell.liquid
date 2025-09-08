@@ -87,10 +87,12 @@
                 {% endif %}
               </div>
               <div class="related-product-details">
-                <h4 class="related-product-name">{{ related_product.title }}</h4>
+                <div class="related-product-header">
+                  <h4 class="related-product-name">{{ related_product.title }}</h4>
+                  <div class="related-product-price">{{ related_product.price | money }}</div>
+                </div>
               </div>
               <div class="related-product-actions">
-                <div class="related-product-price">{{ related_product.price | money }}</div>
                 <button 
                   type="button"
                   class="related-product-add-btn {% if button_style == 'outline' %}outline-style{% else %}solid-style{% endif %}{% unless related_product.available %} sold-out{% endunless %}"
@@ -265,6 +267,13 @@
       flex: 1;
     }
 
+    .related-product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
     .related-product-name {
       font-size: {{ product_title_size }};
       font-weight: 500;
@@ -278,8 +287,9 @@
       font-size: {{ product_price_size }};
       font-weight: 600;
       color: {{ product_price_color }};
-      margin: 0 0 0.5rem 0;
-      text-align: center;
+      margin: 0;
+      text-align: right;
+      flex-shrink: 0;
     }
 
     .related-product-actions {
