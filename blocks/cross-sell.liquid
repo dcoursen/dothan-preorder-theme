@@ -79,23 +79,25 @@
       First item: {{ product.metafields.custom.add_on_product.value.first | json | truncate: 100 }}<br>
     </div>
 
-    {% if related_products.size > 0 %}
+    {% if related_products != blank %}
       <div class="cross-sell__products">
         {% for related_product in related_products %}
           <div style="background: lightblue; padding: 5px; margin: 5px; color: black; font-size: 10px;">
             Product {{ forloop.index }}: {{ related_product.title | default: "NO TITLE" }} ({{ related_product | type }})
           </div>
-          <a href="{{ related_product.url }}">
-            <div class="related-product">
-              <div class="related-product-image">
-                {% if related_product.featured_image %}
-                  <img src="{{ related_product.featured_image | image_url: width: 300 }}" alt="{{ related_product.title }}">
-                {% endif %}
+          {% if related_product.title %}
+            <a href="{{ related_product.url }}">
+              <div class="related-product">
+                <div class="related-product-image">
+                  {% if related_product.featured_image %}
+                    <img src="{{ related_product.featured_image | image_url: width: 300 }}" alt="{{ related_product.title }}">
+                  {% endif %}
+                </div>
+                <div class="related-product-name">{{ related_product.title }}</div>
+                <div class="related-product-price">{{ related_product.price | money }}</div>
               </div>
-              <div class="related-product-name">{{ related_product.title }}</div>
-              <div class="related-product-price">{{ related_product.price | money }}</div>
-            </div>
-          </a>
+            </a>
+          {% endif %}
         {% endfor %}
       </div>
     {% else %}
