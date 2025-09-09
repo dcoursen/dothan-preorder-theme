@@ -43,7 +43,6 @@
       endif
     endif
   endif
-
   assign pickup_start_field = product.metafields.custom.preorder_pickup_start
   if pickup_start_field != blank
     assign pickup_start_date = pickup_start_field | date: '%s'
@@ -74,17 +73,8 @@
   endif
 -%}
 
-{%- comment -%}
-  Availability date display removed - only showing pickup date
-  {%- if is_preorder -%}
-    <div class="preorder-wrapper" data-preorder="true">{{ preorder_text }}</div>
-  {%- endif -%}
-{%- endcomment -%}
-
 {%- if pickup_text != blank -%}
   <div class="pickup-start-display" style="margin-top: 0.25rem; margin-bottom: 1rem; font-size: 0.9rem; color: rgb(var(--color-foreground-heading)); line-height: 1.4;">
     <strong>Pickup Begins In-Store:</strong> {{ pickup_text }}
   </div>
 {%- endif -%}
-
-

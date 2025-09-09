@@ -1,0 +1,334 @@
+{% liquid
+  assign product = closest.product
+  if request.visual_preview_mode and product == blank
+    assign product = collections.all.products.first
+  endif
+
+  assign variant = closest.product.selected_or_first_available_variant
+  assign inventory_quantity = variant.inventory_quantity
+  assign inventory_policy = variant.inventory_policy
+
+  if variant.inventory_management == 'shopify'
+    assign inventory_managed = true
+  endif
+
+  if variant.quantity_rule.min > variant.inventory_quantity and inventory_managed and inventory_policy == 'deny'
+    assign quantity_rule_soldout = true
+  endif
+
+  # ===========================================
+  # PREORDER LOGIC WITH SMART DATE/TIME FORMATTING
+  # ===========================================
+  
+  # Get preorder metafields
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
+  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
+  assign pickup_duration_days = product.metafields.custom.pickup_duration_days.value
+  
+  # Initialize preorder variables
+  assign preorder_is_preorder = false
+  assign preorder_is_coming_soon = false
+  assign preorder_formatted_drop_date = ''
+  assign preorder_formatted_pickup_start = ''
+  assign preorder_formatted_pickup_end = ''
+  assign preorder_smart_drop_text = ''
+  
+  # Check if this is a preorder product
+  if preorder_drop_date != blank
+    assign preorder_is_preorder = true
+    assign current_date = 'now' | date: '%s'
+    assign drop_date_timestamp = preorder_drop_date | date: '%s'
+    
+    # Check if we're before the drop date (coming soon)
+    if current_date < drop_date_timestamp
+      assign preorder_is_coming_soon = true
+      
+      # Create smart date/time formatting for drop date
+      # current_day: 0=Sunday, 1=Monday, etc.
+      assign current_day = 'now' | date: '%w'
+      assign drop_day = preorder_drop_date | date: '%w'
+      assign drop_date_only = preorder_drop_date | date: '%Y-%m-%d'
+      assign current_date_only = 'now' | date: '%Y-%m-%d'
+      
+      # Calculate days difference
+      assign current_date_timestamp = current_date_only | date: '%s'
+      assign drop_date_only_timestamp = drop_date_only | date: '%s'
+      assign days_diff = drop_date_only_timestamp | minus: current_date_timestamp | divided_by: 86400
+      
+      # Format time in EST (assuming drop date is in UTC)
+      assign drop_time_est = preorder_drop_date | date: '%l:%M%p EST'
+      assign drop_day_name = preorder_drop_date | date: '%A'
+      
+      # Create smart relative date text
+      if days_diff == 0
+        assign preorder_smart_drop_text = 'Today @ ' | append: drop_time_est
+      elsif days_diff == 1
+        assign preorder_smart_drop_text = 'Tomorrow @ ' | append: drop_time_est
+      elsif days_diff <= 6
+        # Within a week - use day name
+        if days_diff == 1
+          assign preorder_smart_drop_text = 'This ' | append: drop_day_name | append: ' @ ' | append: drop_time_est
+        elsif days_diff <= 3
+          assign preorder_smart_drop_text = 'This ' | append: drop_day_name | append: ' @ ' | append: drop_time_est
+        else
+          assign preorder_smart_drop_text = drop_day_name | append: ' @ ' | append: drop_time_est
+        endif
+      else
+        # More than a week away - use date
+        assign drop_month_day = preorder_drop_date | date: '%B %-d'
+        assign preorder_smart_drop_text = drop_month_day | append: ' @ ' | append: drop_time_est
+      endif
+    endif
+    
+    # Format pickup dates for informational display (not logic)
+    if preorder_pickup_start != blank
+      assign preorder_formatted_pickup_start = preorder_pickup_start | date: '%B %-d'
+      
+      # Calculate pickup end date if duration is specified
+      if pickup_duration_days != blank and pickup_duration_days > 0
+        assign pickup_start_timestamp = preorder_pickup_start | date: '%s'
+        assign duration_seconds = pickup_duration_days | times: 86400
+        assign pickup_end_timestamp = pickup_start_timestamp | plus: duration_seconds
+        assign preorder_formatted_pickup_end = pickup_end_timestamp | date: '%B %-d'
+      endif
+    endif
+    
+    # Fallback formatting
+    assign preorder_formatted_drop_date = preorder_drop_date | date: '%B %-d'
+  endif
+
+  # ===========================================
+  # BUTTON LOGIC - CORRECTED
+  # ===========================================
+  
+  # Standard inventory logic first
+  if inventory_managed
+    if inventory_quantity <= 0 and inventory_policy == 'deny' or quantity_rule_soldout
+      assign can_add_to_cart = false
+      assign add_to_cart_text = 'products.product.sold_out' | t
+    else
+      assign can_add_to_cart = true
+      assign add_to_cart_text = 'products.product.add_to_cart' | t
+    endif
+  else
+    if closest.product.selected_or_first_available_variant != null
+      assign can_add_to_cart = true
+      assign add_to_cart_text = 'products.product.add_to_cart' | t
+    else
+      assign can_add_to_cart = false
+      assign add_to_cart_text = 'products.product.unavailable' | t
+    endif
+  endif
+  
+  # Override ONLY if preorder and coming soon
+  if preorder_is_preorder and preorder_is_coming_soon
+    # Before drop date - always disabled, regardless of inventory
+    assign can_add_to_cart = false
+    if preorder_smart_drop_text != blank
+      assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_smart_drop_text
+    else
+      assign add_to_cart_text = 'products.product.available' | t | append: ' ' | append: preorder_formatted_drop_date
+    endif
+  endif
+  
+  # After drop date, preorder products work exactly like normal products (inventory-dependent)
+%}
+
+<span
+  class="buy-buttons-block buy-buttons-block--{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if product != blank -%}
+    {%- assign product_form_id = 'BuyButtons-ProductForm-' | append: block.id -%}
+    <product-form-component
+      data-section-id="{{ section.id }}"
+      data-product-id="{{ product.id }}"
+      data-product-url="{{ product.url }}"
+      on:submit="/handleSubmit"
+      data-quantity-default="{% if product.selected_or_first_available_variant.quantity_rule.min %}{{ product.selected_or_first_available_variant.quantity_rule.min }}{% else %}1{% endif %}"
+    >
+      <div
+        class="visually-hidden"
+        aria-live="assertive"
+        role="status"
+        aria-atomic="true"
+        ref="liveRegion"
+      ></div>
+      {%- form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+        <input
+          type="hidden"
+          name="id"
+          ref="variantId"
+          value="{{ product.selected_or_first_available_variant.id }}"
+        >
+        <div
+          class="product-form-buttons spacing-style{% if block.settings.stacking %} product-form-buttons--stacked{% endif %}"
+          style="{% render 'spacing-style', settings: block.settings %}"
+        >
+          {% if can_add_to_cart %}
+            {% content_for 'block', type: 'quantity', id: 'quantity' %}
+          {% endif %}
+
+          {% content_for 'block',
+            type: 'add-to-cart',
+            id: 'add-to-cart',
+            can_add_to_cart: can_add_to_cart,
+            add_to_cart_text: add_to_cart_text
+          %}
+          <span
+            class="product-form-text__error hidden"
+            ref="addToCartTextError"
+          >
+            <span class="svg-wrapper product-form-icon--error">
+              {{- 'icon-error.svg' | inline_asset_content -}}
+            </span>
+          </span>
+          {% content_for 'block',
+            type: 'accelerated-checkout',
+            id: 'accelerated-checkout',
+            can_add_to_cart: can_add_to_cart
+          %}
+        </div>
+      {%- endform -%}
+    </product-form-component>
+  {%- else -%}
+    <div class="product-form-buttons">
+      <button
+        type="submit"
+        name="add"
+        class="button"
+        disabled
+      >
+        {{ 'blocks.sold_out' | t }}
+      </button>
+    </div>
+  {%- endif -%}
+</span>
+
+{% if block.settings.show_pickup_availability %}
+  <script
+    src="{{ 'local-pickup.js' | asset_url }}"
+    type="module"
+  ></script>
+
+  {%- assign pick_up_availabilities = closest.product.selected_or_first_available_variant.store_availabilities
+    | where: 'pick_up_enabled', true
+  -%}
+
+  <local-pickup
+    class="spacing-style product__pickup-availabilities"
+    {% if pick_up_availabilities.size == 0 %}
+      hidden
+    {% endif %}
+    data-section-id="{{ section.id }}"
+    data-product-url="{{ closest.product.url }}"
+    data-variant-id="{{ closest.product.selected_or_first_available_variant.id }}"
+    style="{% render 'spacing-style', settings: block.settings %}"
+    ref="localPickupButton"
+  >
+    {% if can_add_to_cart %}
+      <dialog-component>
+        <div class="pickup-availability__row">
+          <div class="pickup-availability__column">
+            <span class="svg-wrapper">
+              {{- 'icon-unavailable.svg' | inline_asset_content -}}
+            </span>
+            <span class="pickup-availability__text">{{ 'products.product.pickup_availability.unavailable' | t }}</span>
+          </div>
+        </div>
+      </dialog-component>
+    {% endif %}
+  </local-pickup>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:names.product_buy_buttons",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.resource_reference_product"
+    },
+    {
+      "type": "checkbox",
+      "id": "stacking",
+      "label": "t:settings.always_stack_buttons",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pickup_availability",
+      "label": "t:settings.show_pickup_availability",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_buy_buttons",
+      "category": "t:categories.product",
+      "blocks": {
+        "quantity": {
+          "type": "quantity",
+          "static": true
+        },
+        "add-to-cart": {
+          "type": "add-to-cart",
+          "static": true,
+          "settings": {
+            "style_class": "button-secondary"
+          }
+        },
+        "accelerated-checkout": {
+          "type": "accelerated-checkout",
+          "static": true
+        }
+      }
+    }
+  ]
+}
+{% endschema %}

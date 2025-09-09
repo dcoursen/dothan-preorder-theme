@@ -7,19 +7,20 @@
   <div class="dothan-footer-container">
     <div class="dothan-footer-content" 
          data-columns="{{ section.settings.columns | default: 3 }}"
-         style="grid-template-columns: repeat({{ section.settings.columns | default: 3 }}, 1fr); gap: {{ section.settings.column_gap | default: 60 }}px;">
+         style="display: flex; gap: {{ section.settings.column_gap | default: 60 }}px;">
       
-      {% comment %} Create columns first, then populate with blocks {% endcomment %}
-      {% for i in (1..section.settings.columns) %}
-        <div class="dothan-footer-column" data-column="{{ i }}">
-          {% for block in section.blocks %}
-            {% assign target_column = block.settings.column_assignment | default: 1 %}
-            {% if target_column == i %}
-              <div class="dothan-footer-section" 
-                   id="block-{{ block.id }}"
-                   {{ block.shopify_attributes }}>
-                
-                {% case block.type %}
+      {% assign all_columns = '1,2,3,4' | split: ',' %}
+      {% for column_num in all_columns %}
+        {% if forloop.index <= section.settings.columns %}
+          {% assign column_blocks = section.blocks | where: 'settings.column_position', column_num %}
+          {% if column_blocks.size > 0 %}
+            <div class="footer-column footer-column-{{ column_num }}">
+              {% for block in column_blocks %}
+                <div class="dothan-footer-section" 
+                     id="block-{{ block.id }}"
+                     {{ block.shopify_attributes }}>
+                  
+                  {% case block.type %}
             
             {% when 'business_info' %}
               <div class="details-section">
@@ -179,66 +180,10 @@
                 {% if block.settings.heading != blank %}
                   <h4>{{ block.settings.heading }}</h4>
                 {% endif %}
-                
-                {% comment %} Review Stats Display {% endcomment %}
-                {% if block.settings.show_review_stats %}
-                  <div class="review-stats">
-                    {% if block.settings.google_rating != blank %}
-                      <div class="rating-display google-rating">
-                        <div class="platform-label">Google</div>
-                        <div class="rating-content">
-                          <span class="rating-stars">
-                            {% assign rating = block.settings.google_rating | times: 1.0 %}
-                            {% for i in (1..5) %}
-                              {% assign half_star = i | minus: 0.5 %}
-                              {% if rating >= i %}
-                                <span class="star full">★</span>
-                              {% elsif rating >= half_star %}
-                                <span class="star half">☆</span>
-                              {% else %}
-                                <span class="star empty">☆</span>
-                              {% endif %}
-                            {% endfor %}
-                          </span>
-                          <span class="rating-number">{{ block.settings.google_rating }}</span>
-                          {% if block.settings.google_review_count != blank %}
-                            <span class="review-count">({{ block.settings.google_review_count }})</span>
-                          {% endif %}
-                        </div>
-                      </div>
-                    {% endif %}
-                    
-                    {% if block.settings.yelp_rating != blank %}
-                      <div class="rating-display yelp-rating">
-                        <div class="platform-label">Yelp</div>
-                        <div class="rating-content">
-                          <span class="rating-stars">
-                            {% assign yelp_rating = block.settings.yelp_rating | times: 1.0 %}
-                            {% for i in (1..5) %}
-                              {% assign half_star = i | minus: 0.5 %}
-                              {% if yelp_rating >= i %}
-                                <span class="star full">★</span>
-                              {% elsif yelp_rating >= half_star %}
-                                <span class="star half">☆</span>
-                              {% else %}
-                                <span class="star empty">☆</span>
-                              {% endif %}
-                            {% endfor %}
-                          </span>
-                          <span class="rating-number">{{ block.settings.yelp_rating }}</span>
-                          {% if block.settings.yelp_review_count != blank %}
-                            <span class="review-count">({{ block.settings.yelp_review_count }})</span>
-                          {% endif %}
-                        </div>
-                      </div>
-                    {% endif %}
-                  </div>
-                {% endif %}
-                
                 <div class="review-icons">
                   {% if block.settings.google_reviews_url != blank %}
                     <a href="{{ block.settings.google_reviews_url }}" target="_blank" aria-label="Google Reviews">
-                      <svg width="{{ block.settings.icon_size | default: 24 }}" height="{{ block.settings.icon_size | default: 24 }}" viewBox="0 0 24 24" fill="none">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -248,77 +193,127 @@
                   {% endif %}
                   {% if block.settings.yelp_url != blank %}
                     <a href="{{ block.settings.yelp_url }}" target="_blank" aria-label="Yelp Reviews">
-                      <svg width="{{ block.settings.icon_size | default: 24 }}" height="{{ block.settings.icon_size | default: 24 }}" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="11" fill="#D32323"/>
-                        <path d="M8.5 7.5h7c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-7c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1zm0 4h7c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1h-7c-.55 0-1-.45-1-1v-1c0-.55.45-1 1-1z" fill="white"/>
-                        <circle cx="6" cy="8.5" r="1" fill="white"/>
-                        <circle cx="18" cy="8.5" r="1" fill="white"/>
-                        <circle cx="6" cy="12.5" r="1" fill="white"/>
-                        <circle cx="18" cy="12.5" r="1" fill="white"/>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12.017 0C6.396 0 1.807 4.589 1.807 10.21 1.807 15.831 6.396 20.42 12.017 20.42c5.621 0 10.21-4.589 10.21-10.21C22.227 4.589 17.638.001 12.017.001zm0 18.655c-4.666 0-8.445-3.779-8.445-8.445s3.779-8.444 8.445-8.444 8.445 3.778 8.445 8.444-3.779 8.445-8.445 8.445z" fill="#D32323"/>
+                        <path d="M15.108 8.717l-2.29.924-1.516-1.516.924-2.29c.152-.376.076-.808-.19-1.074l-.951-.951c-.342-.342-.895-.342-1.237 0l-.951.951c-.266.266-.342.698-.19 1.074l.924 2.29-1.516 1.516-2.29-.924c-.376-.152-.808-.076-1.074.19l-.951.951c-.342.342-.342.895 0 1.237l.951.951c.266.266.698.342 1.074.19l2.29-.924 1.516 1.516-.924 2.29c-.152.376-.076.808.19 1.074l.951.951c.342.342.895.342 1.237 0l.951-.951c.266-.266.342-.698.19-1.074l-.924-2.29 1.516-1.516 2.29.924c.376.152.808.076 1.074-.19l.951-.951c.342-.342.342-.895 0-1.237l-.951-.951c-.266-.266-.698-.342-1.074-.19z" fill="#D32323"/>
                       </svg>
                     </a>
                   {% endif %}
                 </div>
-            {% when 'html_liquid' %}
-              <div class="html-liquid-section">
+              </div>
+
+            {% when 'reviews' %}
+              <div class="review-section">
                 {% if block.settings.heading != blank %}
                   <h3>{{ block.settings.heading }}</h3>
                 {% endif %}
-                {{ block.settings.html_content }}
-                {{ block.settings.liquid_code }}
+                <div class="review-platforms">
+                  {% if block.settings.show_google_reviews %}
+                    <div class="review-platform">
+                      <div class="platform-header">
+                        <svg class="platform-icon google-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        <span class="platform-name">Google</span>
+                      </div>
+                      <div class="review-content">
+                        {% assign rating = block.settings.google_rating | default: "4.9" | times: 1.0 %}
+                        {% assign full_stars = rating | floor %}
+                        {% assign decimal = rating | minus: full_stars %}
+                        {% assign next_star = full_stars | plus: 1 %}
+                        <div class="stars-wrapper">
+                          {% for i in (1..5) %}
+                            {% if i <= full_stars %}
+                              <span class="star filled">★</span>
+                            {% elsif i == next_star and decimal > 0 %}
+                              <span class="star partial" data-fill="{{ decimal | times: 100 | round }}">★</span>
+                            {% else %}
+                              <span class="star empty">★</span>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <span class="rating-value">{{ block.settings.google_rating | default: "4.9" }}</span>
+                        <span class="review-count">({{ block.settings.google_count | default: "127" }})</span>
+                      </div>
+                      <a href="{{ block.settings.google_reviews_url | default: '#' }}" target="_blank" class="leave-review-link">Leave a Google Review</a>
+                    </div>
+                  {% endif %}
+
+                  {% if block.settings.show_yelp_reviews %}
+                    <div class="review-platform">
+                      <div class="platform-header">
+                        <svg class="platform-icon yelp-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="11" fill="#D32323"/>
+                          <path d="M12.5 8.5L11 14L8 11.5L12.5 8.5Z" fill="white"/>
+                          <path d="M11.5 15.5L13 10L16 12.5L11.5 15.5Z" fill="white"/>
+                        </svg>
+                        <span class="platform-name">Yelp</span>
+                      </div>
+                      <div class="review-content">
+                        {% assign rating = block.settings.yelp_rating | default: "4.5" | times: 1.0 %}
+                        {% assign full_stars = rating | floor %}
+                        {% assign decimal = rating | minus: full_stars %}
+                        {% assign next_star = full_stars | plus: 1 %}
+                        <div class="stars-wrapper">
+                          {% for i in (1..5) %}
+                            {% if i <= full_stars %}
+                              <span class="star filled">★</span>
+                            {% elsif i == next_star and decimal > 0 %}
+                              <span class="star partial" data-fill="{{ decimal | times: 100 | round }}">★</span>
+                            {% else %}
+                              <span class="star empty">★</span>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <span class="rating-value">{{ block.settings.yelp_rating | default: "4.5" }}</span>
+                        <span class="review-count">({{ block.settings.yelp_count | default: "89" }})</span>
+                      </div>
+                      <a href="{{ block.settings.yelp_url | default: '#' }}" target="_blank" class="leave-review-link">Leave a Yelp Review</a>
+                    </div>
+                  {% endif %}
+
+                  {% if block.settings.show_facebook_reviews %}
+                    <div class="review-platform">
+                      <div class="platform-header">
+                        <svg class="platform-icon facebook-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
+                        </svg>
+                        <span class="platform-name">Facebook</span>
+                      </div>
+                      <div class="review-content">
+                        {% assign rating = block.settings.facebook_rating | default: "4.8" | times: 1.0 %}
+                        {% assign full_stars = rating | floor %}
+                        {% assign decimal = rating | minus: full_stars %}
+                        {% assign next_star = full_stars | plus: 1 %}
+                        <div class="stars-wrapper">
+                          {% for i in (1..5) %}
+                            {% if i <= full_stars %}
+                              <span class="star filled">★</span>
+                            {% elsif i == next_star and decimal > 0 %}
+                              <span class="star partial" data-fill="{{ decimal | times: 100 | round }}">★</span>
+                            {% else %}
+                              <span class="star empty">★</span>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <span class="rating-value">{{ block.settings.facebook_rating | default: "4.8" }}</span>
+                        <span class="review-count">({{ block.settings.facebook_count | default: "42" }})</span>
+                      </div>
+                      <a href="{{ block.settings.facebook_url | default: '#' }}" target="_blank" class="leave-review-link">Leave a Facebook Review</a>
+                    </div>
+                  {% endif %}
+                </div>
               </div>
               
-            {% when 'image' %}
-              <div class="image-section">
-                {% if block.settings.heading != blank %}
-                  <h3>{{ block.settings.heading }}</h3>
-                {% endif %}
-                {% if block.settings.image %}
-                  {% if block.settings.link_url != blank %}<a href="{{ block.settings.link_url }}" target="_blank">{% endif %}
-                    <img src="{{ block.settings.image | image_url: width: block.settings.image_width }}" 
-                         alt="{{ block.settings.image.alt | default: block.settings.heading }}"
-                         style="max-width: {{ block.settings.image_width }}px; height: auto;">
-                  {% if block.settings.link_url != blank %}</a>{% endif %}
-                {% endif %}
-                {% if block.settings.caption != blank %}
-                  <p class="image-caption">{{ block.settings.caption }}</p>
-                {% endif %}
-              </div>
-              
-            {% when 'google_map_embed' %}
-              <div class="google-map-section">
-                {% if block.settings.heading != blank %}
-                  <h3>{{ block.settings.heading }}</h3>
-                {% endif %}
-                {% if block.settings.embed_code != blank %}
-                  <div class="map-container">
-                    {{ block.settings.embed_code }}
-                  </div>
-                {% elsif block.settings.embed_url != blank %}
-                  <div class="map-container">
-                    <iframe 
-                      src="{{ block.settings.embed_url }}"
-                      width="100%" 
-                      height="{{ block.settings.map_height | default: 300 }}"
-                      style="border:0;" 
-                      allowfullscreen="" 
-                      loading="lazy" 
-                      referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
-                  </div>
-                {% endif %}
-                {% if block.settings.show_directions_link and block.settings.directions_url != blank %}
-                  <a href="{{ block.settings.directions_url }}" target="_blank" class="directions-link">
-                    Get Directions
-                  </a>
-                {% endif %}
-              </div>
-              
-            {% endcase %}
+                  {% endcase %}
+                </div>
+              {% endfor %}
             </div>
           {% endif %}
-        {% endfor %}
-        </div>
+        {% endif %}
       {% endfor %}
     </div>
 
@@ -349,11 +344,12 @@
   }
 
   .dothan-footer-content {
-    display: grid;
+    display: flex;
     margin-bottom: 40px;
   }
 
-  .dothan-footer-column {
+  .footer-column {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -516,32 +512,56 @@
     color: #28a745;
   }
 
-  /* Review Stats */
-  .review-stats {
-    margin-bottom: 20px;
+  /* Reviews Section */
+  .review-platforms {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .rating-display {
-    margin-bottom: 12px;
-    padding: 8px 0;
+  .review-platform {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.3s ease;
   }
 
-  .platform-label {
-    font-size: 12px;
+  .review-platform:hover {
+    background: rgba(255, 255, 255, 0.03);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .platform-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .platform-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .platform-name {
+    font-size: 15px;
     font-weight: 600;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    color: #333;
+    letter-spacing: -0.2px;
   }
 
-  .rating-content {
+  .review-content {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-bottom: 10px;
+    padding-left: 30px;
   }
 
-  .rating-stars {
+  .stars-wrapper {
     display: inline-flex;
     gap: 2px;
   }
@@ -549,29 +569,69 @@
   .star {
     font-size: 16px;
     line-height: 1;
+    position: relative;
   }
 
-  .star.full {
-    color: #ffd700;
-  }
-
-  .star.half {
-    color: #ffd700;
+  .star.filled {
+    color: #FFA500;
   }
 
   .star.empty {
-    color: #ddd;
+    color: #e0e0e0;
   }
 
-  .rating-number {
+  .star.partial {
+    color: #e0e0e0;
+    position: relative;
+  }
+
+  .star.partial::before {
+    content: '★';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #FFA500;
+    width: attr(data-fill);
+    overflow: hidden;
+    display: inline-block;
+    max-width: calc(var(--fill) * 1%);
+  }
+
+  .star.partial[data-fill="10"]::before { max-width: 10%; }
+  .star.partial[data-fill="20"]::before { max-width: 20%; }
+  .star.partial[data-fill="30"]::before { max-width: 30%; }
+  .star.partial[data-fill="40"]::before { max-width: 40%; }
+  .star.partial[data-fill="50"]::before { max-width: 50%; }
+  .star.partial[data-fill="60"]::before { max-width: 60%; }
+  .star.partial[data-fill="70"]::before { max-width: 70%; }
+  .star.partial[data-fill="80"]::before { max-width: 80%; }
+  .star.partial[data-fill="90"]::before { max-width: 90%; }
+
+  .rating-value {
     font-weight: 600;
-    color: #333;
     font-size: 14px;
+    color: #333;
+    margin-left: 4px;
   }
 
   .review-count {
-    font-size: 13px;
     color: #666;
+    font-size: 13px;
+  }
+
+  .leave-review-link {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    transition: color 0.2s ease;
+    padding-left: 30px;
+  }
+
+  .leave-review-link:hover {
+    color: #2e7d32;
+    text-decoration: underline;
   }
 
   /* Copyright Section */
@@ -637,61 +697,6 @@
     .review-icons {
       justify-content: center;
     }
-  }
-
-  /* New Block Types */
-  .html-liquid-section h3,
-  .image-section h3,
-  .google-map-section h3 {
-    color: #6c757d;
-    font-size: 18px;
-    font-weight: 400;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .image-section img {
-    width: 100%;
-    height: auto;
-    border-radius: 6px;
-  }
-
-  .image-caption {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #6c757d;
-    text-align: center;
-    font-style: italic;
-  }
-
-  .map-container {
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 15px;
-  }
-
-  .map-container iframe {
-    width: 100%;
-    height: auto;
-    min-height: 250px;
-    border: 0;
-  }
-
-  .directions-link {
-    display: inline-block;
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-  }
-
-  .directions-link:hover {
-    background-color: #218838;
   }
 
   /* Mobile responsive */
@@ -856,20 +861,6 @@
       "name": "Business Info",
       "settings": [
         {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 1,
-          "info": "Which column should this block appear in?"
-        },
-        {
           "type": "text",
           "id": "heading",
           "label": "Heading",
@@ -941,6 +932,30 @@
           "type": "url",
           "id": "tiktok_url",
           "label": "TikTok URL"
+        },
+        {
+          "type": "select",
+          "id": "column_position",
+          "label": "Column Position",
+          "options": [
+            {
+              "value": "1",
+              "label": "Column 1"
+            },
+            {
+              "value": "2",
+              "label": "Column 2"
+            },
+            {
+              "value": "3",
+              "label": "Column 3"
+            },
+            {
+              "value": "4",
+              "label": "Column 4"
+            }
+          ],
+          "default": "1"
         }
       ]
     },
@@ -948,20 +963,6 @@
       "type": "store_hours",
       "name": "Store Hours",
       "settings": [
-        {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 2,
-          "info": "Which column should this block appear in?"
-        },
         {
           "type": "text",
           "id": "heading",
@@ -1021,6 +1022,30 @@
           "id": "weekdays_label",
           "label": "Weekdays Label",
           "default": "Tuesday - Friday"
+        },
+        {
+          "type": "select",
+          "id": "column_position",
+          "label": "Column Position",
+          "options": [
+            {
+              "value": "1",
+              "label": "Column 1"
+            },
+            {
+              "value": "2",
+              "label": "Column 2"
+            },
+            {
+              "value": "3",
+              "label": "Column 3"
+            },
+            {
+              "value": "4",
+              "label": "Column 4"
+            }
+          ],
+          "default": "2"
         }
       ]
     },
@@ -1028,20 +1053,6 @@
       "type": "policy_links",
       "name": "Policy Links",
       "settings": [
-        {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 3,
-          "info": "Which column should this block appear in?"
-        },
         {
           "type": "text",
           "id": "heading",
@@ -1080,71 +1091,42 @@
           "id": "returns_text",
           "label": "Returns Link Text",
           "default": "Returns"
+        },
+        {
+          "type": "select",
+          "id": "column_position",
+          "label": "Column Position",
+          "options": [
+            {
+              "value": "1",
+              "label": "Column 1"
+            },
+            {
+              "value": "2",
+              "label": "Column 2"
+            },
+            {
+              "value": "3",
+              "label": "Column 3"
+            },
+            {
+              "value": "4",
+              "label": "Column 4"
+            }
+          ],
+          "default": "3"
         }
       ]
     },
     {
       "type": "google_reviews",
-      "name": "Reviews",
+      "name": "Google Reviews",
       "settings": [
-        {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 3,
-          "info": "Which column should this block appear in?"
-        },
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
           "default": "LEAVE US A REVIEW"
-        },
-        {
-          "type": "header",
-          "content": "Review Stats (Optional)"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_review_stats",
-          "label": "Show Review Stats",
-          "default": true,
-          "info": "Display star ratings and review counts above the icons"
-        },
-        {
-          "type": "text",
-          "id": "google_rating",
-          "label": "Google Rating (1.0 - 5.0)",
-          "info": "Enter your Google star rating (e.g., 4.5)"
-        },
-        {
-          "type": "text",
-          "id": "google_review_count",
-          "label": "Google Review Count",
-          "info": "Number of Google reviews (e.g., 127)"
-        },
-        {
-          "type": "text",
-          "id": "yelp_rating",
-          "label": "Yelp Rating (1.0 - 5.0)",
-          "info": "Enter your Yelp star rating (e.g., 4.8)"
-        },
-        {
-          "type": "text",
-          "id": "yelp_review_count",
-          "label": "Yelp Review Count",
-          "info": "Number of Yelp reviews (e.g., 89)"
-        },
-        {
-          "type": "header",
-          "content": "Review Links"
         },
         {
           "type": "url",
@@ -1157,175 +1139,133 @@
           "label": "Yelp Reviews URL"
         },
         {
-          "type": "header",
-          "content": "Icon Settings"
-        },
-        {
-          "type": "range",
-          "id": "icon_size",
-          "min": 20,
-          "max": 48,
-          "step": 2,
-          "unit": "px",
-          "label": "Icon Size",
-          "default": 32,
-          "info": "Size of review platform icons"
-        },
-        {
-          "type": "header",
-          "content": "💡 How to Get Review URLs"
-        },
-        {
-          "type": "paragraph",
-          "content": "**Google Reviews:** Go to your Google Business profile, click 'Ask for reviews' and copy the link.\n\n**Yelp Reviews:** Go to your Yelp business page and copy the URL.\n\n**Tip:** The icons will automatically link to your review pages when visitors click them."
+          "type": "select",
+          "id": "column_position",
+          "label": "Column Position",
+          "options": [
+            {
+              "value": "1",
+              "label": "Column 1"
+            },
+            {
+              "value": "2",
+              "label": "Column 2"
+            },
+            {
+              "value": "3",
+              "label": "Column 3"
+            },
+            {
+              "value": "4",
+              "label": "Column 4"
+            }
+          ],
+          "default": "3"
         }
       ]
     },
     {
-      "type": "html_liquid",
-      "name": "HTML / Custom Liquid",
+      "type": "reviews",
+      "name": "Reviews",
       "settings": [
-        {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 1,
-          "info": "Which column should this block appear in?"
-        },
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading (Optional)"
-        },
-        {
-          "type": "html",
-          "id": "html_content",
-          "label": "HTML Content",
-          "info": "Add custom HTML content"
-        },
-        {
-          "type": "liquid",
-          "id": "liquid_code",
-          "label": "Custom Liquid Code",
-          "info": "Add custom Liquid code for dynamic content"
-        }
-      ]
-    },
-    {
-      "type": "image",
-      "name": "Image Block",
-      "settings": [
-        {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 1,
-          "info": "Which column should this block appear in?"
-        },
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading (Optional)"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image"
-        },
-        {
-          "type": "range",
-          "id": "image_width",
-          "min": 100,
-          "max": 500,
-          "step": 25,
-          "unit": "px",
-          "label": "Image Width",
-          "default": 200
-        },
-        {
-          "type": "url",
-          "id": "link_url",
-          "label": "Link URL (Optional)",
-          "info": "Make the image clickable"
-        },
-        {
-          "type": "text",
-          "id": "caption",
-          "label": "Image Caption (Optional)"
-        }
-      ]
-    },
-    {
-      "type": "google_map_embed",
-      "name": "Google Maps Embed",
-      "settings": [
-        {
-          "type": "header",
-          "content": "Column Settings"
-        },
-        {
-          "type": "range",
-          "id": "column_assignment",
-          "min": 1,
-          "max": 4,
-          "step": 1,
-          "label": "Assign to Column",
-          "default": 1,
-          "info": "Which column should this block appear in?"
-        },
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Find Us"
-        },
-        {
-          "type": "html",
-          "id": "embed_code",
-          "label": "Google Maps Embed Code",
-          "info": "Paste the full iframe code from Google Maps: Share > Embed a map > Copy HTML"
-        },
-        {
-          "type": "url",
-          "id": "embed_url",
-          "label": "Google Maps Embed URL (Alternative)",
-          "info": "Or just paste the src URL from the iframe (less preferred)"
-        },
-        {
-          "type": "range",
-          "id": "map_height",
-          "min": 200,
-          "max": 500,
-          "step": 50,
-          "unit": "px",
-          "label": "Map Height",
-          "default": 300
+          "default": "REVIEWS"
         },
         {
           "type": "checkbox",
-          "id": "show_directions_link",
-          "label": "Show 'Get Directions' Link",
+          "id": "show_google_reviews",
+          "label": "Show Google Reviews",
           "default": true
         },
         {
+          "type": "text",
+          "id": "google_rating",
+          "label": "Google Rating",
+          "default": "4.9"
+        },
+        {
+          "type": "text",
+          "id": "google_count",
+          "label": "Google Review Count",
+          "default": "568"
+        },
+        {
           "type": "url",
-          "id": "directions_url",
-          "label": "Directions URL",
-          "info": "Direct Google Maps directions link"
+          "id": "google_reviews_url",
+          "label": "Google Reviews URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_yelp_reviews",
+          "label": "Show Yelp Reviews",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "yelp_rating",
+          "label": "Yelp Rating",
+          "default": "4.9"
+        },
+        {
+          "type": "text",
+          "id": "yelp_count",
+          "label": "Yelp Review Count",
+          "default": "9"
+        },
+        {
+          "type": "url",
+          "id": "yelp_url",
+          "label": "Yelp Reviews URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_facebook_reviews",
+          "label": "Show Facebook Reviews",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "facebook_rating",
+          "label": "Facebook Rating",
+          "default": "4.9"
+        },
+        {
+          "type": "text",
+          "id": "facebook_count",
+          "label": "Facebook Review Count",
+          "default": "311"
+        },
+        {
+          "type": "url",
+          "id": "facebook_url",
+          "label": "Facebook Reviews URL"
+        },
+        {
+          "type": "select",
+          "id": "column_position",
+          "label": "Column Position",
+          "options": [
+            {
+              "value": "1",
+              "label": "Column 1"
+            },
+            {
+              "value": "2",
+              "label": "Column 2"
+            },
+            {
+              "value": "3",
+              "label": "Column 3"
+            },
+            {
+              "value": "4",
+              "label": "Column 4"
+            }
+          ],
+          "default": "3"
         }
       ]
     }
@@ -1337,7 +1277,6 @@
         {
           "type": "business_info",
           "settings": {
-            "column_assignment": 1,
             "heading": "VISIT US",
             "show_logo": true,
             "logo_text": "DN",
@@ -1351,7 +1290,6 @@
         {
           "type": "store_hours",
           "settings": {
-            "column_assignment": 2,
             "heading": "HOURS",
             "monday": "Closed",
             "tuesday": "9AM - 5PM",
@@ -1365,23 +1303,15 @@
           }
         },
         {
-          "type": "google_reviews",
+          "type": "policy_links",
           "settings": {
-            "column_assignment": 3,
-            "heading": "LEAVE US A REVIEW",
-            "show_review_stats": true,
-            "google_rating": "4.8",
-            "google_review_count": "127",
-            "yelp_rating": "4.5",
-            "yelp_review_count": "89",
-            "icon_size": 32
+            "heading": "STORE POLICY"
           }
         },
         {
-          "type": "google_map_embed",
+          "type": "google_reviews",
           "settings": {
-            "column_assignment": 4,
-            "heading": "FIND US"
+            "heading": "LEAVE US A REVIEW"
           }
         }
       ]

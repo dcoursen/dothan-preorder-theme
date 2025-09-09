@@ -16,15 +16,15 @@
           "type": "_product-media-gallery",
           "static": true,
           "settings": {
-            "media_presentation": "carousel",
+            "media_presentation": "grid",
             "media_columns": "one",
             "image_gap": 4,
             "large_first_image": false,
-            "icons_style": "chevron_large",
-            "slideshow_controls_style": "thumbnails",
+            "icons_style": "none",
+            "slideshow_controls_style": "counter",
             "slideshow_mobile_controls_style": "dots",
             "thumbnail_position": "right",
-            "thumbnail_width": 72,
+            "thumbnail_width": 44,
             "aspect_ratio": "adapt",
             "constrain_to_viewport": false,
             "media_fit": "contain",
@@ -96,7 +96,6 @@
                 "border_width": 1,
                 "border_opacity": 100,
                 "border_radius": 0,
-                "placeholder": "",
                 "toggle_overlay": false,
                 "overlay_color": "#00000026",
                 "overlay_style": "solid",
@@ -153,18 +152,21 @@
                     "padding-inline-end": 0
                   },
                   "blocks": {}
+                },
+                "pickup_date_block": {
+                  "type": "pickup-date",
+                  "settings": {}
                 }
               },
               "block_order": [
                 "text_xrnftG",
+                "pickup_date_block",
                 "price_tVjtKg"
               ]
             },
-            "pickup_date_tpzpyp": {
-              "type": "pickup-date",
-              "name": "Pickup Date",
-              "settings": {},
-              "blocks": {}
+            "savings_display": {
+              "type": "savings-display",
+              "settings": {}
             },
             "divider_VJhene": {
               "type": "_divider",
@@ -191,10 +193,20 @@
               },
               "blocks": {}
             },
+            "preorder_display_modern": {
+              "type": "preorder-display",
+              "settings": {
+                "show_when_available": true,
+                "padding-block-start": 12,
+                "padding-block-end": 12,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
             "buy_buttons_eYQEYi": {
               "type": "buy-buttons",
               "settings": {
-                "stacking": true,
+                "stacking": false,
                 "show_pickup_availability": false,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
@@ -225,10 +237,21 @@
               },
               "block_order": []
             },
+            "cross_sell_block": {
+              "type": "cross-sell",
+              "settings": {
+                "color_scheme": "scheme-1",
+                "columns": "2",
+                "columns_mobile": "1",
+                "padding-block-start": 20,
+                "padding-block-end": 20,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
             "group_JbmQwr": {
               "type": "group",
               "name": "Policies",
-              "disabled": true,
               "settings": {
                 "link": "",
                 "open_in_new_tab": false,
@@ -255,7 +278,6 @@
                 "border_width": 1,
                 "border_opacity": 100,
                 "border_radius": 0,
-                "placeholder": "",
                 "toggle_overlay": false,
                 "overlay_color": "#00000026",
                 "overlay_style": "solid",
@@ -295,7 +317,6 @@
                     "border_width": 1,
                     "border_opacity": 100,
                     "border_radius": 0,
-                    "placeholder": "",
                     "toggle_overlay": false,
                     "overlay_color": "#00000026",
                     "overlay_style": "solid",
@@ -378,7 +399,6 @@
                     "border_width": 1,
                     "border_opacity": 100,
                     "border_radius": 0,
-                    "placeholder": "",
                     "toggle_overlay": false,
                     "overlay_color": "#00000026",
                     "overlay_style": "solid",
@@ -467,10 +487,12 @@
           },
           "block_order": [
             "group_icgrde",
-            "pickup_date_tpzpyp",
+            "savings_display",
             "divider_VJhene",
             "variant_picker_R3rGDr",
+            "preorder_display_modern",
             "buy_buttons_eYQEYi",
+            "cross_sell_block",
             "group_JbmQwr",
             "text_aEtTtq"
           ]

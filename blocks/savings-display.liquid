@@ -1,0 +1,321 @@
+{% comment %}
+  Simple Savings Display Block
+  Shows savings text from product or variant metafields
+{% endcomment %}
+
+{% assign v = product.selected_or_first_available_variant %}
+{% assign product_text = product.metafields.custom.quantity_discount_text %}
+
+<div id="savings-display-{{ section.id }}" class="savings-display-block{% unless block.settings.inherit_color_scheme %} color-{{ block.settings.color_scheme }}{% endunless %}" 
+     data-section-id="{{ section.id }}"
+     style="{% if product_text != blank %}display: block;{% elsif v and v.metafields.custom.variant_only_discount_text != blank %}display: block;{% else %}display: none;{% endif %}; margin: 8px 0;">
+  
+  <div class="savings-display-content" style="
+    display: flex;
+    {% unless block.settings.inherit_color_scheme %}background: {% if block.settings.background_color != blank %}{{ block.settings.background_color }}{% else %}rgb(var(--color-background)){% endif %};{% else %}background: {% if block.settings.background_color != blank %}{{ block.settings.background_color }}{% else %}#e8f5e8{% endif %};{% endunless %}
+    {% unless block.settings.inherit_color_scheme %}border: 1px solid {% if block.settings.border_color != blank %}{{ block.settings.border_color }}{% else %}rgba(var(--color-foreground), 0.2){% endif %};{% else %}border: 1px solid {% if block.settings.border_color != blank %}{{ block.settings.border_color }}{% else %}#28a745{% endif %};{% endunless %}
+    border-radius: {{ block.settings.border_radius | default: 4 }}px;
+    overflow: hidden;
+  ">
+    
+    <!-- Left Column - Icon Background fills the entire left side -->
+    <div style="
+      {% unless block.settings.inherit_color_scheme %}background: {% if block.settings.icon_background_color != blank %}{{ block.settings.icon_background_color }}{% else %}rgb(var(--color-button)){% endif %};{% else %}background: {% if block.settings.icon_background_color != blank %}{{ block.settings.icon_background_color }}{% else %}#28a745{% endif %};{% endunless %}
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      flex-shrink: 0;
+    ">
+      <svg width="{{ block.settings.icon_size | default: 16 }}" height="{{ block.settings.icon_size | default: 16 }}" viewBox="0 0 24 24" fill="{% if block.settings.icon_color != blank %}{{ block.settings.icon_color }}{% else %}white{% endif %}">
+        <path d="M5.5 7A1.5 1.5 0 0 1 4 5.5A1.5 1.5 0 0 1 5.5 4A1.5 1.5 0 0 1 7 5.5A1.5 1.5 0 0 1 5.5 7M21.41 11.58L12.41 2.58C12.05 2.22 11.55 2 11 2H4C2.9 2 2 2.9 2 4V11C2 11.55 2.22 12.05 2.59 12.42L11.58 21.41C11.95 21.78 12.45 22 13 22S14.05 21.78 14.41 21.41L21.41 14.41C21.78 14.05 22 13.55 22 13S21.78 11.95 21.41 11.58Z"/>
+      </svg>
+    </div>
+
+    <!-- Right Column - Text Content stacked vertically -->
+    <div style="
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex-grow: 1;
+      gap: 2px;
+    ">
+      <!-- Label on its own line -->
+      <div style="
+        {% unless block.settings.inherit_color_scheme %}color: {% if block.settings.text_color != blank %}{{ block.settings.text_color }}{% else %}rgb(var(--color-foreground)){% endif %};{% else %}color: {% if block.settings.text_color != blank %}{{ block.settings.text_color }}{% else %}#333333{% endif %};{% endunless %}
+        font-weight: {{ block.settings.label_font_weight | default: '600' }};
+        font-size: {{ block.settings.label_font_size | default: 14 }}px;
+        line-height: 1.2;
+        {% case block.settings.text_transform %}
+          {% when 'uppercase' %}text-transform: uppercase;
+          {% when 'lowercase' %}text-transform: lowercase;
+          {% when 'capitalize' %}text-transform: capitalize;
+        {% endcase %}
+      ">
+        {{ block.settings.label_text | default: 'Bulk Savings' }}
+      </div>
+      
+      <!-- Meta content on new line below -->
+      <div id="discount-text-{{ section.id }}" 
+           data-product-text="{{ product_text }}" 
+           style="
+             {% unless block.settings.inherit_color_scheme %}color: {% if block.settings.discount_text_color != blank %}{{ block.settings.discount_text_color }}{% else %}rgba(var(--color-foreground), 0.75){% endif %};{% else %}color: {% if block.settings.discount_text_color != blank %}{{ block.settings.discount_text_color }}{% else %}#666666{% endif %};{% endunless %}
+             font-weight: {{ block.settings.discount_font_weight | default: '400' }};
+             font-size: {{ block.settings.discount_font_size | default: 13 }}px;
+             line-height: 1.2;
+           ">
+        {% if v and v.metafields.custom.variant_only_discount_text != blank %}
+          {{ v.metafields.custom.variant_only_discount_text }}
+        {% elsif product_text != blank %}
+          {{ product_text }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var SECTION_ID = "{{ section.id }}";
+  var container = document.getElementById("savings-display-" + SECTION_ID);
+  var discountText = document.getElementById("discount-text-" + SECTION_ID);
+  
+  if (!container || !discountText) return;
+
+  var productText = discountText.getAttribute('data-product-text') || '';
+
+  // Map variant IDs to their discount text
+  var variantText = {
+    {% for variant in product.variants %}
+      "{{ variant.id }}": {{ variant.metafields.custom.variant_only_discount_text | default: '' | json }},
+    {% endfor %}
+  };
+
+  // Get current variant ID
+  function getCurrentVariantId() {
+    var params = new URLSearchParams(location.search);
+    var fromUrl = params.get('variant');
+    if (fromUrl) return fromUrl;
+
+    var select = document.querySelector('select[name="id"]');
+    if (select && select.value) return select.value;
+
+    var radio = document.querySelector('input[name="id"]:checked');
+    if (radio && radio.value) return radio.value;
+
+    var hidden = document.querySelector('input[type="hidden"][name="id"]');
+    if (hidden && hidden.value) return hidden.value;
+
+    return "{{ v.id }}";
+  }
+
+  // Update renderer
+  var lastRenderedId = null;
+  function renderFor(variantId) {
+    if (!variantId || variantId === lastRenderedId) return;
+    lastRenderedId = variantId;
+    
+    // Check variant-specific text first, then fall back to product text
+    var text = variantText[String(variantId)] || productText;
+    
+    if (text && text.trim()) {
+      discountText.textContent = text;
+      container.style.display = 'block';
+    } else {
+      container.style.display = 'none';
+    }
+  }
+
+  // Try to hook any theme events if they exist
+  document.addEventListener('variant:change', function(e){
+    var id = e?.detail?.variant?.id;
+    if (id) renderFor(id);
+  });
+  document.addEventListener('product:variant-change', function(e){
+    var id = e?.detail?.variant?.id || e?.detail?.variantId;
+    if (id) renderFor(id);
+  });
+
+  // Also listen to obvious form changes
+  document.addEventListener('change', function(e){
+    if (!e.target) return;
+    if (e.target.name === 'id' || e.target.closest('[name="id"]')) {
+      renderFor(getCurrentVariantId());
+    }
+  });
+
+  // Safety net: poll the current variant id (catches JS-updated hidden inputs)
+  var lastId = null;
+  setInterval(function(){
+    var id = getCurrentVariantId();
+    if (id && id !== lastId) {
+      lastId = id;
+      renderFor(id);
+    }
+  }, 150); // light-weight; OK on product page
+
+  // Initial render sync (in case server-rendered != initial JS state)
+  renderFor(getCurrentVariantId());
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Savings Display",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Simple display for bulk savings messages. Reads from 'quantity_discount_text' (product) or 'variant_only_discount_text' (variant) metafields."
+    },
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Label Text",
+      "default": "Bulk Savings",
+      "info": "Text shown before the discount message"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Label Text Case",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "lowercase", "label": "lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "label_font_weight",
+      "label": "Label Font Weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "label_font_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Label Font Size",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "discount_font_weight",
+      "label": "Discount Text Font Weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "discount_font_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Discount Font Size",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Color Scheme"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "Inherit color scheme",
+      "default": true,
+      "info": "Use the color scheme from the parent section"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Custom Colors"
+    },
+    {
+      "type": "paragraph",
+      "content": "Override the color scheme with custom colors. Leave blank to use color scheme colors."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color"
+    },
+    {
+      "type": "color",
+      "id": "border_color", 
+      "label": "Border Color"
+    },
+    {
+      "type": "color",
+      "id": "icon_background_color",
+      "label": "Icon Background Color"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color"
+    },
+    {
+      "type": "color",
+      "id": "discount_text_color",
+      "label": "Discount Text Color"
+    },
+    {
+      "type": "header",
+      "content": "Layout & Style"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Rounded corners",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon Size",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "Savings Display"
+    }
+  ]
+}
+{% endschema %}

@@ -2,3 +2,13 @@ node_modules/
 .env
 *.log
 .DS_Store
+
+# Testing
+tests/screenshots/*.png
+coverage/
+jest-results.json
+.puppeteer_cache/
+
+# IDE
+.vscode/
+.idea/

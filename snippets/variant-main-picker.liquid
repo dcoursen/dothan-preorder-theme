@@ -4,7 +4,7 @@
   @param {object} product_resource - The product object.
 {%- enddoc -%}
 
-{% unless product_resource.has_only_default_variant %}
+{% unless product_resource.has_only_default_variant or product_resource.available == false %}
   {% liquid
     assign button_background_brightness = section.settings.color_scheme.settings.foreground | color_brightness
     if button_background_brightness < 105

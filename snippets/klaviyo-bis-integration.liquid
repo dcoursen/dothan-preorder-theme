@@ -46,10 +46,10 @@
           when '6'
             assign day_name = 'Saturday'
         endcase
-        assign time_with_tz = drop_date_field | date: '%l:%M%p EST'
+        assign time_with_tz = drop_date_field | date: '%l:%M%p'
         assign preorder_text = 'Available this ' | append: day_name | append: ' @ ' | append: time_with_tz
       else
-        assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p EST'
+        assign formatted_date = drop_date_field | date: '%B %d @ %l:%M%p'
         assign preorder_text = 'Available ' | append: formatted_date
       endif
     endif
@@ -129,21 +129,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const bisEnabled = container.dataset.bisEnabled === 'true';
     const preorderEnabled = container.dataset.preorderEnabled === 'true';
     
-    // Handle sold-out products with preorder date above BIS button
+    // Handle sold-out products - BIS button only (preorder display handled by preorder-display.liquid)
     if (bisEnabled && inventory < 1 && !available && klaviyoText) {
-      // Show preorder date first if enabled and exists
-      if (preorderEnabled && hasPreorder && preorderText) {
-        showPreorderDate(container, preorderText);
-      }
-      
       // Always show the BIS button - don't wait for add-to-cart replacement
       showBISButton(container, klaviyoText, formId);
       
       // Try to hide the original add-to-cart component if it exists
       hideSoldOutButton();
-    } else if (preorderEnabled && hasPreorder && preorderText) {
-      // Show preorder date for products that are available but have preorder info
-      showPreorderDate(container, preorderText);
     }
   }
   
@@ -311,10 +303,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .klaviyo-bis-button-container {
   margin: 16px 0;
+  width: 100%;
+  display: block;
 }
 
 .klaviyo-bis-button {
   width: 100%;
+  box-sizing: border-box;
+  display: block;
   padding: 16px 24px;
   background: {{ settings.preorder_button_background | default: '#dc6565' }};
   color: {{ settings.preorder_button_text_color | default: '#ffffff' }};

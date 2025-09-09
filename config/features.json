@@ -1,0 +1,26 @@
+{
+  "preorder": {
+    "enabled": true,
+    "showDebugInfo": false,
+    "enableAnalytics": true,
+    "variants": {
+      "dateFormat": "smart",
+      "bisButtonStyle": "gradient",
+      "showCountdown": false
+    }
+  },
+  "klaviyo": {
+    "enabled": true,
+    "testMode": false,
+    "defaultFormId": "WQZSWn"
+  },
+  "performance": {
+    "lazyLoadImages": true,
+    "deferNonCriticalJS": true,
+    "enableCaching": true
+  },
+  "testing": {
+    "showTestBadge": false,
+    "enableMockData": false
+  }
+}
