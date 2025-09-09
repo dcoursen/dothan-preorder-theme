@@ -12,3 +12,20 @@ jest-results.json
 # IDE
 .vscode/
 .idea/
+
+# Backup files
+*.backup
+*.backup[0-9]
+*.backup_*
+*.bak
+*.original
+*.broken
+*.debug-backup
+*-backup.liquid
+theme-backups/
+backups/
+live-theme-backup/
+
+# Local config backups
+*.local.backup
+config/settings_data.local.backup
