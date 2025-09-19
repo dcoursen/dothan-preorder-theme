@@ -1574,6 +1574,48 @@
         "label": "Back-in-stock button text",
         "default": "Notify When Available",
         "info": "Text for sold-out products without preorder dates"
+      },
+      {
+        "type": "header",
+        "content": "Vague Date Settings"
+      },
+      {
+        "type": "paragraph",
+        "content": "Configure how vague pickup dates display when products have 'use_vague_pickup_date' enabled. These settings work with product metafields to show 'early/mid/late month' instead of specific dates."
+      },
+      {
+        "type": "range",
+        "id": "vague_date_early_cutoff",
+        "label": "Early month cutoff day",
+        "min": 3,
+        "max": 10,
+        "step": 1,
+        "default": 10,
+        "info": "Days 1 through this number show as 'early [month]'"
+      },
+      {
+        "type": "range",
+        "id": "vague_date_mid_cutoff",
+        "label": "Mid month cutoff day",
+        "min": 15,
+        "max": 25,
+        "step": 1,
+        "default": 20,
+        "info": "Days after early cutoff through this number show as 'mid [month]'"
+      },
+      {
+        "type": "checkbox",
+        "id": "vague_date_show_range",
+        "label": "Show pickup range",
+        "default": true,
+        "info": "Display full range like 'early September through late September'"
+      },
+      {
+        "type": "checkbox",
+        "id": "vague_date_boundary_handling",
+        "label": "Handle month boundaries",
+        "default": true,
+        "info": "Show 'late February/early March' when range crosses months"
       }
     ]
   },
