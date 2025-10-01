@@ -6,92 +6,33 @@
 {%- liquid
   assign pickup_text = ''
   assign today = 'now' | date: '%s'
-
+  
   assign pickup_start_field = product.metafields.custom.preorder_pickup_start
-  assign use_vague_pickup = product.metafields.custom.use_vague_pickup_date
-  assign pickup_duration = product.metafields.custom.pickup_duration_days | default: 10
-
   if pickup_start_field != blank
-    # Get theme settings for vague dates
-    assign early_cutoff = settings.vague_date_early_cutoff | default: 10
-    assign mid_cutoff = settings.vague_date_mid_cutoff | default: 20
-    assign show_range = settings.vague_date_show_range | default: true
-    assign handle_boundaries = settings.vague_date_boundary_handling | default: true
-
-    if use_vague_pickup == true
-      # Use vague date display
-      assign pickup_day = pickup_start_field | date: '%-d' | plus: 0
-      assign pickup_month = pickup_start_field | date: '%B'
-
-      # Determine early/mid/late for start date
-      if pickup_day <= early_cutoff
-        assign pickup_period = 'early '
-      elsif pickup_day <= mid_cutoff
-        assign pickup_period = 'mid '
-      else
-        assign pickup_period = 'late '
-      endif
-
-      assign pickup_text = pickup_period | append: pickup_month
-
-      # Handle pickup range if enabled and duration exists
-      if show_range and pickup_duration != blank and pickup_duration > 0
-        assign duration_seconds = pickup_duration | times: 86400
-        assign pickup_end_timestamp = pickup_start_field | date: '%s' | plus: duration_seconds
-        assign end_day = pickup_end_timestamp | date: '%-d' | plus: 0
-        assign end_month = pickup_end_timestamp | date: '%B'
-
-        # Determine early/mid/late for end date
-        if end_day <= early_cutoff
-          assign end_period = 'early '
-        elsif end_day <= mid_cutoff
-          assign end_period = 'mid '
-        else
-          assign end_period = 'late '
-        endif
-
-        # Build range text
-        if pickup_month == end_month
-          # Same month
-          if pickup_period == end_period
-            # Same period, just show single period
-            assign pickup_text = pickup_period | append: pickup_month
-          else
-            # Different periods in same month
-            assign pickup_text = pickup_period | append: 'through ' | append: end_period | append: pickup_month
-          endif
-        else
-          # Different months
-          assign pickup_text = pickup_period | append: pickup_month | append: ' through ' | append: end_period | append: end_month
-        endif
-      endif
+    assign pickup_start_date = pickup_start_field | date: '%s'
+    assign days_until_pickup = pickup_start_date | minus: today | divided_by: 86400
+    assign pickup_weekday = pickup_start_field | date: '%w'
+    
+    if days_until_pickup < 7
+      case pickup_weekday
+        when '0'
+          assign pickup_day_name = 'Sunday'
+        when '1'
+          assign pickup_day_name = 'Monday'  
+        when '2'
+          assign pickup_day_name = 'Tuesday'
+        when '3'
+          assign pickup_day_name = 'Wednesday'
+        when '4'
+          assign pickup_day_name = 'Thursday'
+        when '5'
+          assign pickup_day_name = 'Friday'
+        when '6'
+          assign pickup_day_name = 'Saturday'
+      endcase
+      assign pickup_text = 'this ' | append: pickup_day_name
     else
-      # Use existing specific date logic
-      assign pickup_start_date = pickup_start_field | date: '%s'
-      assign days_until_pickup = pickup_start_date | minus: today | divided_by: 86400
-      assign pickup_weekday = pickup_start_field | date: '%w'
-
-      if days_until_pickup < 7
-        case pickup_weekday
-          when '0'
-            assign pickup_day_name = 'Sunday'
-          when '1'
-            assign pickup_day_name = 'Monday'
-          when '2'
-            assign pickup_day_name = 'Tuesday'
-          when '3'
-            assign pickup_day_name = 'Wednesday'
-          when '4'
-            assign pickup_day_name = 'Thursday'
-          when '5'
-            assign pickup_day_name = 'Friday'
-          when '6'
-            assign pickup_day_name = 'Saturday'
-        endcase
-        assign pickup_text = 'this ' | append: pickup_day_name
-      else
-        assign pickup_text = pickup_start_field | date: '%m/%d/%Y'
-      endif
+      assign pickup_text = pickup_start_field | date: '%m/%d/%Y'
     endif
   endif
 -%}

@@ -1,0 +1,179 @@
+/* Bulk Pricing Component */
+.bulk-pricing {
+  background: var(--bulk-bg-color, #f8f9fa);
+  border: 2px solid var(--bulk-border-color, #e9ecef);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  color: var(--bulk-text-color, #495057);
+  font-family: var(--font-body-family);
+}
+
+.bulk-pricing__content {
+  width: 100%;
+}
+
+/* Header */
+.bulk-pricing__header {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.bulk-pricing__title {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--bulk-header-color, #212529);
+  line-height: 1.3;
+}
+
+.bulk-pricing__description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--bulk-text-color, #495057);
+  opacity: 0.8;
+}
+
+/* Tiers */
+.bulk-pricing__tiers {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.bulk-pricing__tier {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: white;
+  border: 1px solid var(--bulk-border-color, #e9ecef);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.bulk-pricing__tier:hover {
+  border-color: var(--bulk-discount-color, #28a745);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+}
+
+.bulk-pricing__tier--active {
+  border-color: var(--bulk-discount-color, #28a745);
+  background: color-mix(in srgb, var(--bulk-discount-color, #28a745) 10%, white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+}
+
+.bulk-pricing__tier-qty {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--bulk-header-color, #212529);
+  min-width: 30px;
+}
+
+.bulk-pricing__tier-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bulk-pricing__tier-discount {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--bulk-discount-color, #28a745);
+}
+
+.bulk-pricing__tier-text {
+  font-size: 0.75rem;
+  color: var(--bulk-text-color, #495057);
+  opacity: 0.7;
+}
+
+/* Example */
+.bulk-pricing__example {
+  background: color-mix(in srgb, var(--bulk-discount-color, #28a745) 5%, white);
+  border: 1px solid color-mix(in srgb, var(--bulk-discount-color, #28a745) 20%, transparent);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+
+.bulk-pricing__example-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--bulk-text-color, #495057);
+}
+
+/* Bulk price display in product price */
+.bulk-price {
+  display: inline-block;
+  color: var(--bulk-discount-color, #28a745) !important;
+  font-weight: 600 !important;
+  margin-left: 8px !important;
+}
+
+/* Mobile optimizations */
+@media screen and (max-width: 640px) {
+  .bulk-pricing {
+    padding: 16px;
+    margin: 12px 0;
+  }
+  
+  .bulk-pricing__title {
+    font-size: 1.1rem;
+  }
+  
+  .bulk-pricing__tiers {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .bulk-pricing__tier {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+  
+  .bulk-pricing__tier-info {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* Animation for tier activation */
+@keyframes tierActivate {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.02);
+  }
+  100% {
+    transform: translateY(-2px) scale(1);
+  }
+}
+
+.bulk-pricing__tier--active {
+  animation: tierActivate 0.3s ease-out;
+}
+
+/* Enhanced styling for garden center theme */
+.bulk-pricing--garden {
+  background: linear-gradient(135deg, #f0f7f0 0%, #e8f4e8 100%);
+  border-color: #4a7c4a;
+  box-shadow: 0 2px 8px rgba(74, 124, 74, 0.1);
+}
+
+.bulk-pricing--garden .bulk-pricing__tier {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #6ba46b;
+}
+
+.bulk-pricing--garden .bulk-pricing__tier--active {
+  background: rgba(74, 124, 74, 0.1);
+  border-color: #4a7c4a;
+}

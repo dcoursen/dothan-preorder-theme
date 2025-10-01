@@ -1,7 +1,73 @@
 {% comment %}
-  Store Hours Footer Block
-  Flexible store hours display with weekday combination option
+  Smart Store Hours Footer Block
+  Automatically groups consecutive days with same hours or closed status
 {% endcomment %}
+
+{%- liquid
+  # Create array of all days with hours in order (Sun=0, Mon=1, etc.)
+  assign days_array = 'sunday,monday,tuesday,wednesday,thursday,friday,saturday' | split: ','
+  assign day_names = 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday' | split: ','
+  assign day_names_short = 'Sun,Mon,Tue,Wed,Thu,Fri,Sat' | split: ','
+  
+  # Get hours for each day
+  assign hours = ''
+  assign hours = hours | append: block.settings.sunday | append: '|'
+  assign hours = hours | append: block.settings.monday | append: '|' 
+  assign hours = hours | append: block.settings.tuesday | append: '|'
+  assign hours = hours | append: block.settings.wednesday | append: '|'
+  assign hours = hours | append: block.settings.thursday | append: '|'
+  assign hours = hours | append: block.settings.friday | append: '|'
+  assign hours = hours | append: block.settings.saturday
+  assign hours_array = hours | split: '|'
+  
+  # Create groups
+  assign groups = ''
+  assign current_group_start = -1
+  assign current_group_hours = ''
+  assign i = 0
+  
+  for hour in hours_array
+    assign is_closed = false
+    if hour contains 'Closed' or hour contains 'closed' or hour == ''
+      assign is_closed = true
+      assign hour = 'Closed'
+    endif
+    
+    # Start new group if hours changed or first iteration
+    if hour != current_group_hours or i == 0
+      # Finish previous group if exists
+      if current_group_start >= 0
+        assign end_index = i | minus: 1
+        if current_group_start == end_index
+          # Single day
+          assign groups = groups | append: day_names[current_group_start] | append: ':' | append: current_group_hours | append: '||'
+        else
+          # Range of days
+          assign groups = groups | append: day_names[current_group_start] | append: '-' | append: day_names[end_index] | append: ':' | append: current_group_hours | append: '||'
+        endif
+      endif
+      
+      # Start new group
+      assign current_group_start = i
+      assign current_group_hours = hour
+    endif
+    
+    # Handle last day
+    if i == 6
+      if current_group_start == i
+        # Single day
+        assign groups = groups | append: day_names[current_group_start] | append: ':' | append: current_group_hours | append: '||'
+      else
+        # Range of days  
+        assign groups = groups | append: day_names[current_group_start] | append: '-' | append: day_names[i] | append: ':' | append: current_group_hours | append: '||'
+      endif
+    endif
+    
+    assign i = i | plus: 1
+  endfor
+  
+  assign groups_array = groups | split: '||'
+-%}
 
 <div class="footer-store-hours">
   {% if block.settings.heading != blank %}
@@ -9,71 +75,22 @@
   {% endif %}
 
   <div class="hours-list">
-    {% if block.settings.combine_weekdays and block.settings.tuesday != blank %}
-      {% comment %} Show combined weekdays if enabled and have consistent hours {% endcomment %}
-      <div class="hours-item">
-        <span class="days">{{ block.settings.weekdays_label | default: 'Monday - Friday' }}:</span>
-        <span class="times">{{ block.settings.tuesday }}</span>
-      </div>
-    {% else %}
-      {% comment %} Show individual days {% endcomment %}
-      {% if block.settings.monday != blank %}
-        <div class="hours-item {% if block.settings.monday contains 'Closed' or block.settings.monday contains 'closed' %}closed{% endif %}">
-          <span class="days">Monday:</span>
-          <span class="times">{{ block.settings.monday }}</span>
+    {%- for group in groups_array -%}
+      {%- if group != blank -%}
+        {%- assign group_parts = group | split: ':' -%}
+        {%- assign days_part = group_parts[0] -%}
+        {%- assign hours_part = group_parts[1] -%}
+        {%- assign is_closed = false -%}
+        {%- if hours_part contains 'Closed' or hours_part contains 'closed' -%}
+          {%- assign is_closed = true -%}
+        {%- endif -%}
+        
+        <div class="hours-item{% if is_closed %} closed{% endif %}">
+          <span class="days">{{ days_part }}:</span>
+          <span class="times">{{ hours_part }}</span>
         </div>
-      {% endif %}
-
-      {% if block.settings.tuesday != blank %}
-        <div class="hours-item {% if block.settings.tuesday contains 'Closed' or block.settings.tuesday contains 'closed' %}closed{% endif %}">
-          <span class="days">Tuesday:</span>
-          <span class="times">{{ block.settings.tuesday }}</span>
-        </div>
-      {% endif %}
-
-      {% if block.settings.wednesday != blank %}
-        <div class="hours-item {% if block.settings.wednesday contains 'Closed' or block.settings.wednesday contains 'closed' %}closed{% endif %}">
-          <span class="days">Wednesday:</span>
-          <span class="times">{{ block.settings.wednesday }}</span>
-        </div>
-      {% endif %}
-
-      {% if block.settings.thursday != blank %}
-        <div class="hours-item {% if block.settings.thursday contains 'Closed' or block.settings.thursday contains 'closed' %}closed{% endif %}">
-          <span class="days">Thursday:</span>
-          <span class="times">{{ block.settings.thursday }}</span>
-        </div>
-      {% endif %}
-
-      {% if block.settings.friday != blank %}
-        <div class="hours-item {% if block.settings.friday contains 'Closed' or block.settings.friday contains 'closed' %}closed{% endif %}">
-          <span class="days">Friday:</span>
-          <span class="times">{{ block.settings.friday }}</span>
-        </div>
-      {% endif %}
-    {% endif %}
-
-    {% if block.settings.saturday != blank %}
-      <div class="hours-item {% if block.settings.saturday contains 'Closed' or block.settings.saturday contains 'closed' %}closed{% endif %}">
-        <span class="days">Saturday:</span>
-        <span class="times">{{ block.settings.saturday }}</span>
-      </div>
-    {% endif %}
-
-    {% if block.settings.sunday != blank %}
-      <div class="hours-item {% if block.settings.sunday contains 'Closed' or block.settings.sunday contains 'closed' %}closed{% endif %}">
-        <span class="days">Sunday:</span>
-        <span class="times">{{ block.settings.sunday }}</span>
-      </div>
-    {% endif %}
-
-    {% comment %} Handle combined Sunday & Monday closed {% endcomment %}
-    {% if block.settings.sunday contains 'Closed' and block.settings.monday contains 'Closed' %}
-      <div class="hours-item closed">
-        <span class="days">Sunday & Monday:</span>
-        <span class="times">Closed</span>
-      </div>
-    {% endif %}
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </div>
 

@@ -1,0 +1,19 @@
+<section role="region" aria-labelledby="rs-hello-heading">
+  <div class="container">
+    <h2 id="rs-hello-heading">{{ section.settings.heading }}</h2>
+    {% if section.settings.subcopy != blank %}
+      <div class="subcopy">{{ section.settings.subcopy }}</div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "RS Hello",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Hello from Retail Savage" },
+    { "type": "richtext", "id": "subcopy", "label": "Subcopy" }
+  ],
+  "presets": [{ "name": "RS Hello" }]
+}
+{% endschema %}

@@ -1496,126 +1496,161 @@
     ]
   },
   {
-    "name": "Preorder Settings",
+    "name": "Preorder Drops Overlay",
     "settings": [
       {
-        "type": "header",
-        "content": "Essential Settings"
+        "type": "checkbox",
+        "id": "drops_overlay_enabled",
+        "label": "Enable drops overlay",
+        "default": true,
+        "info": "Show drop date overlay on preorder product images"
       },
       {
-        "type": "checkbox",
-        "id": "enable_preorders",
-        "label": "Enable preorder system",
-        "default": true,
-        "info": "Master switch for all preorder functionality"
+        "type": "header",
+        "content": "Styling"
+      },
+      {
+        "type": "color",
+        "id": "drops_overlay_background_color",
+        "label": "Background color",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "drops_overlay_text_color",
+        "label": "Text color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "range",
+        "id": "drops_overlay_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Background opacity",
+        "default": 80
+      },
+      {
+        "type": "header",
+        "content": "Typography"
       },
       {
         "type": "select",
-        "id": "preorder_style_preset",
-        "label": "Visual style",
+        "id": "drops_overlay_font_family",
+        "label": "Font",
         "options": [
           {
-            "value": "garden",
-            "label": "Garden (green theme)"
+            "value": "body",
+            "label": "Body"
           },
           {
-            "value": "standard",
-            "label": "Standard (neutral theme)"
+            "value": "subheading",
+            "label": "Subheading"
           },
           {
-            "value": "premium",
-            "label": "Premium (gold theme)"
+            "value": "heading",
+            "label": "Heading"
+          },
+          {
+            "value": "accent",
+            "label": "Accent"
           }
         ],
-        "default": "garden",
-        "info": "Choose a preset style that matches your brand"
-      },
-      {
-        "type": "text",
-        "id": "preorder_info_prefix",
-        "label": "Coming soon text",
-        "default": "Coming Soon",
-        "info": "Text shown before the preorder date (e.g., 'Coming Soon', 'Available')"
-      },
-      {
-        "type": "text",
-        "id": "preorder_icon",
-        "label": "Preorder icon",
-        "default": "🌱",
-        "info": "Emoji or symbol to show with preorder info"
-      },
-      {
-        "type": "checkbox",
-        "id": "preorder_show_icon",
-        "label": "Show icon",
-        "default": true
-      },
-      {
-        "type": "header",
-        "content": "Back-in-Stock Integration"
-      },
-      {
-        "type": "checkbox",
-        "id": "enable_back_in_stock",
-        "label": "Enable back-in-stock notifications",
-        "default": true,
-        "info": "Show notify buttons for sold-out products"
-      },
-      {
-        "type": "text",
-        "id": "klaviyo_bis_form_id",
-        "label": "Klaviyo form ID",
-        "default": "WQZSWn",
-        "info": "Your Klaviyo back-in-stock form ID"
-      },
-      {
-        "type": "text",
-        "id": "bis_button_text",
-        "label": "Back-in-stock button text",
-        "default": "Notify When Available",
-        "info": "Text for sold-out products without preorder dates"
-      },
-      {
-        "type": "header",
-        "content": "Vague Date Settings"
-      },
-      {
-        "type": "paragraph",
-        "content": "Configure how vague pickup dates display when products have 'use_vague_pickup_date' enabled. These settings work with product metafields to show 'early/mid/late month' instead of specific dates."
+        "default": "body"
       },
       {
         "type": "range",
-        "id": "vague_date_early_cutoff",
-        "label": "Early month cutoff day",
-        "min": 3,
-        "max": 10,
+        "id": "drops_overlay_font_size",
+        "min": 10,
+        "max": 24,
         "step": 1,
-        "default": 10,
-        "info": "Days 1 through this number show as 'early [month]'"
+        "unit": "px",
+        "label": "Font size",
+        "default": 14
+      },
+      {
+        "type": "select",
+        "id": "drops_overlay_font_weight",
+        "label": "Font weight",
+        "options": [
+          {
+            "value": "400",
+            "label": "Normal"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semi Bold"
+          },
+          {
+            "value": "700",
+            "label": "Bold"
+          }
+        ],
+        "default": "500"
+      },
+      {
+        "type": "select",
+        "id": "drops_overlay_text_transform",
+        "label": "Text case",
+        "options": [
+          {
+            "value": "none",
+            "label": "Default"
+          },
+          {
+            "value": "uppercase",
+            "label": "Uppercase"
+          },
+          {
+            "value": "lowercase",
+            "label": "Lowercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "Capitalize"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
       },
       {
         "type": "range",
-        "id": "vague_date_mid_cutoff",
-        "label": "Mid month cutoff day",
-        "min": 15,
-        "max": 25,
-        "step": 1,
-        "default": 20,
-        "info": "Days after early cutoff through this number show as 'mid [month]'"
+        "id": "drops_overlay_padding_vertical",
+        "min": 4,
+        "max": 20,
+        "step": 2,
+        "unit": "px",
+        "label": "Vertical padding",
+        "default": 8
       },
       {
-        "type": "checkbox",
-        "id": "vague_date_show_range",
-        "label": "Show pickup range",
-        "default": true,
-        "info": "Display full range like 'early September through late September'"
+        "type": "range",
+        "id": "drops_overlay_padding_horizontal",
+        "min": 8,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Horizontal padding",
+        "default": 16
       },
       {
-        "type": "checkbox",
-        "id": "vague_date_boundary_handling",
-        "label": "Handle month boundaries",
-        "default": true,
-        "info": "Show 'late February/early March' when range crosses months"
+        "type": "header",
+        "content": "Preorder Text"
+      },
+      {
+        "type": "text",
+        "id": "preorder_availability_text",
+        "label": "Availability text",
+        "default": "Available",
+        "info": "Text shown before the availability date (e.g., 'Available this Monday')"
       }
     ]
   },
@@ -2435,6 +2470,951 @@
           }
         ],
         "default": "equal-width-buttons"
+      }
+    ]
+  },
+  {
+    "name": "Back in Stock",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Back in Stock Configuration"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_back_in_stock",
+        "label": "Enable Back in Stock",
+        "default": true,
+        "info": "Show Back in Stock signup for sold-out products without preorder dates"
+      },
+      {
+        "type": "text",
+        "id": "klaviyo_bis_form_id",
+        "label": "Klaviyo Form ID",
+        "info": "Enter your Klaviyo Back in Stock form ID from Forms & Pop-ups",
+        "placeholder": "e.g., ABC123"
+      },
+      {
+        "type": "header",
+        "content": "Back in Stock Button (Regular Products)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for the button shown on regular sold-out products without preorder dates"
+      },
+      {
+        "type": "text",
+        "id": "bis_button_text",
+        "label": "Button Text",
+        "default": "Notify When Back in Stock",
+        "info": "Text displayed on the back in stock button"
+      },
+      {
+        "type": "select",
+        "id": "bis_button_text_case",
+        "label": "Text Capitalization",
+        "options": [
+          {
+            "value": "as-typed",
+            "label": "As Typed"
+          },
+          {
+            "value": "uppercase",
+            "label": "ALL CAPS"
+          },
+          {
+            "value": "capitalize",
+            "label": "Title Case"
+          },
+          {
+            "value": "lowercase",
+            "label": "lowercase"
+          }
+        ],
+        "default": "uppercase",
+        "info": "How to display the back in stock button text"
+      },
+      {
+        "type": "color",
+        "id": "bis_button_background",
+        "label": "Background Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "bis_button_text_color",
+        "label": "Text Color",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "Preorder Button (Get Early Access)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for the button shown on preorder products with future availability dates"
+      },
+      {
+        "type": "text",
+        "id": "preorder_button_text",
+        "label": "Button Text",
+        "default": "Get Early Access",
+        "info": "Text displayed on the preorder button"
+      },
+      {
+        "type": "select",
+        "id": "preorder_button_text_case",
+        "label": "Text Capitalization",
+        "options": [
+          {
+            "value": "as-typed",
+            "label": "As Typed"
+          },
+          {
+            "value": "uppercase",
+            "label": "ALL CAPS"
+          },
+          {
+            "value": "capitalize",
+            "label": "Title Case"
+          },
+          {
+            "value": "lowercase",
+            "label": "lowercase"
+          }
+        ],
+        "default": "uppercase",
+        "info": "How to display the preorder button text"
+      },
+      {
+        "type": "color",
+        "id": "preorder_button_background",
+        "label": "Background Color",
+        "default": "#dc6565",
+        "info": "Background color for the preorder button"
+      },
+      {
+        "type": "color",
+        "id": "preorder_button_background_hover",
+        "label": "Background Hover Color",
+        "default": "#c85454",
+        "info": "Background color when hovering over the preorder button"
+      },
+      {
+        "type": "color",
+        "id": "preorder_button_text_color",
+        "label": "Text Color",
+        "default": "#ffffff",
+        "info": "Text color for the preorder button"
+      },
+      {
+        "type": "header",
+        "content": "Preorder Display Configuration"
+      }
+    ]
+  },
+  {
+    "name": "Preorder Vague Dates",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Vague Date System Settings"
+      },
+      {
+        "type": "paragraph",
+        "content": "Configure representative days for early, mid, and late periods in each month. These days will be used when products have vague pickup dates enabled (via product metafield 'use_vague_pickup_date')."
+      },
+      {
+        "type": "range",
+        "id": "vague_date_early_day",
+        "label": "Early Month Representative Day",
+        "min": 1,
+        "max": 15,
+        "step": 1,
+        "default": 5,
+        "info": "Day of month representing 'early' period (e.g., 'early September')"
+      },
+      {
+        "type": "range",
+        "id": "vague_date_mid_day", 
+        "label": "Mid Month Representative Day",
+        "min": 10,
+        "max": 20,
+        "step": 1,
+        "default": 15,
+        "info": "Day of month representing 'mid' period (e.g., 'mid September')"
+      },
+      {
+        "type": "range",
+        "id": "vague_date_late_day",
+        "label": "Late Month Representative Day", 
+        "min": 20,
+        "max": 31,
+        "step": 1,
+        "default": 25,
+        "info": "Day of month representing 'late' period (e.g., 'late September')"
+      },
+      {
+        "type": "header",
+        "content": "Month Boundary Handling"
+      },
+      {
+        "type": "paragraph",
+        "content": "When the representative day falls on the last day of a month, the system will automatically display month transitions (e.g., 'late February early March')."
+      }
+    ]
+  },
+  {
+    "name": "Preorder Display",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_preorder_display",
+        "label": "Enable Preorder Display",
+        "default": true,
+        "info": "Show preorder information and pickup dates for products"
+      },
+      {
+        "type": "select",
+        "id": "preorder_color_mode",
+        "label": "Color Mode",
+        "options": [
+          {
+            "value": "scheme",
+            "label": "Use Color Scheme"
+          },
+          {
+            "value": "custom",
+            "label": "Custom Colors"
+          }
+        ],
+        "default": "custom",
+        "info": "Choose between theme color schemes or custom colors"
+      },
+      {
+        "type": "color_scheme",
+        "id": "preorder_color_scheme",
+        "label": "Color Scheme",
+        "default": "scheme-1",
+        "info": "Select color scheme when using scheme mode"
+      },
+      {
+        "type": "header",
+        "content": "Container Styling"
+      },
+      {
+        "type": "select",
+        "id": "preorder_bg_type",
+        "label": "Background Type",
+        "options": [
+          {
+            "value": "solid",
+            "label": "Solid Color"
+          },
+          {
+            "value": "gradient",
+            "label": "Gradient"
+          },
+          {
+            "value": "transparent",
+            "label": "Transparent"
+          }
+        ],
+        "default": "gradient"
+      },
+      {
+        "type": "color",
+        "id": "preorder_bg_color",
+        "label": "Background Color",
+        "default": "#f0f7f0",
+        "info": "Used when background type is solid or as gradient start"
+      },
+      {
+        "type": "color",
+        "id": "preorder_bg_gradient_end",
+        "label": "Gradient End Color",
+        "default": "#e8f4e8",
+        "info": "End color for gradient backgrounds"
+      },
+      {
+        "type": "range",
+        "id": "preorder_bg_gradient_angle",
+        "label": "Gradient Angle",
+        "min": 0,
+        "max": 360,
+        "step": 15,
+        "unit": "deg",
+        "default": 135
+      },
+      {
+        "type": "range",
+        "id": "preorder_bg_opacity",
+        "label": "Background Opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Border Settings"
+      },
+      {
+        "type": "select",
+        "id": "preorder_border_style",
+        "label": "Border Style",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "solid",
+            "label": "Solid"
+          },
+          {
+            "value": "dashed",
+            "label": "Dashed"
+          },
+          {
+            "value": "double",
+            "label": "Double"
+          }
+        ],
+        "default": "solid"
+      },
+      {
+        "type": "range",
+        "id": "preorder_border_width",
+        "label": "Border Width",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "default": 2
+      },
+      {
+        "type": "color",
+        "id": "preorder_border_color",
+        "label": "Border Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "range",
+        "id": "preorder_border_radius",
+        "label": "Corner Radius",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "default": 12
+      },
+      {
+        "type": "header",
+        "content": "Shadow Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_shadow_enable",
+        "label": "Enable Shadow",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "preorder_shadow_style",
+        "label": "Shadow Style",
+        "options": [
+          {
+            "value": "subtle",
+            "label": "Subtle"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          },
+          {
+            "value": "strong",
+            "label": "Strong"
+          },
+          {
+            "value": "custom",
+            "label": "Custom"
+          }
+        ],
+        "default": "subtle"
+      },
+      {
+        "type": "color",
+        "id": "preorder_shadow_color",
+        "label": "Shadow Color",
+        "default": "#4c7c4c",
+        "info": "Used when shadow style is custom"
+      },
+      {
+        "type": "header",
+        "content": "Icon Settings"
+      },
+      {
+        "type": "select",
+        "id": "preorder_icon_type",
+        "label": "Icon Type",
+        "options": [
+          {
+            "value": "calendar",
+            "label": "Calendar"
+          },
+          {
+            "value": "clock",
+            "label": "Clock"
+          },
+          {
+            "value": "star",
+            "label": "Star"
+          },
+          {
+            "value": "package",
+            "label": "Package"
+          },
+          {
+            "value": "truck",
+            "label": "Truck"
+          },
+          {
+            "value": "leaf",
+            "label": "Leaf (Garden)"
+          },
+          {
+            "value": "flower",
+            "label": "Flower (Garden)"
+          },
+          {
+            "value": "seedling",
+            "label": "Seedling (Garden)"
+          },
+          {
+            "value": "shopping-bag",
+            "label": "Shopping Bag"
+          },
+          {
+            "value": "gift",
+            "label": "Gift Box"
+          },
+          {
+            "value": "heart",
+            "label": "Heart"
+          },
+          {
+            "value": "lightning",
+            "label": "Lightning Bolt"
+          },
+          {
+            "value": "bell",
+            "label": "Bell"
+          },
+          {
+            "value": "tag",
+            "label": "Tag"
+          },
+          {
+            "value": "timer",
+            "label": "Timer"
+          }
+        ],
+        "default": "calendar"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_icon_circle",
+        "label": "Show Icon Background Circle",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "preorder_icon_color",
+        "label": "Icon Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "preorder_icon_bg_color",
+        "label": "Icon Background Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "header",
+        "content": "Badge/Label Settings"
+      },
+      {
+        "type": "text",
+        "id": "preorder_badge_coming_text",
+        "label": "Coming Soon Badge Text",
+        "default": "Early Access"
+      },
+      {
+        "type": "text",
+        "id": "preorder_badge_ready_text",
+        "label": "Ready Badge Text",
+        "default": "Ready for Pickup"
+      },
+      {
+        "type": "color",
+        "id": "preorder_badge_bg_color",
+        "label": "Badge Background Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "color",
+        "id": "preorder_badge_text_color",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "preorder_badge_ready_bg_color",
+        "label": "Ready Badge Background Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "header",
+        "content": "Text Content"
+      },
+      {
+        "type": "text",
+        "id": "preorder_title_coming",
+        "label": "Coming Soon Title",
+        "default": "Coming Soon"
+      },
+      {
+        "type": "text",
+        "id": "preorder_title_ready",
+        "label": "Ready Title",
+        "default": "Available Now"
+      },
+      {
+        "type": "text",
+        "id": "preorder_available_format",
+        "label": "Available Text Format",
+        "default": "Available {date}",
+        "info": "Use {date} as placeholder for the date"
+      },
+      {
+        "type": "text",
+        "id": "preorder_pickup_format",
+        "label": "Pickup Text Format",
+        "default": "Pickup available {date}",
+        "info": "Use {date} as placeholder for the date"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_note_text",
+        "label": "Bottom Note Text",
+        "default": "Visit our garden center during business hours"
+      },
+      {
+        "type": "header",
+        "content": "Date & Time Settings"
+      },
+      {
+        "type": "select",
+        "id": "preorder_date_format",
+        "label": "Date Format",
+        "options": [
+          {
+            "value": "month_day",
+            "label": "September 2 (single digit days)"
+          },
+          {
+            "value": "mm_dd",
+            "label": "9/2 (single digit format)"
+          },
+          {
+            "value": "dd_mm",
+            "label": "2/9 (single digit format)"
+          },
+          {
+            "value": "relative",
+            "label": "Smart Relative (Today, Next Tuesday, etc.)"
+          },
+          {
+            "value": "full",
+            "label": "September 2 at 2:00PM EST"
+          }
+        ],
+        "default": "relative",
+        "info": "Smart relative format uses proper This/Next logic and single digit formatting"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_use_single_digits",
+        "label": "Use Single Digit Days (1-9 not 01-09)",
+        "default": true,
+        "info": "Show '2' instead of '02' for single digit days"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_smart_relative_dates",
+        "label": "Smart This/Next Week Logic",
+        "default": true,
+        "info": "Uses proper logic: if today is Tuesday and event is next Tuesday, shows 'Next Tuesday' not 'This Tuesday'"
+      },
+      {
+        "type": "header",
+        "content": "Countdown Timer Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_show_countdown",
+        "label": "Enable Countdown Timer",
+        "default": true,
+        "info": "Shows live countdown for pre-drop stage"
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_countdown_24h_only",
+        "label": "Only Show Countdown < 24 Hours",
+        "default": false,
+        "info": "Only displays countdown when less than 24 hours remain"
+      },
+      {
+        "type": "range",
+        "id": "preorder_countdown_font_size",
+        "label": "Countdown Font Size",
+        "min": 12,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "default": 14
+      },
+      {
+        "type": "select",
+        "id": "preorder_countdown_font_weight",
+        "label": "Countdown Font Weight",
+        "options": [
+          {
+            "value": "normal",
+            "label": "Normal"
+          },
+          {
+            "value": "500",
+            "label": "Medium"
+          },
+          {
+            "value": "600",
+            "label": "Semi-bold"
+          },
+          {
+            "value": "bold",
+            "label": "Bold"
+          }
+        ],
+        "default": "normal"
+      },
+      {
+        "type": "header",
+        "content": "Typography"
+      },
+      {
+        "type": "color",
+        "id": "preorder_title_color",
+        "label": "Title Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "color",
+        "id": "preorder_message_color",
+        "label": "Message Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "color",
+        "id": "preorder_note_color",
+        "label": "Note Color",
+        "default": "#6ba46b"
+      },
+      {
+        "type": "header",
+        "content": "Animation"
+      },
+      {
+        "type": "select",
+        "id": "preorder_animation_style",
+        "label": "Animation Style",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "subtle",
+            "label": "Subtle"
+          },
+          {
+            "value": "prominent",
+            "label": "Prominent"
+          }
+        ],
+        "default": "subtle"
+      },
+      {
+        "type": "header",
+        "content": "🕐 PRE DROP STAGE - Before Preorders Open"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for products before preorder window opens"
+      },
+      {
+        "type": "text",
+        "id": "preorder_predrop_badge",
+        "label": "Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "text",
+        "id": "preorder_predrop_title",
+        "label": "Title Text",
+        "default": "Available Soon"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_title_color",
+        "label": "Title Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_predrop_message",
+        "label": "Main Message Template",
+        "default": "Product will be live for preorders {date}",
+        "info": "Available placeholders: {date}, {pickup_date}, {pickup_end}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_message_color",
+        "label": "Message Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_predrop_note",
+        "label": "Pickup Information",
+        "default": "Pickup your preorders in store beginning: {pickup_date}",
+        "info": "Shows pickup date information below main message"
+      },
+      {
+        "type": "color",
+        "id": "preorder_predrop_note_color",
+        "label": "Pickup Info Color",
+        "default": "#6ba46b"
+      },
+      {
+        "type": "header",
+        "content": "✅ LIVE STAGE - Preorders Open (In Stock)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for products during preorder window when items are available"
+      },
+      {
+        "type": "text",
+        "id": "preorder_live_badge",
+        "label": "Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "text",
+        "id": "preorder_live_title",
+        "label": "Title Text",
+        "default": "Order Now"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_title_color",
+        "label": "Title Color",
+        "default": "#2d5a2d"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_live_message",
+        "label": "Main Message Template",
+        "default": "Pickup your preorders in store beginning: {pickup_date} through {pickup_end}",
+        "info": "Available placeholders: {pickup_date}, {pickup_end}, {close_date}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_message_color",
+        "label": "Message Color",
+        "default": "#4c7c4c"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_live_note",
+        "label": "Additional Information",
+        "default": "Visit our garden center during business hours",
+        "info": "Additional note shown below pickup information"
+      },
+      {
+        "type": "color",
+        "id": "preorder_live_note_color",
+        "label": "Additional Info Color",
+        "default": "#6ba46b"
+      },
+      {
+        "type": "header",
+        "content": "❌ SOLD OUT STAGE - Preorders Open (No Stock)"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for products during preorder window when items are sold out"
+      },
+      {
+        "type": "text",
+        "id": "preorder_soldout_badge",
+        "label": "Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#dc6565"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "text",
+        "id": "preorder_soldout_title",
+        "label": "Title Text",
+        "default": "Sold Out"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_title_color",
+        "label": "Title Color",
+        "default": "#dc6565"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_soldout_message",
+        "label": "Main Message Template",
+        "default": "This product is currently sold out",
+        "info": "Available placeholders: {pickup_date}, {pickup_end}, {close_date}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_message_color",
+        "label": "Message Color",
+        "default": "#dc6565"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_soldout_note",
+        "label": "Additional Information",
+        "default": "Check back later or contact us for availability",
+        "info": "Additional note shown below main message"
+      },
+      {
+        "type": "color",
+        "id": "preorder_soldout_note_color",
+        "label": "Additional Info Color",
+        "default": "#c85454"
+      },
+      {
+        "type": "header",
+        "content": "🔒 CLOSED STAGE - After Preorder Window Closes"
+      },
+      {
+        "type": "paragraph",
+        "content": "Settings for products after the preorder window has closed"
+      },
+      {
+        "type": "text",
+        "id": "preorder_closed_badge",
+        "label": "Badge Text",
+        "default": "Preorder"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_badge_bg",
+        "label": "Badge Background Color",
+        "default": "#666666"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_badge_text",
+        "label": "Badge Text Color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "text",
+        "id": "preorder_closed_title",
+        "label": "Title Text",
+        "default": "Ordering Closed"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_title_color",
+        "label": "Title Color",
+        "default": "#666666"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_closed_message",
+        "label": "Main Message Template",
+        "default": "Ordering for this product closed {close_date}",
+        "info": "Available placeholders: {close_date}, {pickup_date}, {pickup_end}"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_message_color",
+        "label": "Message Color",
+        "default": "#666666"
+      },
+      {
+        "type": "textarea",
+        "id": "preorder_closed_note",
+        "label": "Additional Information",
+        "default": "Contact us for future availability",
+        "info": "Additional note shown below main message"
+      },
+      {
+        "type": "color",
+        "id": "preorder_closed_note_color",
+        "label": "Additional Info Color",
+        "default": "#999999"
       }
     ]
   }

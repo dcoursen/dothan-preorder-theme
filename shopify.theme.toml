@@ -8,9 +8,9 @@
 theme_id = "142915502242"
 store = "vzgxcj-h9"
 
-# Staging Theme  
+# Staging Theme
 [environments.staging]
-theme_id = "143102967970"
+theme_id = "143188983970"
 store = "vzgxcj-h9"
 
 # Development Theme (preorder branch work)
@@ -20,7 +20,7 @@ store = "vzgxcj-h9"
 
 # Default environment when no --environment is specified
 [environments.default]
-theme_id = "143102967970"  # Points to staging by default
+theme_id = "143188983970"  # Points to staging by default
 store = "vzgxcj-h9"
 
 # Theme settings

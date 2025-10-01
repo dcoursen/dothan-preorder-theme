@@ -1,0 +1,125 @@
+{%- comment -%}
+  Smart Date Formatter
+  Handles proper relative date formatting with single digits and proper This/Next week logic
+  
+  Parameters:
+  - date: The date to format
+  - format_type: 'relative', 'month_day', 'mm_dd', 'dd_mm', 'full'
+  - context: 'drop', 'pickup', 'close' (for different messaging contexts)
+{%- endcomment -%}
+
+{%- liquid
+  assign target_date = date
+  assign now = 'now' | date: '%s'
+  assign target_timestamp = target_date | date: '%s'
+  assign days_diff = target_timestamp | minus: now | divided_by: 86400
+  assign formatted_date = ''
+  
+  case format_type
+    when 'relative'
+      # Get day of week info
+      assign today_weekday = now | date: '%w'
+      assign target_weekday = target_date | date: '%w'
+      assign today_date = now | date: '%Y-%m-%d'
+      assign target_date_only = target_date | date: '%Y-%m-%d'
+      
+      # Check if it's today
+      if target_date_only == today_date
+        assign time_part = target_date | date: '%l:%M%p'
+        case context
+          when 'drop'
+            assign formatted_date = 'Dropping Today at ' | append: time_part
+          when 'pickup'
+            assign formatted_date = 'Pickup starts today at ' | append: time_part
+          when 'pickup_end'
+            assign formatted_date = 'Today'
+          when 'close'
+            assign formatted_date = 'Closes today at ' | append: time_part
+          else
+            assign formatted_date = 'Today at ' | append: time_part
+        endcase
+      elsif days_diff == 1
+        if context == 'pickup_end'
+          assign formatted_date = 'Tomorrow'
+        else
+          assign time_part = target_date | date: '%l:%M%p'
+          assign formatted_date = 'Tomorrow at ' | append: time_part
+        endif
+      elsif days_diff > 0 and days_diff <= 13
+        # Within 2 weeks - use relative weekday logic
+        assign weeks_diff = days_diff | divided_by: 7
+        assign target_day_name = target_date | date: '%A'
+        assign time_part = target_date | date: '%l:%M%p'
+        
+        if context == 'pickup_end'
+          # No time for pickup end dates
+          if weeks_diff == 0
+            # Same week
+            if target_weekday > today_weekday
+              assign formatted_date = 'This ' | append: target_day_name
+            else
+              assign formatted_date = 'Next ' | append: target_day_name
+            endif
+          else
+            # Next week
+            assign formatted_date = 'Next ' | append: target_day_name
+          endif
+        else
+          # Include time for other contexts
+          if weeks_diff == 0
+            # Same week
+            if target_weekday > today_weekday
+              assign formatted_date = 'This ' | append: target_day_name | append: ' at ' | append: time_part
+            else
+              assign formatted_date = 'Next ' | append: target_day_name | append: ' at ' | append: time_part
+            endif
+          else
+            # Next week
+            assign formatted_date = 'Next ' | append: target_day_name | append: ' at ' | append: time_part
+          endif
+        endif
+      else
+        # More than 2 weeks out - use month/day format with single digits
+        assign month_name = target_date | date: '%B'
+        assign day_num = target_date | date: '%e' | strip
+        if context == 'pickup_end'
+          # No time for pickup end dates
+          assign formatted_date = month_name | append: ' ' | append: day_num
+        else
+          assign time_part = target_date | date: '%l:%M%p'
+          assign formatted_date = month_name | append: ' ' | append: day_num | append: ' at ' | append: time_part
+        endif
+      endif
+      
+    when 'month_day'
+      # Single digit day formatting
+      assign month_name = target_date | date: '%B'
+      assign day_num = target_date | date: '%e' | strip
+      assign formatted_date = month_name | append: ' ' | append: day_num
+      
+    when 'mm_dd'
+      # Single digit formatting for mm/dd
+      assign month_num = target_date | date: '%-m'
+      assign day_num = target_date | date: '%-d'
+      assign formatted_date = month_num | append: '/' | append: day_num
+      
+    when 'dd_mm'
+      # Single digit formatting for dd/mm
+      assign month_num = target_date | date: '%-m'
+      assign day_num = target_date | date: '%-d'
+      assign formatted_date = day_num | append: '/' | append: month_num
+      
+    when 'full'
+      # Full format with single digit day
+      assign month_name = target_date | date: '%B'
+      assign day_num = target_date | date: '%e' | strip
+      assign time_part = target_date | date: '%l:%M%p %Z'
+      assign formatted_date = month_name | append: ' ' | append: day_num | append: ' at ' | append: time_part
+      
+    else
+      # Default to month_day with single digits
+      assign month_name = target_date | date: '%B'
+      assign day_num = target_date | date: '%e' | strip
+      assign formatted_date = month_name | append: ' ' | append: day_num
+  endcase
+-%}{{ formatted_date }}

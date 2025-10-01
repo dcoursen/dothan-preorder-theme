@@ -1,0 +1,51 @@
+{%- comment -%}
+Preorder Date Debug Snippet
+Use this to troubleshoot pickup date calculations
+{%- endcomment -%}
+
+{%- liquid
+  assign product = product | default: closest.product
+  if product == blank
+    assign product = collections.all.products.first
+  endif
+  
+  # Get metafields
+  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
+  assign pickup_duration_days = product.metafields.custom.pickup_duration_days.value | default: 14
+  assign preorder_close_date = product.metafields.custom.preorder_close_date.value
+  
+  # Calculate timestamps
+  assign now = 'now' | date: '%s'
+  if preorder_pickup_start != blank
+    assign pickup_start_timestamp = preorder_pickup_start | date: '%s'
+    assign pickup_duration_seconds = pickup_duration_days | times: 86400
+    assign pickup_end_timestamp = pickup_start_timestamp | plus: pickup_duration_seconds
+    assign pickup_end_date = pickup_end_timestamp | date: '%Y-%m-%d %H:%M:%S'
+  endif
+-%}
+
+{%- if product.metafields.custom.preorder_pickup_start.value != blank -%}
+<div style="background: #f0f0f0; padding: 15px; margin: 20px 0; border: 1px solid #ddd; font-family: monospace; font-size: 12px;">
+  <h4>🐛 Preorder Date Debug Info</h4>
+  <p><strong>Product:</strong> {{ product.title }}</p>
+  <p><strong>Current Time:</strong> {{ 'now' | date: '%Y-%m-%d %H:%M:%S' }}</p>
+  
+  <h5>📅 Metafield Values:</h5>
+  <p><strong>Pickup Start:</strong> {{ preorder_pickup_start | default: 'NOT SET' }}</p>
+  <p><strong>Pickup Duration:</strong> {{ pickup_duration_days }} days</p>
+  <p><strong>Close Date:</strong> {{ preorder_close_date | default: 'NOT SET' }}</p>
+  
+  <h5>🧮 Calculated Values:</h5>
+  <p><strong>Start Timestamp:</strong> {{ pickup_start_timestamp }}</p>
+  <p><strong>Duration Seconds:</strong> {{ pickup_duration_seconds }}</p>
+  <p><strong>End Timestamp:</strong> {{ pickup_end_timestamp }}</p>
+  <p><strong>Calculated End Date:</strong> {{ pickup_end_date }}</p>
+  
+  <h5>📍 What Should Display:</h5>
+  <p>Pickup window: <strong>{{ preorder_pickup_start | date: '%B %d' }} through {{ pickup_end_date | date: '%B %d' }}</strong></p>
+  
+  {%- if preorder_close_date != blank -%}
+    <p style="color: orange;"><strong>⚠️ Warning:</strong> Close date ({{ preorder_close_date | date: '%B %d' }}) is different from calculated pickup end date</p>
+  {%- endif -%}
+</div>
+{%- endif -%}

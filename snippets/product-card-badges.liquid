@@ -52,7 +52,7 @@
       endcase
       
       if days_until_drop <= 7
-        assign time_with_tz = preorder_drop_date | date: '%l:%M%p EST'
+        assign time_with_tz = preorder_drop_date | date: '%l:%M%p'
         assign preorder_smart_drop_date = 'This ' | append: day_name | append: ' @ ' | append: time_with_tz
       else
         assign formatted_date = preorder_drop_date | date: '%-m/%-d'

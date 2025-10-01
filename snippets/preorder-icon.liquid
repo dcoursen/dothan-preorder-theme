@@ -1,0 +1,82 @@
+{%- case icon_type -%}
+  {%- when 'calendar' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H18V1H16V3H8V1H6V3H5C3.89 3 3.01 3.9 3.01 5L3 19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19ZM7 10H12V15H7V10Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'clock' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'star' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9L8.91 8.26L12 2Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'package' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 8H17.19C16.74 7.22 16.12 6.55 15.37 6.04L12 4L8.63 6.04C7.88 6.55 7.26 7.22 6.81 8H4C2.9 8 2 8.9 2 10V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V10C22 8.9 21.1 8 20 8ZM12 6L13.5 7H10.5L12 6ZM20 19H4V10H20V19Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'truck' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 8H17V4H3C1.9 4 1 4.9 1 6V17H3C3 18.66 4.34 20 6 20S9 18.66 9 17H15C15 18.66 16.34 20 18 20S21 18.66 21 17H23V12L20 8ZM6 18C5.45 18 5 17.55 5 17S5.45 16 6 16 7 16.45 7 17 6.55 18 6 18ZM19.5 9.5L21.46 12H17V9.5H19.5ZM18 18C17.45 18 17 17.55 17 17S17.45 16 18 16 19 16.45 19 17 18.55 18 18 18Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'leaf' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22L6.66 19.7C7.14 19.87 7.64 20 8.16 20C13.76 20 18.16 15.76 18.16 10.16C18.16 9.65 18.12 9.15 18.05 8.66L17 8ZM8.16 18C7.65 18 7.16 17.91 6.71 17.73L10.48 7.39C13.77 8.16 16.16 11 16.16 14.42C16.16 16.95 14.2 18 12.21 18H8.16Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'flower' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22.5C11.17 22.5 10.5 21.83 10.5 21C10.5 20.17 11.17 19.5 12 19.5C12.83 19.5 13.5 20.17 13.5 21C13.5 21.83 12.83 22.5 12 22.5ZM15.5 16.5C15.5 14.57 13.93 13 12 13C10.07 13 8.5 14.57 8.5 16.5C8.5 17.44 8.86 18.3 9.46 18.94L12 16L14.54 18.94C15.14 18.3 15.5 17.44 15.5 16.5ZM18.5 11.5C18.5 9.57 16.93 8 15 8C14.71 8 14.42 8.03 14.15 8.08C14.41 8.66 14.58 9.3 14.61 9.97C15.96 10.12 17 11.26 17 12.66C17 13.22 16.79 13.73 16.46 14.13L14.93 11.93C15.57 11.33 16 10.46 16 9.5C16 7.57 14.43 6 12.5 6C10.57 6 9 7.57 9 9.5C9 10.46 9.43 11.33 10.07 11.93L8.54 14.13C8.21 13.73 8 13.22 8 12.66C8 11.26 9.04 10.12 10.39 9.97C10.42 9.3 10.59 8.66 10.85 8.08C10.58 8.03 10.29 8 10 8C8.07 8 6.5 9.57 6.5 11.5C6.5 13.43 8.07 15 10 15H14C15.93 15 17.5 13.43 17.5 11.5H18.5Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'seedling' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 11H13V4C13 2.9 13.9 2 15 2H20C21.1 2 22 2.9 22 4V11ZM11 11H2V7C2 5.9 2.9 5 4 5H9C10.1 5 11 5.9 11 7V11ZM13 13V22H11V13H13Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'shopping-bag' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 7H16V6C16 4.9 15.1 4 14 4H10C8.9 4 8 4.9 8 6V7H5C4.45 7 4 7.45 4 8C4 8.55 4.45 9 5 9H6V19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V9H19C19.55 9 20 8.55 20 8C20 7.45 19.55 7 19 7ZM10 6H14V7H10V6ZM16 19H8V9H16V19Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'gift' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 6H17.82C17.93 5.69 18 5.35 18 5C18 3.34 16.66 2 15 2C13.95 2 13.04 2.54 12.5 3.35L12 4.02L11.5 3.34C10.96 2.54 10.05 2 9 2C7.34 2 6 3.34 6 5C6 5.35 6.07 5.69 6.18 6H4C2.9 6 2.01 6.9 2.01 8L2 19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V8C22 6.9 21.1 6 20 6ZM15 4C15.55 4 16 4.45 16 5C16 5.55 15.55 6 15 6C14.45 6 14 5.55 14 5C14 4.45 14.45 4 15 4ZM9 4C9.55 4 10 4.45 10 5C10 5.55 9.55 6 9 6C8.45 6 8 5.55 8 5C8 4.45 8.45 4 9 4ZM20 19H4V17H20V19ZM20 14H4V8H11V10H13V8H20V14Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'heart' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'lightning' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7 2V13H10V22L17 10H13L17 2H7Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'bell' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'tag' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21.41 11.58L12.41 2.58C12.05 2.22 11.55 2 11 2H4C2.9 2 2 2.9 2 4V11C2 11.55 2.22 12.05 2.59 12.42L11.59 21.42C11.95 21.78 12.45 22 13 22C13.55 22 14.05 21.78 14.41 21.41L21.41 14.41C21.78 14.05 22 13.55 22 13C22 12.45 21.77 11.94 21.41 11.58ZM5.5 7C4.67 7 4 6.33 4 5.5C4 4.67 4.67 4 5.5 4C6.33 4 7 4.67 7 5.5C7 6.33 6.33 7 5.5 7Z" fill="currentColor"/>
+    </svg>
+    
+  {%- when 'timer' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 1H9V3H15V1ZM11 14H13V8H11V14ZM19.03 7.39L20.45 5.97C20.02 5.46 19.55 4.98 19.04 4.56L17.62 5.98C16.07 4.74 14.12 4 12 4C7.03 4 3 8.03 3 13C3 17.97 7.03 22 12 22C16.97 22 21 17.97 21 13C21 10.88 20.26 8.93 19.03 7.39ZM12 20C8.13 20 5 16.87 5 13C5 9.13 8.13 6 12 6C15.87 6 19 9.13 19 13C19 16.87 15.87 20 12 20Z" fill="currentColor"/>
+    </svg>
+    
+  {%- else -%}
+    {%- comment -%} Default to calendar icon {%- endcomment -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 3H18V1H16V3H8V1H6V3H5C3.89 3 3.01 3.9 3.01 5L3 19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V8H19V19ZM7 10H12V15H7V10Z" fill="currentColor"/>
+    </svg>
+{%- endcase -%}

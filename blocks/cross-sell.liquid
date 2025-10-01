@@ -1,0 +1,717 @@
+{%- comment -%}
+  Cross-sell block for displaying "Buy it with" products
+  Uses product metafields following Shopify best practices:
+  - product.metafields.custom.cross_sell_products (List of product references)
+  - product.metafields.custom.cross_sell_title (optional title)
+  - product.metafields.custom.cross_sell_description (optional description)
+{%- endcomment -%}
+
+{% liquid
+  # Get the product context properly
+  if product == blank or product == nil
+    assign product = section.settings.product | default: page.product | default: closest.product
+  endif
+  
+  if request.visual_preview_mode and product == blank
+    assign product = collections.all.products.first
+  endif
+
+  # Get related products using the correct pattern  
+  assign related_products = product.metafields.custom.add_on_product.value
+  
+  assign add_on_title = product.metafields.custom.add_on_title.value
+  if add_on_title == blank
+    assign add_on_title = 'Goes great with'
+  endif
+  
+  # Use metafield_tag for rich text metafields - handles JSON parsing automatically
+  assign add_on_description_metafield = product.metafields.custom.add_on_description
+  
+  # Parse title if it's JSON too
+  if add_on_title contains '"value":"'
+    assign title_split = add_on_title | split: '"value":"'
+    if title_split.size > 1
+      assign title_text_with_end = title_split[1]
+      assign title_text_parts = title_text_with_end | split: '"'
+      assign add_on_title = title_text_parts[0]
+    endif
+  endif
+  
+  assign color_scheme = block.settings.color_scheme | default: 'scheme-1'
+  assign product_spacing = block.settings.product_spacing | default: 1
+  assign product_title_size = block.settings.product_title_size | default: '1rem'
+  assign product_title_color = block.settings.product_title_color | default: '#000000'
+  assign product_price_size = block.settings.product_price_size | default: '1rem'
+  assign product_price_color = block.settings.product_price_color | default: '#000000'
+  assign background_color = block.settings.background_color | default: '#f5f5f5'
+  assign border_width = block.settings.border_width | default: 1
+  assign border_color = block.settings.border_color | default: '#e5e5e5'
+  assign button_style = block.settings.button_style | default: 'solid'
+  assign button_radius = block.settings.button_radius | default: 25
+  assign title_font_size = block.settings.title_font_size | default: '1.1rem'
+  assign title_color = block.settings.title_color | default: 'var(--color-foreground)'
+  assign description_font_size = block.settings.description_font_size | default: '0.9rem'
+  assign description_color = block.settings.description_color | default: 'var(--color-foreground-secondary, #666)'
+%}
+
+
+
+{% comment %} Show the add-on block if we have products {% endcomment %}
+{% if related_products.size > 0 or related_products != blank %}
+  <div
+    class="cross-sell-block cross-sell-block--{{ block.id }} color-{{ color_scheme }} button-style--{{ button_style }}"
+    {{ block.shopify_attributes }}
+    style="background-color: {{ background_color }}; border: {{ border_width }}px solid {{ border_color }}; padding: 1.5rem; border-radius: 8px; margin-top: 2rem;"
+  >
+    <div class="cross-sell__header">
+      {% if add_on_title != blank %}
+        <h3 class="cross-sell__title" style="font-size: {{ title_font_size }}; color: {{ title_color }}; margin: 0 0 0.5rem 0; font-weight: 600;">{{ add_on_title }}</h3>
+      {% endif %}
+      
+      {% if add_on_description_metafield != blank %}
+        <div class="cross-sell__description" style="font-size: {{ description_font_size }}; color: {{ description_color }}; margin-bottom: 1rem;">{{ add_on_description_metafield | metafield_tag }}</div>
+      {% endif %}
+    </div>
+
+    {% if related_products != blank %}
+      <div class="cross-sell__products">
+        {% for related_product in related_products %}
+          {% if related_product.title %}
+            {% unless forloop.first %}
+              <hr class="related-product-divider">
+            {% endunless %}
+            <div class="related-product-item">
+              <div class="related-product-image">
+                {% if related_product.featured_image %}
+                  <img src="{{ related_product.featured_image | image_url: width: 100 }}" alt="{{ related_product.title }}">
+                {% endif %}
+              </div>
+              <div class="related-product-details">
+                <h4 class="related-product-name">{{ related_product.title }}</h4>
+              </div>
+              <div class="related-product-actions">
+                <div class="related-product-price">{{ related_product.price | money }}</div>
+                <button 
+                  type="button"
+                  class="related-product-add-btn {% if button_style == 'outline' %}outline-style{% else %}solid-style{% endif %}{% unless related_product.available %} sold-out{% endunless %}"
+                  data-product-id="{{ related_product.id }}"
+                  data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
+                  data-add-to-cart
+                  {% unless related_product.available %}disabled{% endunless %}
+                >
+                  {% if related_product.available %}+ Add{% else %}Sold out{% endif %}
+                </button>
+                <a href="{{ related_product.url }}" class="related-product-more-link">More info</a>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <script type="module">
+    // Import Horizons theme events
+    import { CartUpdateEvent, ThemeEvents } from '{{ 'events.js' | asset_url }}';
+    import { fetchConfig } from '{{ 'utilities.js' | asset_url }}';
+
+    class CrossSellBlock extends HTMLElement {
+      constructor() {
+        super();
+        this.addButtons = this.querySelectorAll('[data-add-to-cart]');
+        this.init();
+      }
+
+      init() {
+        this.addButtons.forEach(button => {
+          button.addEventListener('click', this.handleAddToCart.bind(this));
+        });
+      }
+
+      async handleAddToCart(event) {
+        event.preventDefault();
+        const button = event.currentTarget;
+        const variantId = button.dataset.variantId;
+        const productId = button.dataset.productId;
+        
+        if (!variantId) return;
+
+        button.disabled = true;
+        const originalText = button.innerText;
+        button.innerText = 'Adding...';
+
+        try {
+          // Use Shopify's add to cart endpoint with proper form data
+          const formData = new FormData();
+          formData.append('id', variantId);
+          formData.append('quantity', '1');
+          
+          const fetchCfg = fetchConfig('javascript', { body: formData });
+          
+          const response = await fetch(Theme.routes.cart_add_url || '/cart/add', {
+            ...fetchCfg,
+            headers: {
+              ...fetchCfg.headers,
+              'Accept': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            button.innerText = '✓ Added';
+            
+            // Get fresh cart data
+            const cartResponse = await fetch('/cart.js');
+            const cartData = await cartResponse.json();
+            
+            // Dispatch proper Horizons theme CartUpdateEvent
+            const cartUpdateEvent = new CartUpdateEvent(cartData, 'cross-sell-block', {
+              itemCount: cartData.item_count,
+              source: 'cross-sell-block',
+              productId: productId,
+              variantId: variantId,
+              didError: false
+            });
+            
+            document.dispatchEvent(cartUpdateEvent);
+
+            // Reset button after delay
+            setTimeout(() => {
+              button.innerText = originalText;
+              button.disabled = false;
+            }, 2000);
+            
+          } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add item');
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+          button.innerText = 'Error';
+          setTimeout(() => {
+            button.innerText = originalText;
+            button.disabled = false;
+          }, 2000);
+        }
+      }
+    }
+
+    customElements.define('cross-sell-block', CrossSellBlock);
+  </script>
+
+  {% style %}
+    .cross-sell-block {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      background: #f8f8f8;
+      border: 1px solid #e5e5e5;
+    }
+
+    .cross-sell__header {
+      margin-bottom: 1rem;
+      padding: 0;
+    }
+
+    .cross-sell__title {
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+      color: #000;
+    }
+
+    .cross-sell__description {
+      margin: 0 0 1rem 0;
+      line-height: 1.5;
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .cross-sell__products {
+      display: block;
+      width: 100%;
+    }
+
+    .related-product-divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 1rem 0;
+      width: 100%;
+    }
+
+    .related-product-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: {{ product_spacing }}px 0;
+    }
+
+    .related-product-image {
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+    }
+
+    .related-product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .related-product-details {
+      flex: 1;
+    }
+
+    .related-product-name {
+      font-size: {{ product_title_size }};
+      font-weight: 500;
+      margin: 0;
+      color: {{ product_title_color }};
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .related-product-price {
+      font-size: {{ product_price_size }};
+      font-weight: 600;
+      color: {{ product_price_color }};
+      margin: 0 0 0.5rem 0;
+      text-align: center;
+    }
+
+    .related-product-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-top: 0.75rem;
+    }
+
+    .related-product-add-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: {{ button_radius }}px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 100px;
+      border: 2px solid #000;
+    }
+
+    .related-product-add-btn.solid-style {
+      background: #000;
+      color: #fff;
+    }
+
+    .related-product-add-btn.outline-style {
+      background: transparent;
+      color: #000;
+    }
+
+    .related-product-add-btn.solid-style:hover {
+      opacity: 0.8;
+    }
+
+    .related-product-add-btn.outline-style:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .related-product-add-btn.sold-out {
+      background: #999;
+      color: #fff;
+      border-color: #999;
+      cursor: not-allowed;
+    }
+
+    .related-product-add-btn.sold-out.outline-style {
+      background: transparent;
+      color: #999;
+    }
+
+    .related-product-add-btn.sold-out:hover {
+      opacity: 1;
+      background: #999;
+      color: #fff;
+    }
+
+    .related-product-add-btn.sold-out.outline-style:hover {
+      background: transparent;
+      color: #999;
+    }
+
+    .related-product-add-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .related-product-more-link {
+      color: #666;
+      text-decoration: underline;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    .related-product-more-link:hover {
+      color: #000;
+    }
+
+    .cross-sell__product-item {
+      display: flex;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      margin-bottom: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      width: 100%;
+      box-sizing: border-box;
+      align-items: flex-start;
+    }
+
+    .cross-sell__product-item:first-child {
+      padding-top: 0;
+    }
+    
+    .cross-sell__product-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .cross-sell__product-image {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+    }
+
+    .cross-sell__product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .cross-sell__product-details {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .cross-sell__product-info {
+      flex: 1;
+    }
+
+    .cross-sell__product-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+      min-width: 100px;
+      flex-shrink: 0;
+    }
+
+    .cross-sell__product-title {
+      font-size: 0.95rem;
+      margin: 0;
+      font-weight: 500;
+      color: #000;
+      line-height: 1.3;
+    }
+
+    .cross-sell__product-price {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: flex-end;
+      font-size: 1rem;
+      text-align: right;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 0.5rem;
+    }
+
+    .cross-sell__price--compare {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 0.9rem;
+      font-weight: normal;
+    }
+
+    .cross-sell__price {
+      font-weight: 600;
+      color: #000;
+    }
+
+    .cross-sell__add-button {
+      width: 100%;
+      min-width: 80px;
+      white-space: nowrap;
+      padding: 0.5rem 1rem;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .cross-sell__add-button:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+    
+    .cross-sell__add-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Clickable product links */
+    .cross-sell__product-image-link {
+      display: block;
+      text-decoration: none;
+    }
+
+    .cross-sell__product-title-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .cross-sell__product-title-link:hover .cross-sell__product-title {
+      color: var(--color-link-hover, #333);
+    }
+
+    .cross-sell__more-info {
+      font-size: 0.85rem;
+      color: #007bff;
+      text-decoration: underline;
+      text-align: right;
+      white-space: nowrap;
+      display: inline-block;
+      margin-top: 0.25rem;
+    }
+
+    .cross-sell__more-info:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
+    /* Color scheme styles */
+    .color-scheme-1 {
+      background: var(--color-scheme-1-background);
+      color: var(--color-scheme-1-foreground);
+    }
+
+    .color-scheme-2 {
+      background: var(--color-scheme-2-background);
+      color: var(--color-scheme-2-foreground);
+    }
+
+    .color-scheme-3 {
+      background: var(--color-scheme-3-background);
+      color: var(--color-scheme-3-foreground);
+    }
+
+    .color-scheme-4 {
+      background: var(--color-scheme-4-background);
+      color: var(--color-scheme-4-foreground);
+    }
+
+    .color-scheme-5 {
+      background: var(--color-scheme-5-background);
+      color: var(--color-scheme-5-foreground);
+    }
+  {% endstyle %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Cross-sell Products",
+  "tag": "cross-sell-block",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Configure cross-sell products through product metafields: custom.cross_sell_products (List of product references), custom.cross_sell_title, custom.cross_sell_description. Maintains backward compatibility with old add_on_* metafields."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 25,
+      "info": "0 = square corners, 50 = fully rounded"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "text",
+      "id": "title_font_size",
+      "label": "Title font size",
+      "default": "1.1rem",
+      "info": "Use CSS units like rem, em, px"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "description_font_size",
+      "label": "Description font size",
+      "default": "0.9rem",
+      "info": "Use CSS units like rem, em, px"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Product Layout"
+    },
+    {
+      "type": "range",
+      "id": "product_spacing",
+      "label": "Product spacing",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 16,
+      "info": "Padding between products"
+    },
+    {
+      "type": "text",
+      "id": "product_title_size",
+      "label": "Product title font size",
+      "default": "1rem",
+      "info": "Use CSS units like rem, em, px"
+    },
+    {
+      "type": "color",
+      "id": "product_title_color",
+      "label": "Product title color",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "product_price_size",
+      "label": "Product price font size",
+      "default": "1rem",
+      "info": "Use CSS units like rem, em, px"
+    },
+    {
+      "type": "color",
+      "id": "product_price_color",
+      "label": "Product price color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Left padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Right padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cross-sell Products",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

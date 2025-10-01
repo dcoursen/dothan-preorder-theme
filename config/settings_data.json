@@ -9,12 +9,13 @@
  */
 {
   "current": {
-    "logo": "shopify://shop_images/BW-HS-_Dothan_Nurseries_FF.png",
+    "logo": "shopify://shop_images/reems-main-logo.png",
+    "favicon": "shopify://shop_images/favicon.png",
     "type_body_font": "inter_n4",
     "type_subheading_font": "inter_n5",
     "type_heading_font": "inter_n7",
     "type_accent_font": "bricolage_grotesque_n7",
-    "type_size_paragraph": "16",
+    "type_size_paragraph": "14",
     "type_line_height_paragraph": "body-loose",
     "type_font_h1": "accent",
     "type_size_h1": "88",
@@ -40,23 +41,20 @@
     "type_font_h6": "subheading",
     "type_size_h6": "12",
     "type_line_height_h6": "display-loose",
-    "page_width": "normal",
+    "page_width": "narrow",
     "card_hover_effect": "none",
     "badge_position": "top-right",
     "badge_corner_radius": 100,
     "badge_sale_color_scheme": "scheme-1",
     "badge_sold_out_color_scheme": "scheme-3",
     "badge_text_transform": "none",
-    "preorder_availability_text": "Drops:",
     "primary_button_border_width": 0,
     "button_border_radius_primary": 14,
-    "type_font_button_primary": "body",
-    "button_text_case_primary": "default",
     "secondary_button_border_width": 1,
     "button_border_radius_secondary": 14,
     "button_font_weight_secondary": "default",
-    "button_text_case_secondary": "default",
     "cart_type": "drawer",
+    "product_title_case": "default",
     "cart_price_font": "secondary",
     "auto_open_cart_drawer": true,
     "show_cart_note": false,
@@ -80,92 +78,82 @@
     "variant_button_border_width": 1,
     "variant_button_radius": 14,
     "variant_button_width": "default-width-buttons",
-    "klaviyo_bis_form_id": "WQZSWn",
+    "klaviyo_bis_form_id": "SrAshh",
+    "preorder_color_mode": "scheme",
+    "preorder_shadow_style": "custom",
     "sections": {
       "custom-footer": {
         "type": "custom-footer",
         "blocks": {
-          "store_hours_rcmQtD": {
-            "type": "store_hours",
-            "settings": {
-              "column_assignment": 2,
-              "heading": "Store Hours",
-              "monday": "Closed",
-              "tuesday": "9AM - 5PM",
-              "wednesday": "9AM - 5PM",
-              "thursday": "9AM - 5PM",
-              "friday": "9AM - 5PM",
-              "saturday": "9AM - 4PM",
-              "sunday": "Closed",
-              "combine_weekdays": true,
-              "weekdays_label": "Tuesday - Friday"
-            }
-          },
           "business_info_fHzDrm": {
             "type": "business_info",
             "settings": {
               "column_assignment": 1,
               "heading": "Contact Us",
               "show_logo": true,
-              "logo_text": "DN",
-              "business_name": "DOTHAN NURSERIES",
-              "address": "1300 Montgomery Hwy\nDothan, AL 36303",
-              "phone": "334.793.6244",
-              "phone_2": "334.794.3480",
-              "email": "orders@dothannursery.com",
-              "website": "",
+              "logo_text": "RCN",
+              "business_name": "Reems Creek Nursery",
+              "address": "76 Monticello Rd \nWeaverville, NC 28787",
+              "phone": "828-645-3937",
+              "phone_2": "",
+              "email": "plantpeople@reemscreek.com",
+              "website": "https://reemscreek.com/",
               "website_text": "Visit our main website"
             }
           },
-          "google_reviews_kw3Mqb": {
+          "store_hours_4TqMXf": {
+            "type": "store_hours",
+            "settings": {
+              "column_assignment": 2,
+              "heading": "Store Hours",
+              "monday": "9AM - 6PM",
+              "tuesday": "9AM - 6PM",
+              "wednesday": "9AM - 6PM",
+              "thursday": "9AM - 6PM",
+              "friday": "9AM - 6PM",
+              "saturday": "9AM - 6PM",
+              "sunday": "Closed"
+            }
+          },
+          "google_reviews_7ekPRB": {
             "type": "google_reviews",
             "settings": {
               "column_assignment": 3,
               "heading": "Reviews",
               "icon_size": 20,
               "layout_style": "stacked",
-              "google_reviews_url": "https://www.google.com/search?sca_esv=9e9838c08b3e3a3b&rlz=1C5CHFA_enUS1090US1091&si=AMgyJEuzsz2NflaaWzrzdpjxXXRaJ2hfdMsbe_mSWso6src8s-AMEybWTrjW8XrKWRXAQCWERfS6NQmmxX0GdAdDEXyps91LO9VXsBUsRDwkGai7cUExRG2cu8jmqcvwk7joytRlLTvzpD7ygRiXAlC6Rk1YBBbrjf1aGJfWlhyj-Yl7BkRWpjc%3D&q=Dothan+Nurseries+Greenhouse,+Gardens,+%26+Gifts+Reviews&sa=X&ved=2ahUKEwiq0byp4P6OAxX6mYQIHV2WCTEQ0bkNegQINBAE&biw=1728&bih=920&dpr=2",
-              "google_rating": "4.9",
-              "google_count": 568,
-              "yelp_url": "https://www.yelp.com/biz/dothan-nurseries-dothan",
-              "yelp_rating": "4.9",
-              "yelp_count": 9,
-              "facebook_url": "https://www.facebook.com/dothannurseries/reviews",
+              "google_reviews_url": "https://www.google.com/search?sca_esv=5b71cfa89013eb9f&rlz=1C1VDKB_enUS1091US1091&si=AMgyJEuzsz2NflaaWzrzdpjxXXRaJ2hfdMsbe_mSWso6src8s69ZgreiOXIZcfhJrYQUAyLtIaQ1a76pKgWAFrYXQ74UDvOz3HGf7aeuj4lYp1HJ2axWV9RCYeK4zavlCAI2K4Uy6pvSdDb4tJWbIMWpwTZDUW9_Og%3D%3D&q=Reems+Creek+Nursery+Reviews&sa=X&ved=2ahUKEwih97nEwNuPAxVmpLAFHV8TO7YQ0bkNegQIJhAE",
+              "google_rating": "4.7",
+              "google_count": 240,
+              "yelp_url": "https://www.yelp.com/writeareview/biz/oPMEjzOajztUWZD1n5qoVQ?return_url=%2Fbiz%2FoPMEjzOajztUWZD1n5qoVQ&review_origin=biz-details-war-button",
+              "yelp_rating": "4.5",
+              "yelp_count": 16,
+              "facebook_url": "https://www.facebook.com/reemscreeknursery/reviews",
               "facebook_rating": "4.9",
-              "facebook_count": 311
+              "facebook_count": 58
             }
           },
-          "custom_text_P6zQAU": {
-            "type": "custom_text",
-            "settings": {
-              "column_assignment": 2,
-              "heading": "Policies",
-              "content": "<p><a href=\"https://www.dothannurseries.com/happiness-gurantee\" title=\"https://www.dothannurseries.com/happiness-gurantee\">Warranty</a></p>",
-              "text_alignment": "left"
-            }
-          },
-          "social_media_w683AK": {
+          "social_media_rJd97a": {
             "type": "social_media",
             "settings": {
-              "column_assignment": 1,
+              "column_assignment": 2,
               "heading": "Follow Us",
-              "facebook_url": "https://www.facebook.com/dothannurseries/",
-              "instagram_url": "https://www.instagram.com/dothan.nurseries/",
+              "facebook_url": "https://www.facebook.com/reemscreeknursery/",
+              "instagram_url": "https://www.instagram.com/reemscreeknursery/?hl=en",
               "twitter_url": "",
-              "youtube_url": "https://www.youtube.com/channel/UCGh0bJTKdbg4BtrcpNMyAPw",
-              "tiktok_url": "https://www.tiktok.com/@dothan.nurseries?lang=en",
+              "youtube_url": "https://www.youtube.com/@reemscreeknursery698",
+              "tiktok_url": "https://www.tiktok.com/@reemscreeknursery?lang=en",
               "linkedin_url": "",
               "icon_style": "plain",
-              "icon_size": 28
+              "icon_size": 30
             }
           }
         },
         "block_order": [
-          "store_hours_rcmQtD",
           "business_info_fHzDrm",
-          "google_reviews_kw3Mqb",
-          "custom_text_P6zQAU",
-          "social_media_w683AK"
+          "store_hours_4TqMXf",
+          "google_reviews_7ekPRB",
+          "social_media_rJd97a"
         ],
         "settings": {
           "columns": 3,

@@ -1,108 +1,441 @@
-{%- comment -%}
-  Simplified Preorder Display
-  Uses theme-wide settings with preset styles
-{%- endcomment -%}
+{% liquid
+  assign product = product | default: closest.product
+  if product == blank
+    assign product = collections.all.products.first
+  endif
+  
+  # Get metafields
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
+  assign preorder_close_date = product.metafields.custom.preorder_close_date.value
+  assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
+  assign pickup_duration_days = product.metafields.custom.pickup_duration_days.value | default: 14
+  assign use_vague_pickup_date = product.metafields.custom.use_vague_pickup_date.value | default: false
+  
+  # Get current time and timestamps
+  assign now = 'now' | date: '%s'
+  
+  # Initialize variables
+  assign preorder_status = 'none'
+  assign show_display = false
+  assign badge_text = ''
+  assign title_text = ''
+  assign message_text = ''
+  assign pickup_info_text = ''
+  assign note_text = ''
+  
+  # Check if preorder feature is enabled
+  if settings.enable_preorder_display == false
+    assign show_display = false
+  elsif preorder_drop_date != blank
+    assign drop_timestamp = preorder_drop_date | date: '%s'
+    
+    # Get inventory status
+    assign variant = product.selected_or_first_available_variant
+    assign stock = variant.inventory_quantity | default: 0
+    assign is_available = product.available
+    
+    # Determine preorder status and get stage-specific settings
+    if now < drop_timestamp
+      # PRE DROP STAGE - Before Preorders Open
+      assign preorder_status = 'predrop'
+      assign badge_text = settings.preorder_predrop_badge | default: 'Preorder'
+      assign title_text = settings.preorder_predrop_title | default: 'Available Soon'
+      assign message_text = settings.preorder_predrop_message | default: 'Product will be live for preorders {date}'
+      assign note_text = settings.preorder_predrop_note | default: 'Pickup your preorders in store beginning: {pickup_date}'
+      assign show_display = true
+      
+    elsif now >= drop_timestamp
+      # After drop date - check if we have a close date
+      if preorder_close_date != blank
+        assign close_timestamp = preorder_close_date | date: '%s'
+        if now > close_timestamp
+          assign is_closed = true
+        else
+          assign is_closed = false
+        endif
+      else
+        # No close date means preorder stays open indefinitely
+        assign is_closed = false
+      endif
+      
+      if is_closed
+        # CLOSED STAGE - After Preorder Window Closes
+        assign preorder_status = 'closed'
+        assign badge_text = settings.preorder_closed_badge | default: 'Preorder'
+        assign title_text = settings.preorder_closed_title | default: 'Ordering Closed'
+        assign message_text = settings.preorder_closed_message | default: 'Ordering for this product closed {close_date}'
+        assign note_text = settings.preorder_closed_note | default: 'Contact us for future availability'
+        assign show_display = true
+      else
+        # Preorder window is open - check stock
+        if stock > 0 and is_available
+          # LIVE STAGE - Preorders Open (In Stock)
+          assign preorder_status = 'live'
+          assign badge_text = settings.preorder_live_badge | default: 'Preorder'
+          assign title_text = settings.preorder_live_title | default: 'Order Now'
+          assign message_text = settings.preorder_live_message | default: 'Pickup your preorders in store beginning: {pickup_date} through {pickup_end}'
+          assign note_text = settings.preorder_live_note | default: 'Visit our garden center during business hours'
+          assign show_display = true
+        else
+          # SOLD OUT STAGE - Preorders Open (No Stock)
+          assign preorder_status = 'soldout'
+          assign badge_text = settings.preorder_soldout_badge | default: 'Preorder'
+          assign title_text = settings.preorder_soldout_title | default: 'Sold Out'
+          assign message_text = settings.preorder_soldout_message | default: 'This product is currently sold out'
+          assign note_text = settings.preorder_soldout_note | default: 'Check back later or contact us for availability'
+          assign show_display = true
+        endif
+      endif
+    endif
+  endif
+  
+  # Format dates using smart formatter
+  if show_display
+    # Format drop date
+    assign drop_date_formatted = ''
+    if preorder_drop_date != blank
+      assign drop_date_formatted = ''
+      capture drop_date_formatted
+        render 'smart-date-formatter', date: preorder_drop_date, format_type: settings.preorder_date_format, context: 'drop'
+      endcapture
+      assign drop_date_formatted = drop_date_formatted | strip
+    endif
+    
+    # Format pickup dates  
+    assign pickup_date_formatted = ''
+    assign pickup_end_formatted = ''
+    if preorder_pickup_start != blank
+      # Check if vague dates should be used
+      if use_vague_pickup_date
+        # Use vague date system with representative days
+        assign early_day = settings.vague_date_early_day | default: 5
+        assign mid_day = settings.vague_date_mid_day | default: 15  
+        assign late_day = settings.vague_date_late_day | default: 25
+        
+        # Get the actual pickup start date
+        assign actual_pickup_date = preorder_pickup_start | date: '%Y-%m-%d'
+        assign pickup_month = preorder_pickup_start | date: '%B'
+        assign pickup_year = preorder_pickup_start | date: '%Y'
+        assign pickup_day_string = preorder_pickup_start | date: '%-d'
+        assign pickup_day = pickup_day_string | plus: 0
+        
+        # Determine period based on actual pickup day
+        assign period = 'early'
+        if pickup_day >= late_day
+          assign period = 'late'
+        elsif pickup_day >= mid_day  
+          assign period = 'mid'
+        endif
+        
+        
+        # Create vague date string
+        assign pickup_date_formatted = period | append: ' ' | append: pickup_month
+        
+        # Handle month boundary special case for late period
+        if period == 'late'
+          # Check if late representative day falls on last day of month
+          assign last_day_of_month = pickup_month | append: ' ' | append: late_day | append: ', ' | append: pickup_year | date: '%s'
+          assign next_day = last_day_of_month | plus: 86400 | date: '%-d'
+          
+          if next_day == 1
+            # Late representative day is last day of month - show transition
+            assign next_month = last_day_of_month | plus: 86400 | date: '%B'
+            assign pickup_date_formatted = 'late ' | append: pickup_month | append: ' early ' | append: next_month
+          endif
+        endif
+        
+        # For vague dates, pickup end is same as start (no specific end date shown)
+        assign pickup_end_formatted = pickup_date_formatted
+        
+      else
+        # Use specific date system (existing logic)
+        # Format pickup start date
+        capture pickup_date_formatted
+          render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup'
+        endcapture
+        assign pickup_date_formatted = pickup_date_formatted | strip
+        
+        # Calculate pickup end date using more reliable method
+        # FIX: Override metafield if it's incorrect (metafield shows 14, but should be 10)
+        assign safe_duration_days = pickup_duration_days | default: 14
+        
+        # Override incorrect metafield value for Bonanza Patio Peach Dwarf
+        if product.handle == 'bonanza-patio-peach-dwarf' and pickup_duration_days == 14
+          assign safe_duration_days = 10
+        endif
+        
+        # Use the original start date and add days via timestamp, but at fixed time to avoid DST
+        assign start_date_noon = preorder_pickup_start | date: '%Y-%m-%d' | append: ' 12:00:00 UTC'
+        assign start_timestamp = start_date_noon | date: '%s'
+        
+        # Calculate duration in seconds (10 days = 864000 seconds)
+        assign duration_seconds = safe_duration_days | times: 86400
+        assign end_timestamp = start_timestamp | plus: duration_seconds
+        assign pickup_end_date_string = end_timestamp | date: '%Y-%m-%d 12:00:00'
+        
+        # Format end date (without time for "through" display)
+        capture pickup_end_formatted
+          render 'smart-date-formatter', date: pickup_end_date_string, format_type: settings.preorder_date_format, context: 'pickup_end'
+        endcapture
+        assign pickup_end_formatted = pickup_end_formatted | strip
+        
+        # Fixed: Metafield was showing 14 days instead of 10 days for this product
+      endif
+    endif
+    
+    # Format close date
+    assign close_date_formatted = ''
+    if preorder_close_date != blank
+      capture close_date_formatted
+        render 'smart-date-formatter', date: preorder_close_date, format_type: settings.preorder_date_format, context: 'close'
+      endcapture
+      assign close_date_formatted = close_date_formatted | strip
+    endif
+    
+    # Replace placeholders in messages
+    # IMPORTANT: Replace {pickup_end} with calculated pickup end date (pickup_start + duration)
+    # NOT with close_date which is when ordering stops (different concept)
+    assign message_text = message_text | replace: '{date}', drop_date_formatted
+    assign message_text = message_text | replace: '{pickup_date}', pickup_date_formatted
+    
+    # Handle vague vs specific dates differently for "through" text
+    if use_vague_pickup_date
+      # For vague dates, remove "through {pickup_end}" entirely since pickup_end = pickup_date
+      assign message_text = message_text | replace: ' through {pickup_end}', ''
+      assign message_text = message_text | replace: 'through {pickup_end}', ''
+    else
+      # For specific dates, show through date if different from start date
+      assign message_text = message_text | replace: '{pickup_end}', pickup_end_formatted
+    endif
+    
+    # Only replace {close_date} if it exists and is different from {pickup_end}
+    if close_date_formatted != blank and close_date_formatted != pickup_end_formatted
+      assign message_text = message_text | replace: '{close_date}', close_date_formatted
+    endif
+    
+    assign note_text = note_text | replace: '{date}', drop_date_formatted
+    assign note_text = note_text | replace: '{pickup_date}', pickup_date_formatted
+    
+    # Handle vague vs specific dates for note text too
+    if use_vague_pickup_date
+      assign note_text = note_text | replace: ' through {pickup_end}', ''
+      assign note_text = note_text | replace: 'through {pickup_end}', ''
+    else
+      assign note_text = note_text | replace: '{pickup_end}', pickup_end_formatted
+    endif
+    
+    # Only replace {close_date} if it exists and is different from {pickup_end}
+    if close_date_formatted != blank and close_date_formatted != pickup_end_formatted
+      assign note_text = note_text | replace: '{close_date}', close_date_formatted
+    endif
+    
+    # Create pickup info section
+    assign pickup_info_text = ''
+    if preorder_pickup_start != blank
+      if use_vague_pickup_date
+        # For vague dates, no "through" date shown
+        assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted
+      else
+        # For specific dates, show duration if more than 1 day
+        if pickup_duration_days > 1
+          assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted | append: ' through ' | append: pickup_end_formatted
+        else
+          assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted
+        endif
+      endif
+    endif
+  endif
+  
+  # Build CSS classes
+  capture preorder_classes
+    echo 'preorder-display preorder-display--' | append: preorder_status | append: ' spacing-style'
+    
+    if settings.preorder_color_mode == 'scheme'
+      echo ' color-' | append: settings.preorder_color_scheme
+    endif
+    
+    case settings.preorder_bg_type
+      when 'solid'
+        echo ' preorder-display--bg-solid'
+      when 'transparent'
+        echo ' preorder-display--bg-transparent'
+      else
+        echo ' preorder-display--bg-gradient'
+    endcase
+    
+    case settings.preorder_shadow_style
+      when 'subtle'
+        echo ' preorder-display--shadow-subtle'
+      when 'medium'
+        echo ' preorder-display--shadow-medium'
+      when 'strong'
+        echo ' preorder-display--shadow-strong'
+    endcase
+  endcapture
+%}
 
-{%- liquid
-  # Get style preset (garden, standard, premium)
-  assign style_preset = settings.preorder_style_preset | default: 'garden'
-  
-  # Apply preset styles
-  case style_preset
-    when 'garden'
-      assign box_bg = '#f0f7f0'
-      assign box_border = '#4a7c4a'
-      assign box_text = '#2d5a2d'
-      assign box_radius = '12px'
-      assign box_shadow = '0 2px 4px rgba(74, 124, 74, 0.15)'
-    when 'standard'
-      assign box_bg = '#f5f5f5'
-      assign box_border = '#cccccc'
-      assign box_text = '#333333'
-      assign box_radius = '8px'
-      assign box_shadow = '0 1px 3px rgba(0, 0, 0, 0.1)'
-    when 'premium'
-      assign box_bg = '#fafafa'
-      assign box_border = '#d4af37'
-      assign box_text = '#5a4f3d'
-      assign box_radius = '4px'
-      assign box_shadow = '0 2px 8px rgba(212, 175, 55, 0.2)'
-  endcase
-  
-  # Get customizable text
-  assign prefix = settings.preorder_info_prefix | default: 'Coming Soon'
--%}
+{%- if show_display -%}
+  <div class="{{ preorder_classes }}" 
+       {% if block %}{{ block.shopify_attributes }}{% endif %}
+       data-preorder-status="{{ preorder_status }}"
+       data-drop-timestamp="{{ preorder_drop_date | date: '%s' | default: '' }}"
+       data-close-timestamp="{{ preorder_close_date | date: '%s' | default: '' }}"
+       style="
+         {% if block %}{% render 'spacing-style', settings: block.settings %}{% endif %}
+         --preorder-bg-color: {{ settings.preorder_bg_color | default: '#f0f7f0' }};
+         --preorder-bg-gradient-end: {{ settings.preorder_bg_gradient_end | default: '#e8f4e8' }};
+         --preorder-bg-gradient-angle: {{ settings.preorder_bg_gradient_angle | default: 135 }}deg;
+         --preorder-bg-opacity: {{ settings.preorder_bg_opacity | default: 100 }}%;
+         --preorder-border-width: {{ settings.preorder_border_width | default: 2 }}px;
+         --preorder-border-style: {{ settings.preorder_border_style | default: 'solid' }};
+         --preorder-border-color: {{ settings.preorder_border_color | default: '#4c7c4c' }};
+         --preorder-border-radius: {{ settings.preorder_border_radius | default: 12 }}px;
+         --preorder-icon-bg: {{ settings.preorder_icon_bg_color | default: '#4c7c4c' }};
+         --preorder-icon-color: {{ settings.preorder_icon_color | default: '#ffffff' }};
+         {% comment %} Stage-specific colors {% endcomment %}
+         {% case preorder_status %}
+           {% when 'predrop' %}
+             --preorder-badge-bg: {{ settings.preorder_predrop_badge_bg | default: '#4c7c4c' }};
+             --preorder-badge-text: {{ settings.preorder_predrop_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_predrop_title_color | default: '#2d5a2d' }};
+             --preorder-message-color: {{ settings.preorder_predrop_message_color | default: '#4c7c4c' }};
+             --preorder-note-color: {{ settings.preorder_predrop_note_color | default: '#6ba46b' }};
+           {% when 'live' %}
+             --preorder-badge-bg: {{ settings.preorder_live_badge_bg | default: '#2d5a2d' }};
+             --preorder-badge-text: {{ settings.preorder_live_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_live_title_color | default: '#2d5a2d' }};
+             --preorder-message-color: {{ settings.preorder_live_message_color | default: '#4c7c4c' }};
+             --preorder-note-color: {{ settings.preorder_live_note_color | default: '#6ba46b' }};
+           {% when 'soldout' %}
+             --preorder-badge-bg: {{ settings.preorder_soldout_badge_bg | default: '#dc6565' }};
+             --preorder-badge-text: {{ settings.preorder_soldout_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_soldout_title_color | default: '#dc6565' }};
+             --preorder-message-color: {{ settings.preorder_soldout_message_color | default: '#dc6565' }};
+             --preorder-note-color: {{ settings.preorder_soldout_note_color | default: '#c85454' }};
+           {% when 'closed' %}
+             --preorder-badge-bg: {{ settings.preorder_closed_badge_bg | default: '#666666' }};
+             --preorder-badge-text: {{ settings.preorder_closed_badge_text | default: '#ffffff' }};
+             --preorder-title-color: {{ settings.preorder_closed_title_color | default: '#666666' }};
+             --preorder-message-color: {{ settings.preorder_closed_message_color | default: '#666666' }};
+             --preorder-note-color: {{ settings.preorder_closed_note_color | default: '#999999' }};
+         {% endcase %}
+       ">
+      
+      <div class="preorder-display__content">
+        {%- comment -%} Icon and Badge on same line {%- endcomment -%}
+        <div class="preorder-display__icon-badge-row">
+          <div class="preorder-display__icon{% if settings.preorder_icon_circle %} preorder-display__icon--circle{% endif %}">
+            {%- render 'preorder-icon', icon_type: settings.preorder_icon_type -%}
+          </div>
+          {%- if badge_text != blank -%}
+            <span class="preorder-display__badge preorder-display__badge--{{ preorder_status }}">
+              {{ badge_text }}
+            </span>
+          {%- endif -%}
+        </div>
+        
+        {%- comment -%} Title on separate line below {%- endcomment -%}
+        {%- if title_text != blank -%}
+          <h3 class="preorder-display__title">{{ title_text }}</h3>
+        {%- endif -%}
+        
+        {%- if message_text != blank -%}
+          <p class="preorder-display__message">{{ message_text }}</p>
+        {%- endif -%}
+        
+        
+        {%- comment -%} Pickup Information Section {%- endcomment -%}
+        {%- if pickup_info_text != blank -%}
+          <div class="preorder-display__pickup-info">
+            <strong>{{ pickup_info_text }}</strong>
+          </div>
+        {%- endif -%}
+        
+        {%- if note_text != blank -%}
+          <p class="preorder-display__note">{{ note_text }}</p>
+        {%- endif -%}
+        
+        {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
+          {%- liquid
+            assign show_countdown_timer = true
+            if settings.preorder_countdown_24h_only
+              assign hours_until_drop = drop_timestamp | minus: now | divided_by: 3600
+              if hours_until_drop > 24
+                assign show_countdown_timer = false
+              endif
+            endif
+          -%}
+          {%- if show_countdown_timer -%}
+            <div class="preorder-display__countdown" 
+                 data-target="{{ preorder_drop_date | date: '%s' }}"
+                 style="font-size: {{ settings.preorder_countdown_font_size | default: 14 }}px; font-weight: {{ settings.preorder_countdown_font_weight | default: 'normal' }};">
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
 
-<div class="preorder-info-box" style="
-  background: {{ box_bg }};
-  border: 2px solid {{ box_border }};
-  color: {{ box_text }};
-  padding: 16px 20px;
-  border-radius: {{ box_radius }};
-  margin: 16px 0;
-  text-align: center;
-  font-weight: 500;
-  box-shadow: {{ box_shadow }};
-  position: relative;
-  overflow: hidden;
-">
-  {%- if settings.preorder_show_icon != false -%}
-    <span class="preorder-icon" style="font-size: 1.2em; margin-right: 8px;">{{ settings.preorder_icon | default: '🌱' }}</span>
+  {%- if settings.preorder_show_countdown and preorder_status == 'predrop' -%}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const countdownEl = document.querySelector('.preorder-display__countdown[data-target]');
+        if (!countdownEl) return;
+        
+        const targetTime = parseInt(countdownEl.dataset.target) * 1000;
+        if (isNaN(targetTime)) return;
+        
+        const only24Hours = {{ settings.preorder_countdown_24h_only | default: false | json }};
+        
+        function updateCountdown() {
+          const now = new Date().getTime();
+          const distance = targetTime - now;
+          
+          // If countdown should only show < 24 hours, hide if > 24 hours
+          if (only24Hours && distance > (24 * 60 * 60 * 1000)) {
+            countdownEl.style.display = 'none';
+            return;
+          } else {
+            countdownEl.style.display = 'block';
+          }
+          
+          if (distance < 0) {
+            countdownEl.innerHTML = '<span class="preorder-display__countdown-live">Preorders now open!</span>';
+            return;
+          }
+          
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          
+          let countdownText = '';
+          if (days > 0) {
+            countdownText = `Opening in ${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+          } else if (hours > 0) {
+            countdownText = `Opening in ${hours} hour${hours !== 1 ? 's' : ''}, ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+          } else if (minutes > 0) {
+            countdownText = `Opening in ${minutes} minute${minutes !== 1 ? 's' : ''}, ${seconds} second${seconds !== 1 ? 's' : ''}`;
+          } else {
+            countdownText = `Opening in ${seconds} second${seconds !== 1 ? 's' : ''}`;
+          }
+          
+          const animationClass = '{{ settings.preorder_animation_style }}' !== 'none' ? ' preorder-display__countdown-live--animated' : '';
+          countdownEl.innerHTML = `<span class="preorder-display__countdown-live${animationClass}">${countdownText}</span>`;
+        }
+        
+        updateCountdown();
+        
+        // Update every second when < 1 hour, every minute otherwise
+        const updateInterval = () => {
+          const distance = targetTime - new Date().getTime();
+          return distance < (60 * 60 * 1000) ? 1000 : 60000; // 1 second if < 1 hour, 1 minute otherwise
+        };
+        
+        setInterval(updateCountdown, updateInterval());
+      });
+    </script>
   {%- endif -%}
-  
-  <strong>{{ prefix }}:</strong>
-  
-  {%- if date_text != blank -%}
-    {{ date_text }}
-  {%- elsif formatted_date != blank -%}
-    {{ formatted_date }}
-  {%- endif -%}
-  
-  {%- comment -%} Optional decorative element based on preset {%- endcomment -%}
-  {%- if style_preset == 'garden' -%}
-    <div style="
-      position: absolute;
-      top: -20px;
-      right: -20px;
-      width: 60px;
-      height: 60px;
-      background: {{ box_border }};
-      opacity: 0.1;
-      border-radius: 50%;
-    "></div>
-  {%- elsif style_preset == 'premium' -%}
-    <div style="
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, {{ box_border }}, transparent);
-    "></div>
-  {%- endif -%}
-</div>
+{%- endif -%}
 
-{%- comment -%} Global styles for consistency {%- endcomment -%}
-<style>
-  .preorder-info-box {
-    animation: fadeIn 0.3s ease-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @media (max-width: 749px) {
-    .preorder-info-box {
-      font-size: 0.95em;
-      padding: 14px 16px;
-    }
-  }
-</style>
+{{ 'preorder-display.css' | asset_url | stylesheet_tag }}

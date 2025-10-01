@@ -1,0 +1,117 @@
+{%- comment -%}
+  Enhanced Buy Buttons with Preorder Display Integration
+  
+  This snippet shows how to integrate the preorder display component
+  with your existing buy buttons for a seamless user experience.
+  
+  Place this snippet before your buy-buttons block in the product template.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = closest.product | default: product
+  assign current_timestamp = 'now' | date: '%s'
+  assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
+  
+  # Check if this is a future preorder
+  assign is_future_preorder = false
+  if preorder_drop_date != blank
+    assign drop_timestamp = preorder_drop_date | date: '%s'
+    if current_timestamp < drop_timestamp
+      assign is_future_preorder = true
+    endif
+  endif
+-%}
+
+{%- if is_future_preorder -%}
+  {%- comment -%}
+    Show preorder display when product is coming soon
+    This creates anticipation and provides clear information about availability
+  {%- endcomment -%}
+  
+  <div class="preorder-integration-container">
+    {% render 'preorder-display' %}
+    
+    {%- comment -%}
+      Optionally show a message about the buy buttons being disabled
+      You can customize this message or remove it entirely
+    {%- endcomment -%}
+    <div class="preorder-integration__notice">
+      <p class="preorder-integration__notice-text">
+        Purchase will be available when early access begins
+      </p>
+    </div>
+  </div>
+  
+{%- else -%}
+  {%- comment -%}
+    For products that are available now or past their drop date,
+    show pickup information if available
+  {%- endcomment -%}
+  
+  {%- liquid
+    assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
+    assign show_pickup_info = false
+    
+    if preorder_pickup_start != blank
+      assign pickup_timestamp = preorder_pickup_start | date: '%s'
+      assign pickup_duration_days = product.metafields.custom.pickup_duration_days.value | default: 14
+      assign duration_seconds = pickup_duration_days | times: 86400
+      assign pickup_end_timestamp = pickup_timestamp | plus: duration_seconds
+      
+      if current_timestamp <= pickup_end_timestamp
+        assign show_pickup_info = true
+      endif
+    endif
+  -%}
+  
+  {%- if show_pickup_info -%}
+    <div class="preorder-integration-container preorder-integration-container--pickup">
+      {% render 'preorder-display' %}
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+{% stylesheet %}
+.preorder-integration-container {
+  margin-bottom: var(--gap-md, 1.5rem);
+}
+
+.preorder-integration-container--pickup {
+  margin-bottom: var(--gap-sm, 1rem);
+}
+
+.preorder-integration__notice {
+  margin-top: var(--gap-sm, 1rem);
+  padding: var(--padding-sm, 0.75rem) var(--padding-md, 1rem);
+  background: rgb(255, 248, 220);
+  border: 1px solid rgb(255, 218, 121);
+  border-radius: var(--border-radius-sm, 6px);
+  text-align: center;
+}
+
+.preorder-integration__notice-text {
+  margin: 0;
+  font-size: var(--font-size-sm, 0.875rem);
+  color: rgb(146, 96, 0);
+  font-weight: 500;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .preorder-integration__notice {
+    background: rgb(66, 47, 20);
+    border-color: rgb(146, 96, 0);
+  }
+  
+  .preorder-integration__notice-text {
+    color: rgb(255, 218, 121);
+  }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 749px) {
+  .preorder-integration-container {
+    margin-bottom: var(--gap-sm, 1rem);
+  }
+}
+{% endstylesheet %}

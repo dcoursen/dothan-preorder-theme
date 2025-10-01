@@ -1,374 +1,1054 @@
-
-
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div
-  class="
-    section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}
-    {% if section.settings.section_height != "" %} {{ section.settings.section_height | prepend: "section--height-" }}{% endif %}
+<footer 
+  class="footer section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    {% if section.settings.background_color != blank %}
+      background-color: {{ section.settings.background_color }};
+    {% endif %}
   "
 >
-  {% render 'background-media',
-    background_media: section.settings.background_media,
-    background_video: section.settings.video,
-    background_video_position: section.settings.video_position,
-    background_image: section.settings.background_image,
-    background_image_position: section.settings.background_image_position
-  %}
-
-  <div
-    class="
-      spacing-style
-      layout-panel-flex
-      layout-panel-flex--{{ section.settings.content_direction }}
-      section-content-wrapper
-      {% if section.settings.vertical_on_mobile %} mobile-column{% endif %}
-    "
-    style="
-      {% render 'layout-panel-style', settings: section.settings %}
-      {%  render 'spacing-style', settings: section.settings %}
-    "
-  >
-    {% content_for 'blocks' %}
+  <div class="footer-container page-width">
+    <div 
+      class="footer-columns" 
+      data-columns="{{ section.settings.columns }}"
+      style="
+        --footer-columns: {{ section.settings.columns }};
+        --footer-gap: {{ section.settings.column_gap | default: 40 }}px;
+      "
+    >
+      {% comment %} Create columns and populate with blocks based on column assignment {% endcomment %}
+      {% for col in (1..section.settings.columns) %}
+        <div class="footer-column footer-column--{{ col }}">
+          {% for block in section.blocks %}
+            {% assign block_column = block.settings.column | default: 1 %}
+            {% if block_column == col %}
+              <div class="footer-block footer-block--{{ block.type }}" {{ block.shopify_attributes }}>
+                {% case block.type %}
+                  {% when 'heading' %}
+                    <h3 class="footer-block__heading">{{ block.settings.heading }}</h3>
+                    
+                  {% when 'text' %}
+                    <div class="footer-block__text">
+                      {{ block.settings.text }}
+                    </div>
+                    
+                  {% when 'links' %}
+                    {% if block.settings.heading != blank %}
+                      <h3 class="footer-block__heading">{{ block.settings.heading }}</h3>
+                    {% endif %}
+                    {% if block.settings.menu != blank %}
+                      <ul class="footer-block__links list-unstyled">
+                        {% for link in block.settings.menu.links %}
+                          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                    
+                  {% when 'business_hours' %}
+                    <div class="footer-block__hours">
+                      {% if block.settings.heading != blank %}
+                        <h3 class="footer-block__heading">{{ block.settings.heading }}</h3>
+                      {% endif %}
+                      <div class="hours-list">
+                        {% if block.settings.combine_weekdays %}
+                          {% if block.settings.weekdays_label != blank and block.settings.tuesday != blank %}
+                            <div class="hours-item">
+                              <span class="day">{{ block.settings.weekdays_label }}:</span>
+                              <span class="time">{{ block.settings.tuesday }}</span>
+                            </div>
+                          {% endif %}
+                          {% if block.settings.saturday != blank %}
+                            <div class="hours-item">
+                              <span class="day">Saturday:</span>
+                              <span class="time">{{ block.settings.saturday }}</span>
+                            </div>
+                          {% endif %}
+                          {% if block.settings.sunday != blank and block.settings.monday != blank %}
+                            {% assign sunday_monday = block.settings.sunday | append: ' & Monday: ' | append: block.settings.monday %}
+                            <div class="hours-item">
+                              <span class="day">Sunday & Monday:</span>
+                              <span class="time">{{ block.settings.sunday }}</span>
+                            </div>
+                          {% endif %}
+                        {% else %}
+                          {% assign days = 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday' | split: ',' %}
+                          {% assign day_settings = block.settings.monday | append: ',' | append: block.settings.tuesday | append: ',' | append: block.settings.wednesday | append: ',' | append: block.settings.thursday | append: ',' | append: block.settings.friday | append: ',' | append: block.settings.saturday | append: ',' | append: block.settings.sunday | split: ',' %}
+                          {% for day in days %}
+                            {% assign day_time = day_settings[forloop.index0] %}
+                            {% if day_time != blank %}
+                              <div class="hours-item">
+                                <span class="day">{{ day }}:</span>
+                                <span class="time">{{ day_time }}</span>
+                              </div>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                  {% when 'social' %}
+                    <div class="footer-block__social">
+                      {% if block.settings.heading != blank %}
+                        <h3 class="footer-block__heading">{{ block.settings.heading }}</h3>
+                      {% endif %}
+                      <ul class="list-social list-unstyled" role="list">
+                        {%- if block.settings.facebook_url != blank -%}
+                          <li class="list-social__item">
+                            <a href="{{ block.settings.facebook_url }}" class="link list-social__link" target="_blank" rel="noopener">
+                              {%- render 'icon-facebook' -%}
+                              <span class="visually-hidden">Facebook</span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                        {%- if block.settings.instagram_url != blank -%}
+                          <li class="list-social__item">
+                            <a href="{{ block.settings.instagram_url }}" class="link list-social__link" target="_blank" rel="noopener">
+                              {%- render 'icon-instagram' -%}
+                              <span class="visually-hidden">Instagram</span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                        {%- if block.settings.twitter_url != blank -%}
+                          <li class="list-social__item">
+                            <a href="{{ block.settings.twitter_url }}" class="link list-social__link" target="_blank" rel="noopener">
+                              {%- render 'icon-twitter' -%}
+                              <span class="visually-hidden">Twitter</span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                        {%- if block.settings.youtube_url != blank -%}
+                          <li class="list-social__item">
+                            <a href="{{ block.settings.youtube_url }}" class="link list-social__link" target="_blank" rel="noopener">
+                              {%- render 'icon-youtube' -%}
+                              <span class="visually-hidden">YouTube</span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                        {%- if block.settings.tiktok_url != blank -%}
+                          <li class="list-social__item">
+                            <a href="{{ block.settings.tiktok_url }}" class="link list-social__link" target="_blank" rel="noopener">
+                              {%- render 'icon-tiktok' -%}
+                              <span class="visually-hidden">TikTok</span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                        {%- if block.settings.linkedin_url != blank -%}
+                          <li class="list-social__item">
+                            <a href="{{ block.settings.linkedin_url }}" class="link list-social__link" target="_blank" rel="noopener">
+                              {%- render 'icon-linkedin' -%}
+                              <span class="visually-hidden">LinkedIn</span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                      </ul>
+                    </div>
+                    
+                  {% when 'logo' %}
+                    <div class="footer-block__logo">
+                      <div class="footer-logo-container">
+                        {% if block.settings.show_badge %}
+                          <div class="footer-logo-badge" style="background-color: {{ block.settings.badge_background }};">
+                            <span class="logo-letters" style="color: {{ block.settings.badge_text_color }};">{{ block.settings.badge_text | default: 'DN' }}</span>
+                          </div>
+                        {% endif %}
+                        <div class="footer-logo-text">
+                          {% if block.settings.business_name != blank %}
+                            <span class="logo-name">{{ block.settings.business_name }}</span>
+                          {% endif %}
+                          {% if block.settings.business_subtitle != blank %}
+                            <span class="logo-subtitle">{{ block.settings.business_subtitle }}</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                      {% if block.settings.tagline != blank %}
+                        <p class="footer-tagline">{{ block.settings.tagline }}</p>
+                      {% endif %}
+                    </div>
+                    
+                  {% when 'newsletter' %}
+                    <div class="footer-block__newsletter">
+                      {% if block.settings.heading != blank %}
+                        <h3 class="footer-block__heading">{{ block.settings.heading }}</h3>
+                      {% endif %}
+                      {% form 'customer', id: 'FooterNewsletterForm' %}
+                        <input type="hidden" name="contact[tags]" value="newsletter">
+                        <div class="newsletter-form__field-wrapper">
+                          <input
+                            id="FooterNewsletterInput"
+                            type="email"
+                            name="contact[email]"
+                            class="field__input"
+                            value="{{ form.email }}"
+                            aria-required="true"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            autocomplete="email"
+                            placeholder="{{ 'newsletter.label' | t }}"
+                            required
+                          >
+                          <button type="submit" class="button button--primary">
+                            {{ 'newsletter.button_label' | t }}
+                          </button>
+                        </div>
+                      {% endform %}
+                    </div>
+                    
+                  {% when 'reviews' %}
+                    <div class="footer-block__reviews">
+                      {% if block.settings.heading != blank %}
+                        <h3 class="footer-block__heading">{{ block.settings.heading }}</h3>
+                      {% endif %}
+                      <div class="reviews-list">
+                        {% if block.settings.google_rating != blank %}
+                          {% if block.settings.google_reviews_url != blank %}
+                            <a href="{{ block.settings.google_reviews_url }}" target="_blank" rel="noopener" class="review-platform-card">
+                              <div class="platform-header">
+                                <div class="platform-info">
+                                  <svg class="platform-icon platform-icon--google" width="20" height="20" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                  </svg>
+                                  <span class="platform-name">Google</span>
+                                </div>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.google_rating }} ({{ block.settings.google_count }})</span>
+                                </div>
+                              </div>
+                              <span class="review-cta-text">Leave a Google Review</span>
+                            </a>
+                          {% else %}
+                            <div class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Google</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.google_rating }} ({{ block.settings.google_count }})</span>
+                                </div>
+                              </div>
+                            </div>
+                          {% endif %}
+                        {% endif %}
+                        {% if block.settings.yelp_rating != blank %}
+                          {% if block.settings.yelp_url != blank %}
+                            <a href="{{ block.settings.yelp_url }}" target="_blank" rel="noopener" class="review-platform-card">
+                              <div class="platform-header">
+                                <div class="platform-info">
+                                  <svg class="platform-icon platform-icon--yelp" width="20" height="20" viewBox="0 0 24 24">
+                                    <path fill="#FF1A1A" d="M12.048 8.294l2.647 5.458c.097.193.018.43-.176.528-.194.097-.43.018-.528-.176l-2.647-5.458c-.097-.194-.018-.43.176-.528.194-.097.43-.018.528.176zm-4.172 2.528c.193-.097.43-.018.528.176l2.647 5.458c.097.194.018.43-.176.528-.194.097-.43.018-.528-.176l-2.647-5.458c-.097-.194-.018-.43.176-.528zm7.058 7.71l-1.414 1.414c-.195.195-.512.195-.707 0s-.195-.512 0-.707l1.414-1.414c.195-.195.512-.195.707 0s.195.512 0 .707z"/>
+                                  </svg>
+                                  <span class="platform-name">Yelp</span>
+                                </div>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.yelp_rating }} ({{ block.settings.yelp_count }})</span>
+                                </div>
+                              </div>
+                              <span class="review-cta-text">Leave a Yelp Review</span>
+                            </a>
+                          {% else %}
+                            <div class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Yelp</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.yelp_rating }} ({{ block.settings.yelp_count }})</span>
+                                </div>
+                              </div>
+                            </div>
+                          {% endif %}
+                        {% endif %}
+                        {% if block.settings.facebook_rating != blank %}
+                          {% if block.settings.facebook_url != blank %}
+                            <a href="{{ block.settings.facebook_url }}" target="_blank" rel="noopener" class="review-platform-card">
+                              <div class="platform-header">
+                                <div class="platform-info">
+                                  <svg class="platform-icon platform-icon--facebook" width="20" height="20" viewBox="0 0 24 24">
+                                    <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                  </svg>
+                                  <span class="platform-name">Facebook</span>
+                                </div>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.facebook_rating }} ({{ block.settings.facebook_count }})</span>
+                                </div>
+                              </div>
+                              <span class="review-cta-text">Leave a Facebook Review</span>
+                            </a>
+                          {% else %}
+                            <div class="review-platform-card">
+                              <div class="platform-header">
+                                <span class="platform-name">Facebook</span>
+                                <div class="star-rating">
+                                  {% for i in (1..5) %}
+                                    <span class="star star--full">★</span>
+                                  {% endfor %}
+                                  <span class="rating-text">{{ block.settings.facebook_rating }} ({{ block.settings.facebook_count }})</span>
+                                </div>
+                              </div>
+                            </div>
+                          {% endif %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                  {% when 'custom_liquid' %}
+                    {{ block.settings.custom_liquid }}
+                    
+                {% endcase %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    
+    {% if section.settings.show_copyright %}
+      <div class="footer-copyright">
+        <small>
+          &copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url }}
+          {% if section.settings.show_policy_links %}
+            {% for link in shop.policies %}
+              {%- if link != blank -%}
+                | <a href="{{ link.url }}">{{ link.title }}</a>
+              {%- endif -%}
+            {% endfor %}
+          {% endif %}
+        </small>
+      </div>
+    {% endif %}
   </div>
-</div>
+</footer>
+
+{% stylesheet %}
+  .footer {
+    margin-top: auto;
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+  
+  .footer-container {
+    padding: 3rem 1rem;
+  }
+  
+  .footer-columns {
+    display: grid;
+    grid-template-columns: repeat(var(--footer-columns, 4), 1fr);
+    gap: var(--footer-gap, 40px);
+    margin-bottom: 3rem;
+  }
+  
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .footer-block__heading {
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #333;
+    opacity: 1;
+  }
+  
+  .footer-block__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .footer-block__links a {
+    color: currentColor;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  
+  .footer-block__links a:hover {
+    opacity: 1;
+  }
+  
+  .list-social {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .list-social__link {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .footer-copyright {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+    text-align: center;
+  }
+  
+  .footer-copyright small {
+    opacity: 0.7;
+  }
+  
+  @media screen and (max-width: 749px) {
+    .footer-columns {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .footer-column {
+      gap: 1rem;
+    }
+  }
+  
+  .hours-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .hours-item .day {
+    font-weight: 500;
+    opacity: 0.8;
+  }
+  
+  .hours-item .time {
+    opacity: 0.7;
+  }
+  
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .review-platform-card {
+    display: block;
+    padding: 1.25rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .review-platform-card:hover {
+    background: #fafafa;
+    border-color: #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .platform-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+  
+  .platform-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .platform-icon {
+    flex-shrink: 0;
+  }
+  
+  .platform-name {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #111827;
+  }
+  
+  .star-rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 0.25rem;
+  }
+  
+  .star {
+    font-size: 15px;
+    line-height: 1;
+    color: #fbbf24;
+  }
+  
+  .rating-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-left: 0.5rem;
+  }
+  
+  .review-cta-text {
+    display: block;
+    color: #10b981;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 0.75rem;
+  }
+  
+  .review-platform-card:hover .review-cta-text {
+    color: #059669;
+  }
+  
+  /* Logo styles */
+  .footer-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-logo-badge {
+    width: 48px;
+    height: 48px;
+    background: #1f2937;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .logo-letters {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.025em;
+  }
+  
+  .footer-logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .logo-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #111827;
+    letter-spacing: 0.05em;
+  }
+  
+  .logo-subtitle {
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: #111827;
+    letter-spacing: 0.05em;
+  }
+  
+  .footer-tagline {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+  }
+  
+  @media screen and (max-width: 749px) {
+    .review-content {
+      gap: 0.75rem;
+    }
+    
+    .review-platform {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+  }
+  
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .footer-columns[data-columns="4"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.footer",
+  "name": "Footer",
   "class": "section-wrapper",
   "tag": "footer",
-  "blocks": [
-    {
-      "type": "_divider"
-    },
-    {
-      "type": "@app"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "email-signup"
-    },
-    {
-      "type": "follow-on-shop"
-    },
-    {
-      "type": "footer-utilities"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "icon"
-    },
-    {
-      "type": "image"
-    },
-    {
-      "type": "menu"
-    },
-    {
-      "type": "payment-icons"
-    },
-    {
-      "type": "text"
-    },
-    {
-      "type": "logo"
-    },
-    {
-      "type": "jumbo-text"
-    }
-  ],
-  "enabled_on": {
-    "groups": ["footer"]
-  },
   "settings": [
     {
       "type": "header",
-      "content": "t:content.layout"
-    },
-    {
-      "type": "select",
-      "id": "content_direction",
-      "label": "t:settings.direction",
-      "options": [
-        {
-          "value": "column",
-          "label": "t:options.vertical"
-        },
-        {
-          "value": "row",
-          "label": "t:options.horizontal"
-        }
-      ],
-      "default": "column"
-    },
-    {
-      "type": "checkbox",
-      "id": "vertical_on_mobile",
-      "label": "t:settings.vertical_on_mobile",
-      "default": true,
-      "visible_if": "{{ section.settings.content_direction == 'row' }}"
-    },
-    {
-      "type": "select",
-      "id": "horizontal_alignment",
-      "label": "t:settings.alignment",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.right"
-        },
-        {
-          "value": "space-between",
-          "label": "t:options.space_between"
-        }
-      ],
-      "default": "flex-start",
-      "visible_if": "{{ section.settings.content_direction == 'row' }}"
-    },
-    {
-      "type": "select",
-      "id": "vertical_alignment",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.top"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.bottom"
-        }
-      ],
-      "default": "center",
-      "visible_if": "{{ section.settings.content_direction == 'row' }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "align_baseline",
-      "label": "t:settings.align_baseline",
-      "default": false,
-      "visible_if": "{{ section.settings.vertical_alignment == 'flex-end' }}"
-    },
-    {
-      "type": "select",
-      "id": "horizontal_alignment_flex_direction_column",
-      "label": "t:settings.alignment",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "flex-start",
-      "visible_if": "{{ section.settings.content_direction != 'row' }}"
-    },
-    {
-      "type": "select",
-      "id": "vertical_alignment_flex_direction_column",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "t:options.top"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "flex-end",
-          "label": "t:options.bottom"
-        },
-        {
-          "value": "space-between",
-          "label": "t:options.space_between"
-        }
-      ],
-      "default": "center",
-      "visible_if": "{{ section.settings.content_direction == 'column' }}"
+      "content": "Layout"
     },
     {
       "type": "range",
-      "id": "gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 100,
+      "id": "columns",
+      "label": "Number of columns",
+      "min": 1,
+      "max": 4,
       "step": 1,
-      "unit": "px",
-      "default": 12
+      "default": 4
     },
     {
-      "type": "header",
-      "content": "t:content.size"
+      "type": "range",
+      "id": "column_gap",
+      "label": "Gap between columns",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 40
     },
     {
       "type": "select",
       "id": "section_width",
-      "label": "t:settings.width",
+      "label": "Section width",
       "options": [
         {
           "value": "page-width",
-          "label": "t:options.page"
+          "label": "Page width"
         },
         {
           "value": "full-width",
-          "label": "t:options.full"
+          "label": "Full width"
         }
       ],
       "default": "page-width"
     },
     {
-      "type": "select",
-      "id": "section_height",
-      "label": "t:settings.height",
-      "options": [
-        {
-          "value": "",
-          "label": "t:options.auto"
-        },
-        {
-          "value": "small",
-          "label": "t:options.small"
-        },
-        {
-          "value": "medium",
-          "label": "t:options.medium"
-        },
-        {
-          "value": "large",
-          "label": "t:options.large"
-        },
-        {
-          "value": "full-screen",
-          "label": "t:options.full_screen"
-        }
-      ],
-      "default": ""
+      "type": "header",
+      "content": "Appearance"
     },
     {
-      "type": "header",
-      "content": "t:content.appearance"
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f8f9fa"
     },
     {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "t:settings.color_scheme",
+      "label": "Color scheme",
       "default": "scheme-1"
     },
     {
-      "type": "select",
-      "id": "background_media",
-      "label": "t:settings.background_media",
-      "options": [
-        {
-          "value": "none",
-          "label": "t:options.none"
-        },
-        {
-          "value": "image",
-          "label": "t:options.image"
-        },
-        {
-          "value": "video",
-          "label": "t:options.video"
-        }
-      ],
-      "default": "none"
+      "type": "checkbox",
+      "id": "show_copyright",
+      "label": "Show copyright",
+      "default": true
     },
     {
-      "type": "video",
-      "id": "video",
-      "label": "t:settings.video",
-      "visible_if": "{{ section.settings.background_media == 'video' }}"
-    },
-    {
-      "type": "select",
-      "id": "video_position",
-      "label": "t:settings.video_position",
-      "options": [
-        {
-          "value": "cover",
-          "label": "t:options.cover"
-        },
-        {
-          "value": "contain",
-          "label": "t:options.contain"
-        }
-      ],
-      "default": "cover",
-      "visible_if": "{{ section.settings.background_media == 'video' }}"
-    },
-    {
-      "type": "image_picker",
-      "id": "background_image",
-      "label": "t:settings.image",
-      "visible_if": "{{ section.settings.background_media == 'image' }}"
-    },
-    {
-      "type": "select",
-      "id": "background_image_position",
-      "label": "t:settings.image_position",
-      "options": [
-        {
-          "value": "cover",
-          "label": "t:options.cover"
-        },
-        {
-          "value": "fit",
-          "label": "t:options.fit"
-        }
-      ],
-      "default": "cover",
-      "visible_if": "{{ section.settings.background_media == 'image' }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.padding"
-    },
-    {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
+      "type": "checkbox",
+      "id": "show_policy_links",
+      "label": "Show policy links",
+      "default": true
     }
-  ]
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Heading"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Rich text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Share information about your brand with your customers.</p>"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "links",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "business_hours",
+      "name": "Business hours",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Store Hours"
+        },
+        {
+          "type": "text",
+          "id": "monday",
+          "label": "Monday",
+          "default": "Closed"
+        },
+        {
+          "type": "text",
+          "id": "tuesday",
+          "label": "Tuesday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "wednesday",
+          "label": "Wednesday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "thursday",
+          "label": "Thursday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "friday",
+          "label": "Friday",
+          "default": "9AM - 5PM"
+        },
+        {
+          "type": "text",
+          "id": "saturday",
+          "label": "Saturday",
+          "default": "9AM - 4PM"
+        },
+        {
+          "type": "text",
+          "id": "sunday",
+          "label": "Sunday",
+          "default": "Closed"
+        },
+        {
+          "type": "checkbox",
+          "id": "combine_weekdays",
+          "label": "Combine Weekdays (Tues-Fri)",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "weekdays_label",
+          "label": "Weekdays Label",
+          "default": "Tuesday - Friday"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 2
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social media",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Follow us"
+        },
+        {
+          "type": "url",
+          "id": "facebook_url",
+          "label": "Facebook URL"
+        },
+        {
+          "type": "url",
+          "id": "instagram_url",
+          "label": "Instagram URL"
+        },
+        {
+          "type": "url",
+          "id": "twitter_url",
+          "label": "Twitter/X URL"
+        },
+        {
+          "type": "url",
+          "id": "youtube_url",
+          "label": "YouTube URL"
+        },
+        {
+          "type": "url",
+          "id": "tiktok_url",
+          "label": "TikTok URL"
+        },
+        {
+          "type": "url",
+          "id": "linkedin_url",
+          "label": "LinkedIn URL"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 4
+        }
+      ]
+    },
+    {
+      "type": "logo",
+      "name": "Logo",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_badge",
+          "label": "Show logo badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge text (e.g., DN)",
+          "default": "DN"
+        },
+        {
+          "type": "color",
+          "id": "badge_background",
+          "label": "Badge background color",
+          "default": "#1f2937"
+        },
+        {
+          "type": "color",
+          "id": "badge_text_color",
+          "label": "Badge text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "text",
+          "id": "business_name",
+          "label": "Business name",
+          "default": "DOTHAN"
+        },
+        {
+          "type": "text",
+          "id": "business_subtitle",
+          "label": "Business subtitle",
+          "default": "NURSERIES"
+        },
+        {
+          "type": "text",
+          "id": "tagline",
+          "label": "Tagline",
+          "placeholder": "Greenhouse, Gardens, & Gifts"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Subscribe to our newsletter"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "reviews",
+      "name": "Reviews",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Reviews"
+        },
+        {
+          "type": "select",
+          "id": "layout_style",
+          "label": "Layout Style",
+          "options": [
+            {"value": "stacked", "label": "Stacked (Name | Stars | Icon)"},
+            {"value": "horizontal", "label": "Horizontal (Icon + Name/Stars)"}
+          ],
+          "default": "stacked"
+        },
+        {
+          "type": "header",
+          "content": "Google Reviews"
+        },
+        {
+          "type": "url",
+          "id": "google_reviews_url",
+          "label": "Google Reviews URL",
+          "info": "Direct link to your Google Reviews"
+        },
+        {
+          "type": "text",
+          "id": "google_rating",
+          "label": "Google Rating",
+          "info": "Enter rating like 4.9",
+          "placeholder": "4.9"
+        },
+        {
+          "type": "number",
+          "id": "google_count",
+          "label": "Google Review Count",
+          "placeholder": "127"
+        },
+        {
+          "type": "header",
+          "content": "Yelp Reviews"
+        },
+        {
+          "type": "url",
+          "id": "yelp_url",
+          "label": "Yelp Reviews URL"
+        },
+        {
+          "type": "text",
+          "id": "yelp_rating",
+          "label": "Yelp Rating",
+          "info": "Enter rating like 4.5",
+          "placeholder": "4.5"
+        },
+        {
+          "type": "number",
+          "id": "yelp_count",
+          "label": "Yelp Review Count",
+          "placeholder": "89"
+        },
+        {
+          "type": "header",
+          "content": "Facebook Reviews"
+        },
+        {
+          "type": "url",
+          "id": "facebook_url",
+          "label": "Facebook Reviews URL"
+        },
+        {
+          "type": "text",
+          "id": "facebook_rating",
+          "label": "Facebook Rating",
+          "info": "Enter rating like 4.8",
+          "placeholder": "4.8"
+        },
+        {
+          "type": "number",
+          "id": "facebook_count",
+          "label": "Facebook Review Count",
+          "placeholder": "42"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 4
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom Liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Custom Liquid"
+        },
+        {
+          "type": "range",
+          "id": "column",
+          "label": "Column",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 1
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["footer"]
+  }
 }
 {% endschema %}

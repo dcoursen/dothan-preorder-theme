@@ -1,0 +1,61 @@
+{% render 'preorder-display', 
+   show_when_available: block.settings.show_when_available, 
+   block: block %}
+
+{% comment %} Include Klaviyo BIS integration {% endcomment %}
+{% render 'klaviyo-bis-integration' %}
+
+{% schema %}
+{
+  "name": "Preorder Display",
+  "tag": "preorder-display-block",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Displays preorder information and pickup dates for products with preorder metafields. Shows 'Coming Soon' for future drop dates and 'Ready for Pickup' for available products."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_when_available",
+      "label": "Show when product is available for pickup",
+      "default": true,
+      "info": "Display pickup information even when the product is currently available (not coming soon)"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "Preorder Display",
+      "category": "Product",
+      "settings": {
+        "show_when_available": true,
+        "padding-block-start": 16,
+        "padding-block-end": 16
+      }
+    }
+  ]
+}
+{% endschema %}
