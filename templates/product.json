@@ -142,28 +142,6 @@
                   },
                   "blocks": {}
                 },
-                "savings_display_gXL6c9": {
-                  "type": "savings-display",
-                  "settings": {
-                    "label_text": "Multiple Pricing",
-                    "text_transform": "none",
-                    "label_font_weight": "600",
-                    "label_font_size": 14,
-                    "discount_font_weight": "400",
-                    "discount_font_size": 18,
-                    "inherit_color_scheme": true,
-                    "color_scheme": "",
-                    "background_color": "",
-                    "border_color": "",
-                    "icon_background_color": "",
-                    "icon_color": "",
-                    "text_color": "",
-                    "discount_text_color": "",
-                    "border_radius": 4,
-                    "icon_size": 16
-                  },
-                  "blocks": {}
-                },
                 "price_tVjtKg": {
                   "type": "price",
                   "settings": {
@@ -190,9 +168,30 @@
               "block_order": [
                 "text_xrnftG",
                 "preorder_display_6CByCG",
-                "savings_display_gXL6c9",
                 "price_tVjtKg"
               ]
+            },
+            "savings_display_gXL6c9": {
+              "type": "savings-display",
+              "settings": {
+                "label_text": "Multiple Pricing",
+                "text_transform": "none",
+                "label_font_weight": "600",
+                "label_font_size": 14,
+                "discount_font_weight": "400",
+                "discount_font_size": 18,
+                "inherit_color_scheme": true,
+                "color_scheme": "",
+                "background_color": "",
+                "border_color": "",
+                "icon_background_color": "",
+                "icon_color": "",
+                "text_color": "",
+                "discount_text_color": "",
+                "border_radius": 4,
+                "icon_size": 16
+              },
+              "blocks": {}
             },
             "divider_VJhene": {
               "type": "_divider",
@@ -309,6 +308,7 @@
           },
           "block_order": [
             "group_icgrde",
+            "savings_display_gXL6c9",
             "divider_VJhene",
             "variant_picker_Czrz7h",
             "buy_buttons_eYQEYi",

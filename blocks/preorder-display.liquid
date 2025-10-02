@@ -8,7 +8,7 @@
 {% schema %}
 {
   "name": "Preorder Display",
-  "tag": "preorder-display-block",
+  "tag": null,
   "settings": [
     {
       "type": "paragraph",
@@ -44,6 +44,26 @@
       "step": 4,
       "unit": "px",
       "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Left spacing",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Right spacing",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 24
     }
   ],
   "presets": [
@@ -53,7 +73,9 @@
       "settings": {
         "show_when_available": true,
         "padding-block-start": 16,
-        "padding-block-end": 16
+        "padding-block-end": 16,
+        "padding-inline-start": 24,
+        "padding-inline-end": 24
       }
     }
   ]

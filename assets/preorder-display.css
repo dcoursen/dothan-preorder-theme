@@ -2,12 +2,27 @@
 .preorder-display {
   width: 100%;
   display: block;
-  padding: var(--spacing-lg, 24px);
-  margin-bottom: var(--spacing-lg, 24px);
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
   transition: all 0.3s ease;
+
+  /* Apply padding from block settings with fallback defaults */
+  padding: var(--padding-block-start, 16px) var(--padding-inline-end, 24px)
+           var(--padding-block-end, 16px) var(--padding-inline-start, 24px);
+
+  /* Default CSS custom properties - can be overridden by inline styles from theme settings */
+  --preorder-bg-color: #f0f7f0;
+  --preorder-bg-gradient-end: #e8f4e8;
+  --preorder-bg-gradient-angle: 135deg;
+  --preorder-bg-opacity: 100%;
+  --preorder-border-width: 2px;
+  --preorder-border-style: solid;
+  --preorder-border-color: #4c7c4c;
+  --preorder-border-radius: 12px;
+  --preorder-icon-bg: #4c7c4c;
+  --preorder-icon-color: #ffffff;
+
   border-radius: var(--preorder-border-radius);
 }
 
@@ -232,21 +247,112 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Mobile optimizations */
-@media screen and (max-width: 640px) {
+/* Stage-specific default colors (can be overridden by inline styles from theme settings) */
+.preorder-display[data-preorder-status="predrop"] {
+  --preorder-badge-bg: #4c7c4c;
+  --preorder-badge-text: #ffffff;
+  --preorder-badge-ready-bg: #2d5a2d;
+  --preorder-title-color: #2d5a2d;
+  --preorder-message-color: #4c7c4c;
+  --preorder-note-color: #6ba46b;
+}
+
+.preorder-display[data-preorder-status="live"] {
+  --preorder-badge-bg: #2d5a2d;
+  --preorder-badge-text: #ffffff;
+  --preorder-badge-ready-bg: #2d5a2d;
+  --preorder-title-color: #2d5a2d;
+  --preorder-message-color: #4c7c4c;
+  --preorder-note-color: #6ba46b;
+}
+
+.preorder-display[data-preorder-status="soldout"] {
+  --preorder-badge-bg: #dc6565;
+  --preorder-badge-text: #ffffff;
+  --preorder-badge-ready-bg: #dc6565;
+  --preorder-title-color: #dc6565;
+  --preorder-message-color: #dc6565;
+  --preorder-note-color: #c85454;
+}
+
+.preorder-display[data-preorder-status="closed"] {
+  --preorder-badge-bg: #666666;
+  --preorder-badge-text: #ffffff;
+  --preorder-badge-ready-bg: #666666;
+  --preorder-title-color: #666666;
+  --preorder-message-color: #666666;
+  --preorder-note-color: #999999;
+}
+
+/* Mobile optimizations - Reduce spacing on mobile */
+@media screen and (max-width: 749px) {
   .preorder-display {
-    padding: var(--spacing-md, 16px);
-    gap: var(--spacing-sm, 12px);
+    /* Override spacing with mobile-friendly values */
+    padding: max(8px, calc(var(--padding-block-start, 16px) * 0.75))
+             max(12px, calc(var(--padding-inline-end, 24px) * 0.67))
+             max(8px, calc(var(--padding-block-end, 16px) * 0.75))
+             max(12px, calc(var(--padding-inline-start, 24px) * 0.67));
   }
-  
+
   .preorder-display__icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
-  
+
   .preorder-display__icon svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .preorder-display__icon-badge-row {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .preorder-display__title {
+    margin: 0 0 8px 0;
+    font-size: 1.125rem; /* Slightly smaller on mobile */
+  }
+
+  .preorder-display__message {
+    margin: 0 0 6px 0;
+    font-size: 0.875rem;
+  }
+
+  .preorder-display__message-section {
+    margin-bottom: 6px;
+  }
+
+  .preorder-display__pickup-info {
+    margin-bottom: 6px;
+  }
+
+  .preorder-display__note {
+    font-size: 0.75rem;
+  }
+
+  .preorder-display__countdown-section {
+    margin-top: 8px;
+  }
+}
+
+/* Extra small screens - more aggressive reduction */
+@media screen and (max-width: 480px) {
+  .preorder-display {
+    padding: max(6px, calc(var(--padding-block-start, 16px) * 0.5))
+             max(10px, calc(var(--padding-inline-end, 24px) * 0.5))
+             max(6px, calc(var(--padding-block-end, 16px) * 0.5))
+             max(10px, calc(var(--padding-inline-start, 24px) * 0.5));
+  }
+
+  .preorder-display__title {
+    font-size: 1rem;
+    margin: 0 0 6px 0;
+  }
+
+  .preorder-display__badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
   }
 }
 
