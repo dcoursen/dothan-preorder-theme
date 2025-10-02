@@ -8,7 +8,7 @@
   assign preorder_drop_date = product.metafields.custom.preorder_drop_date.value
   assign preorder_close_date = product.metafields.custom.preorder_close_date.value
   assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
-  assign pickup_duration_days = product.metafields.custom.pickup_duration_days | default: 14 | plus: 0
+  assign pickup_duration_days = product.metafields.custom.preorder_pickup_duration_days | default: 14 | plus: 0
   assign use_vague_pickup_date = product.metafields.custom.use_vague_pickup_date.value | default: false
 
   
@@ -276,18 +276,6 @@
   endcapture
 %}
 
-<!-- TEMP DEBUG - After fix -->
-<div style="background: green; color: white; padding: 10px; position: fixed; top: 0; left: 0; z-index: 9999; font-family: monospace;">
-  FIXED: duration={{ pickup_duration_days }}, pickup_end="{{ pickup_end_formatted }}"
-</div>
-
-<!-- Enhanced DEBUG -->
-<div style="background: blue; color: white; padding: 10px; position: fixed; top: 60px; left: 0; z-index: 9999; font-family: monospace; font-size: 12px;">
-  Metafield Raw: {{ product.metafields.custom.pickup_duration_days }}<br>
-  Metafield Value: {{ product.metafields.custom.pickup_duration_days.value }}<br>
-  Final Duration: {{ pickup_duration_days }} (type: {{ pickup_duration_days | type }})<br>
-  pickup_end_formatted = "{{ pickup_end_formatted }}"<br>
-</div>
 
 {%- if show_display -%}
   {%- comment -%}
