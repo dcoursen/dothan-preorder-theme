@@ -10,9 +10,17 @@
   assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
   assign pickup_duration_days = product.metafields.custom.preorder_pickup_duration_days | default: 14 | plus: 0
   assign use_vague_pickup_date = product.metafields.custom.use_vague_pickup_date.value | default: false
-  assign preorder_pickup_show_times = product.metafields.custom.preorder_pickup_show_times.value | default: true
+  assign preorder_pickup_show_times_raw = product.metafields.custom.preorder_pickup_show_times.value
+  if preorder_pickup_show_times_raw == blank
+    assign preorder_pickup_show_times = true
+  elsif preorder_pickup_show_times_raw == false
+    assign preorder_pickup_show_times = false
+  elsif preorder_pickup_show_times_raw == true
+    assign preorder_pickup_show_times = true
+  else
+    assign preorder_pickup_show_times = true
+  endif
 
-  
   # Get current time and timestamps
   assign now = 'now' | date: '%s'
   
@@ -152,10 +160,16 @@
       else
         # Use specific date system (existing logic)
         # Format pickup start date
-        capture pickup_date_formatted
-          render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup', show_times: preorder_pickup_show_times
-        endcapture
-        assign pickup_date_formatted = pickup_date_formatted | strip
+        if preorder_pickup_show_times_raw == false
+          # Format without time when show_times is false
+          assign pickup_date_formatted = preorder_pickup_start | date: '%B %-d'
+        else
+          # Format with time when show_times is true (default behavior)
+          capture pickup_date_formatted
+            render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup', show_times: true
+          endcapture
+          assign pickup_date_formatted = pickup_date_formatted | strip
+        endif
         
         # Calculate pickup end date using more reliable method
         # FIX: Override metafield if it's incorrect (metafield shows 14, but should be 10)
@@ -445,5 +459,6 @@
     </script>
   {%- endif -%}
 {%- endif -%}
+
 
 {{ 'preorder-display.css' | asset_url | stylesheet_tag }}
