@@ -165,10 +165,7 @@
           assign pickup_date_formatted = preorder_pickup_start | date: '%B %-d'
         else
           # Format with time when show_times is true (default behavior)
-          capture pickup_date_formatted
-            render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup', show_times: true
-          endcapture
-          assign pickup_date_formatted = pickup_date_formatted | strip
+          assign pickup_date_formatted = preorder_pickup_start | date: '%B %-d at %-l:%M%p'
         endif
         
         # Calculate pickup end date using more reliable method
@@ -253,7 +250,6 @@
         assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted
       else
         # For specific dates, show duration if more than 1 day
-        # DEBUG: pickup_duration_days={{ pickup_duration_days }}, use_vague={{ use_vague_pickup_date }}
         if pickup_duration_days > 1
           assign pickup_info_text = 'Pickup available ' | append: pickup_date_formatted | append: ' through ' | append: pickup_end_formatted
         else
