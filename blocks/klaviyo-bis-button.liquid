@@ -1,22 +1,18 @@
-{% render 'preorder-display',
-   show_when_available: block.settings.show_when_available,
-   block: block %}
+{% comment %}
+  Klaviyo Back in Stock Button Block
+  Follows Shopify spacing pattern and provides standalone positioning
+{% endcomment %}
+
+{% render 'klaviyo-bis-integration', block: block %}
 
 {% schema %}
 {
-  "name": "Preorder Display",
+  "name": "Back in Stock Button",
   "tag": null,
   "settings": [
     {
       "type": "paragraph",
-      "content": "Displays preorder information and pickup dates for products with preorder metafields. Shows 'Coming Soon' for future drop dates and 'Ready for Pickup' for available products."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_when_available",
-      "label": "Show when product is available for pickup",
-      "default": true,
-      "info": "Display pickup information even when the product is currently available (not coming soon)"
+      "content": "Displays a 'Get Early Access' or 'Notify When Back in Stock' button for sold-out products with Klaviyo integration."
     },
     {
       "type": "header",
@@ -50,7 +46,7 @@
       "max": 100,
       "step": 4,
       "unit": "px",
-      "default": 24
+      "default": 0
     },
     {
       "type": "range",
@@ -60,20 +56,13 @@
       "max": 100,
       "step": 4,
       "unit": "px",
-      "default": 24
+      "default": 0
     }
   ],
   "presets": [
     {
-      "name": "Preorder Display",
-      "category": "Product",
-      "settings": {
-        "show_when_available": true,
-        "padding-block-start": 16,
-        "padding-block-end": 16,
-        "padding-inline-start": 24,
-        "padding-inline-end": 24
-      }
+      "name": "Back in Stock Button",
+      "category": "Product"
     }
   ]
 }

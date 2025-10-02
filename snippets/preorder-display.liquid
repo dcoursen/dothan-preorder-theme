@@ -10,6 +10,7 @@
   assign preorder_pickup_start = product.metafields.custom.preorder_pickup_start.value
   assign pickup_duration_days = product.metafields.custom.preorder_pickup_duration_days | default: 14 | plus: 0
   assign use_vague_pickup_date = product.metafields.custom.use_vague_pickup_date.value | default: false
+  assign preorder_pickup_show_times = product.metafields.custom.preorder_pickup_show_times.value | default: true
 
   
   # Get current time and timestamps
@@ -97,7 +98,7 @@
     if preorder_drop_date != blank
       assign drop_date_formatted = ''
       capture drop_date_formatted
-        render 'smart-date-formatter', date: preorder_drop_date, format_type: settings.preorder_date_format, context: 'drop'
+        render 'smart-date-formatter', date: preorder_drop_date, format_type: settings.preorder_date_format, context: 'drop', show_times: true
       endcapture
       assign drop_date_formatted = drop_date_formatted | strip
     endif
@@ -152,7 +153,7 @@
         # Use specific date system (existing logic)
         # Format pickup start date
         capture pickup_date_formatted
-          render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup'
+          render 'smart-date-formatter', date: preorder_pickup_start, format_type: settings.preorder_date_format, context: 'pickup', show_times: preorder_pickup_show_times
         endcapture
         assign pickup_date_formatted = pickup_date_formatted | strip
         
@@ -176,7 +177,7 @@
         
         # Format end date (without time for "through" display)
         capture pickup_end_formatted
-          render 'smart-date-formatter', date: pickup_end_date_string, format_type: settings.preorder_date_format, context: 'pickup_end'
+          render 'smart-date-formatter', date: pickup_end_date_string, format_type: settings.preorder_date_format, context: 'pickup_end', show_times: false
         endcapture
         assign pickup_end_formatted = pickup_end_formatted | strip
         
@@ -188,7 +189,7 @@
     assign close_date_formatted = ''
     if preorder_close_date != blank
       capture close_date_formatted
-        render 'smart-date-formatter', date: preorder_close_date, format_type: settings.preorder_date_format, context: 'close'
+        render 'smart-date-formatter', date: preorder_close_date, format_type: settings.preorder_date_format, context: 'close', show_times: true
       endcapture
       assign close_date_formatted = close_date_formatted | strip
     endif

@@ -6,6 +6,7 @@
   - date: The date to format
   - format_type: 'relative', 'month_day', 'mm_dd', 'dd_mm', 'full'
   - context: 'drop', 'pickup', 'close' (for different messaging contexts)
+  - show_times: true/false - whether to include time in the output (defaults to true)
 {%- endcomment -%}
 
 {%- liquid
@@ -14,6 +15,11 @@
   assign target_timestamp = target_date | date: '%s'
   assign days_diff = target_timestamp | minus: now | divided_by: 86400
   assign formatted_date = ''
+
+  # Default show_times to true if not specified
+  if show_times == blank
+    assign show_times = true
+  endif
   
   case format_type
     when 'relative'
@@ -25,21 +31,36 @@
       
       # Check if it's today
       if target_date_only == today_date
-        assign time_part = target_date | date: '%l:%M%p'
-        case context
-          when 'drop'
-            assign formatted_date = 'Dropping Today at ' | append: time_part
-          when 'pickup'
-            assign formatted_date = 'Pickup starts today at ' | append: time_part
-          when 'pickup_end'
-            assign formatted_date = 'Today'
-          when 'close'
-            assign formatted_date = 'Closes today at ' | append: time_part
-          else
-            assign formatted_date = 'Today at ' | append: time_part
-        endcase
+        if show_times
+          assign time_part = target_date | date: '%l:%M%p'
+          case context
+            when 'drop'
+              assign formatted_date = 'Dropping Today at ' | append: time_part
+            when 'pickup'
+              assign formatted_date = 'Pickup starts today at ' | append: time_part
+            when 'pickup_end'
+              assign formatted_date = 'Today'
+            when 'close'
+              assign formatted_date = 'Closes today at ' | append: time_part
+            else
+              assign formatted_date = 'Today at ' | append: time_part
+          endcase
+        else
+          case context
+            when 'drop'
+              assign formatted_date = 'Dropping Today'
+            when 'pickup'
+              assign formatted_date = 'Pickup starts today'
+            when 'pickup_end'
+              assign formatted_date = 'Today'
+            when 'close'
+              assign formatted_date = 'Closes today'
+            else
+              assign formatted_date = 'Today'
+          endcase
+        endif
       elsif days_diff == 1
-        if context == 'pickup_end'
+        if context == 'pickup_end' or show_times == false
           assign formatted_date = 'Tomorrow'
         else
           assign time_part = target_date | date: '%l:%M%p'
@@ -51,8 +72,8 @@
         assign target_day_name = target_date | date: '%A'
         assign time_part = target_date | date: '%l:%M%p'
         
-        if context == 'pickup_end'
-          # No time for pickup end dates
+        if context == 'pickup_end' or show_times == false
+          # No time for pickup end dates or when show_times is false
           if weeks_diff == 0
             # Same week
             if target_weekday > today_weekday
@@ -65,7 +86,8 @@
             assign formatted_date = 'Next ' | append: target_day_name
           endif
         else
-          # Include time for other contexts
+          # Include time for other contexts when show_times is true
+          assign time_part = target_date | date: '%l:%M%p'
           if weeks_diff == 0
             # Same week
             if target_weekday > today_weekday
@@ -82,8 +104,8 @@
         # More than 2 weeks out - use month/day format with single digits
         assign month_name = target_date | date: '%B'
         assign day_num = target_date | date: '%e' | strip
-        if context == 'pickup_end'
-          # No time for pickup end dates
+        if context == 'pickup_end' or show_times == false
+          # No time for pickup end dates or when show_times is false
           assign formatted_date = month_name | append: ' ' | append: day_num
         else
           assign time_part = target_date | date: '%l:%M%p'
@@ -113,8 +135,12 @@
       # Full format with single digit day
       assign month_name = target_date | date: '%B'
       assign day_num = target_date | date: '%e' | strip
-      assign time_part = target_date | date: '%l:%M%p %Z'
-      assign formatted_date = month_name | append: ' ' | append: day_num | append: ' at ' | append: time_part
+      if show_times
+        assign time_part = target_date | date: '%l:%M%p %Z'
+        assign formatted_date = month_name | append: ' ' | append: day_num | append: ' at ' | append: time_part
+      else
+        assign formatted_date = month_name | append: ' ' | append: day_num
+      endif
       
     else
       # Default to month_day with single digits

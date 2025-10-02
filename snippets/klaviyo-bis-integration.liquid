@@ -66,7 +66,9 @@
 -%}
 
 <!-- Debug: Product ID = {{ target_product.id }}, Inventory = {{ inventory_quantity }}, Available = {{ product_available }} -->
-<div id="preorder-bis-container" 
+<div id="preorder-bis-container"
+     class="spacing-style"
+     style="{% if block %}{% render 'spacing-padding', settings: block.settings %}{% endif %}"
      data-product-id="{{ target_product.id }}"
      data-has-preorder="{{ has_future_preorder }}"
      data-preorder-text="{{ preorder_text | escape }}"
@@ -172,8 +174,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     button.addEventListener('click', function() {
       console.log('BIS button clicked, trying to open Klaviyo form:', formId);
-      
-      // Method 1: Try _learnq with multiple commands
+
+      // Method 1: Modern Klaviyo API
+      if (typeof window.klaviyo !== 'undefined' && formId) {
+        try {
+          // Track the event first
+          window.klaviyo.push(['track', 'Requested Back in Stock', {
+            'item': '{{ target_product.title | escape }}',
+            'variant': '{{ target_variant.title | escape }}',
+            'product_id': '{{ target_product.id }}',
+            'variant_id': '{{ target_variant.id }}'
+          }]);
+
+          // Show the form using modern method
+          window.klaviyo.push(['openForm', formId]);
+          console.log('Called klaviyo.openForm with ID:', formId);
+          return; // Exit if successful
+
+        } catch (e) {
+          console.log('Modern klaviyo method failed:', e);
+        }
+      }
+
+      // Method 2: Legacy _learnq fallback
       if (typeof window._learnq !== 'undefined' && window._learnq.push && formId) {
         try {
           // Track the event first
@@ -183,28 +206,14 @@ document.addEventListener('DOMContentLoaded', function() {
             'product_id': '{{ target_product.id }}',
             'variant_id': '{{ target_variant.id }}'
           }]);
-          
-          // Then show the form - try multiple methods
+
+          // Show the form
           window._learnq.push(['showForm', formId]);
           console.log('Called _learnq.showForm with ID:', formId);
-          
-          // Alternative method for showing forms
-          window._learnq.push(['identify', {}]);
-          window._learnq.push(['showForm', formId]);
-          
+          return; // Exit if successful
+
         } catch (e) {
           console.log('_learnq methods failed:', e);
-        }
-      }
-      
-      // Method 2: Try klaviyo global object with different commands
-      if (typeof window.klaviyo !== 'undefined' && window.klaviyo.push && formId) {
-        try {
-          window.klaviyo.push(['openForm', formId]);
-          window.klaviyo.push(['showForm', formId]); 
-          console.log('Called klaviyo showForm/openForm with ID:', formId);
-        } catch (e) {
-          console.log('klaviyo methods failed:', e);
         }
       }
       
@@ -252,13 +261,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }, 500);
       
-      // Debug info
+      // Method 3: Alert user if no Klaviyo integration found
+      console.warn('No Klaviyo integration found! Form ID:', formId);
       console.log('Klaviyo debug info:', {
         _learnq: typeof window._learnq,
         klaviyo: typeof window.klaviyo,
         formId: formId,
         allKlaviyoGlobals: Object.keys(window).filter(key => key.toLowerCase().includes('klaviyo'))
       });
+
+      // Show user-friendly message
+      alert('Klaviyo form not available. Please check the form ID configuration or contact support.');
     });
     
     bisDiv.appendChild(button);
@@ -302,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .klaviyo-bis-button-container {
-  margin: 16px 0;
   width: 100%;
   display: block;
 }
