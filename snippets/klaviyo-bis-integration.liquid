@@ -172,8 +172,93 @@ document.addEventListener('DOMContentLoaded', function() {
     button.className = 'klaviyo-bis-button';
     button.textContent = buttonText;
     
+    // Helper function to auto-check promotional marketing checkboxes for both email and SMS forms
+    function autoCheckPromotionalCheckbox() {
+      // Use MutationObserver to detect when Klaviyo forms are added to DOM
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          mutation.addedNodes.forEach(function(node) {
+            // Check if this is a Klaviyo form element
+            if (node.nodeType === 1 && (
+              node.classList && (
+                node.classList.contains('klaviyo-form') ||
+                node.classList.contains('kl-private-reset-css') ||
+                node.id && node.id.includes('klaviyo') ||
+                node.querySelector && (
+                  node.querySelector('[class*="klaviyo"]') ||
+                  node.querySelector('[data-testid*="klaviyo"]') ||
+                  node.querySelector('[class*="kl-private"]')
+                )
+              )
+            )) {
+              // Wait a moment for form to fully render
+              setTimeout(function() {
+                let checkedCount = 0;
+
+                // Direct ID-based selectors for promotional checkboxes
+                const directSelectors = [
+                  'input[id*="opt_in_promotional_email"]',
+                  'input[id*="opt_in_promotional_sms"]',
+                  'input[id*="opt_in_marketing"]',
+                  'input[id*="promotional"]',
+                  'input[id*="marketing"][type="checkbox"]',
+                  'input[id*="consent"][type="checkbox"]'
+                ];
+
+                // Try direct ID-based approach first
+                directSelectors.forEach(function(selector) {
+                  const checkboxes = document.querySelectorAll(selector);
+                  checkboxes.forEach(function(checkbox) {
+                    if (!checkbox.checked) {
+                      checkbox.checked = true;
+                      checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                      checkbox.dispatchEvent(new Event('click', { bubbles: true }));
+                      checkbox.dispatchEvent(new Event('input', { bubbles: true }));
+                      checkedCount++;
+                    }
+                  });
+                });
+
+                // Fallback: search all non-required checkboxes with content analysis
+                if (checkedCount === 0) {
+                  const allCheckboxes = document.querySelectorAll('input[type="checkbox"]:not([required])');
+                  allCheckboxes.forEach(function(checkbox) {
+                    if (!checkbox.checked) {
+                      const form = checkbox.closest('form') || checkbox.closest('[class*="klaviyo"]') || checkbox.closest('[data-testid*="form"]');
+                      const contextText = form ? form.textContent.toLowerCase() : '';
+
+                      if (contextText.includes('promotional') ||
+                          contextText.includes('marketing emails') ||
+                          contextText.includes('marketing texts') ||
+                          contextText.includes('also receive') ||
+                          contextText.includes('sms updates')) {
+                        checkbox.checked = true;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        checkbox.dispatchEvent(new Event('click', { bubbles: true }));
+                        checkedCount++;
+                      }
+                    }
+                  });
+                }
+              }, 500); // Wait 500ms for form to render (increased for better reliability)
+            }
+          });
+        });
+      });
+
+      // Start observing the entire document for new nodes
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      // Stop observing after 10 seconds (forms should be loaded by then)
+      setTimeout(function() {
+        observer.disconnect();
+      }, 10000);
+    }
+
     button.addEventListener('click', function() {
-      console.log('BIS button clicked, trying to open Klaviyo form:', formId);
 
       // Method 1: Modern Klaviyo API
       if (typeof window.klaviyo !== 'undefined' && formId) {
@@ -188,11 +273,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
           // Show the form using modern method
           window.klaviyo.push(['openForm', formId]);
-          console.log('Called klaviyo.openForm with ID:', formId);
+          // Auto-check promotional checkbox when form loads
+          autoCheckPromotionalCheckbox();
           return; // Exit if successful
 
         } catch (e) {
-          console.log('Modern klaviyo method failed:', e);
+          // Silent fallback to next method
         }
       }
 
@@ -209,11 +295,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
           // Show the form
           window._learnq.push(['showForm', formId]);
-          console.log('Called _learnq.showForm with ID:', formId);
+          // Auto-check promotional checkbox when form loads
+          autoCheckPromotionalCheckbox();
           return; // Exit if successful
 
         } catch (e) {
-          console.log('_learnq methods failed:', e);
+          // Silent fallback to next method
         }
       }
       
@@ -251,27 +338,10 @@ document.addEventListener('DOMContentLoaded', function() {
           klaviyoForm.removeAttribute('hidden');
           klaviyoForm.classList.remove('hidden');
           
-          console.log('Force displayed Klaviyo form');
-        } else {
-          console.log('No Klaviyo form found in DOM');
-          
-          // Debug: log all elements that might be Klaviyo-related
-          var allKlaviyoElements = document.querySelectorAll('[class*="klaviyo"], [id*="klaviyo"], [data-testid*="klaviyo"]');
-          console.log('All Klaviyo-related elements found:', allKlaviyoElements);
+          // Auto-check promotional checkbox when form loads
+          autoCheckPromotionalCheckbox();
         }
       }, 500);
-      
-      // Method 3: Alert user if no Klaviyo integration found
-      console.warn('No Klaviyo integration found! Form ID:', formId);
-      console.log('Klaviyo debug info:', {
-        _learnq: typeof window._learnq,
-        klaviyo: typeof window.klaviyo,
-        formId: formId,
-        allKlaviyoGlobals: Object.keys(window).filter(key => key.toLowerCase().includes('klaviyo'))
-      });
-
-      // Show user-friendly message
-      alert('Klaviyo form not available. Please check the form ID configuration or contact support.');
     });
     
     bisDiv.appendChild(button);
